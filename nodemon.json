@@ -1,0 +1,22 @@
+{
+  "verbose": false,
+  "stdin": false,
+  "stdout": false,
+  "events": {
+    "start": "cls || clear"
+  },
+  "watch": [
+    "node_modules/**/*",
+    ".babelrc",
+    ".env.development.local",
+    "craco.config.js",
+    "nodemon.json",
+    "yarn.lock"
+  ],
+  "ignore": [
+    "public/**/*",
+    "src/**/*",
+    "package.json",
+    "tsconfig.json"
+  ]
+}

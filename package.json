@@ -1,0 +1,72 @@
+{
+  "name": "zhijian-packing-pc",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "@ant-design/icons": "^4.2.1",
+    "@hot-loader/react-dom": "^16.13.0",
+    "@loadable/component": "^5.12.0",
+    "@rematch/core": "^1.4.0",
+    "@rematch/loading": "^1.2.1",
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.3.2",
+    "@testing-library/user-event": "^7.1.2",
+    "@types/jest": "^24.0.0",
+    "@types/node": "^12.0.0",
+    "@types/react": "^16.9.0",
+    "@types/react-dom": "^16.9.0",
+    "antd": "^4.3.5",
+    "axios": "^0.19.2",
+    "classnames": "^2.2.6",
+    "dayjs": "^1.8.28",
+    "localforage": "^1.7.4",
+    "nprogress": "^0.2.0",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-redux": "^7.2.0",
+    "react-router-dom": "^5.2.0",
+    "react-scripts": "3.4.1",
+    "redux-persist": "^6.0.0",
+    "rematch-immer-combine-persist": "^1.0.2",
+    "typescript": "~3.7.2"
+  },
+  "scripts": {
+    "start": "nodemon --exec \"craco start\"",
+    "build": "craco build",
+    "test": "craco test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@babel/plugin-syntax-dynamic-import": "^7.8.3",
+    "@craco/craco": "^5.6.4",
+    "@types/classnames": "^2.2.10",
+    "@types/loadable__component": "^5.10.0",
+    "@types/nprogress": "^0.2.0",
+    "@types/react-redux": "^7.1.9",
+    "@types/react-router-dom": "^5.1.5",
+    "@types/redux-persist": "^4.3.1",
+    "antd-dayjs-webpack-plugin": "^1.0.0",
+    "craco-antd": "^1.18.1",
+    "craco-less": "^1.17.0",
+    "craco-plugin-react-hot-reload": "^0.1.0",
+    "nodemon": "^2.0.4",
+    "react-hot-loader": "^4.12.21",
+    "webpack-bundle-analyzer": "^3.8.0",
+    "webpackbar": "^4.0.0"
+  }
+}

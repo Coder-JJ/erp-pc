@@ -1,0 +1,33 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+
+  .header {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    background-color: #fff;
+    border-radius: 4px;
+
+    .input {
+      width: 200px;
+      margin-left: 8px;
+    }
+
+    .search {
+      margin-left: 20px;
+    }
+  }
+
+  .footer {
+    flex-grow: 1;
+    padding: 12px;
+    margin-top: 12px;
+    background-color: #fff;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+}

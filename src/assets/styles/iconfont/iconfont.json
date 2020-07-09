@@ -1,0 +1,93 @@
+{
+  "id": "1905865",
+  "name": "zhijian-packing",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "3702975",
+      "name": "其他出库单审批",
+      "font_class": "qtckdsp",
+      "unicode": "e655",
+      "unicode_decimal": 58965
+    },
+    {
+      "icon_id": "3702977",
+      "name": "其他出库单",
+      "font_class": "qtckd",
+      "unicode": "e656",
+      "unicode_decimal": 58966
+    },
+    {
+      "icon_id": "3702979",
+      "name": "入库单审批",
+      "font_class": "rkdsp",
+      "unicode": "e657",
+      "unicode_decimal": 58967
+    },
+    {
+      "icon_id": "3702980",
+      "name": "其他入库单审批",
+      "font_class": "qtrkdsp",
+      "unicode": "e658",
+      "unicode_decimal": 58968
+    },
+    {
+      "icon_id": "3702981",
+      "name": "其他入库单",
+      "font_class": "qtrkd",
+      "unicode": "e659",
+      "unicode_decimal": 58969
+    },
+    {
+      "icon_id": "3702984",
+      "name": "入库单",
+      "font_class": "rkd",
+      "unicode": "e65b",
+      "unicode_decimal": 58971
+    },
+    {
+      "icon_id": "3702988",
+      "name": "材料出库单",
+      "font_class": "clckd",
+      "unicode": "e65c",
+      "unicode_decimal": 58972
+    },
+    {
+      "icon_id": "3702992",
+      "name": "材料出库单审批",
+      "font_class": "clckdsp",
+      "unicode": "e65d",
+      "unicode_decimal": 58973
+    },
+    {
+      "icon_id": "3702993",
+      "name": "采购入库单",
+      "font_class": "cgrkd",
+      "unicode": "e65e",
+      "unicode_decimal": 58974
+    },
+    {
+      "icon_id": "3702995",
+      "name": "出库单审批",
+      "font_class": "ckdsp",
+      "unicode": "e65f",
+      "unicode_decimal": 58975
+    },
+    {
+      "icon_id": "3702994",
+      "name": "出库单",
+      "font_class": "ckd",
+      "unicode": "e65a",
+      "unicode_decimal": 58970
+    },
+    {
+      "icon_id": "1403058",
+      "name": "包装箱",
+      "font_class": "package",
+      "unicode": "e77f",
+      "unicode_decimal": 59263
+    }
+  ]
+}
