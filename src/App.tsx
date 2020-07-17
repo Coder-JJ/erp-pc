@@ -1,7 +1,7 @@
 import styles from './App.less'
 import { hot } from 'react-hot-loader/root'
-import React, { useCallback, useState, useEffect } from 'react'
-import { Switch, Route, useHistory } from 'react-router-dom'
+import React, { useCallback, useMemo } from 'react'
+import { Switch, Route, useHistory, useLocation, Redirect } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { ConfigProvider, Layout, Menu } from 'antd'
 import zhCN from 'antd/es/locale/zh_CN'
@@ -26,12 +26,14 @@ const menus: MenuType[] = [
 
 function App () {
   const { menuCollapsed } = useSelector((store: RootState) => store.app)
-  const loading = useSelector((store: any) => store.loading.global)
+
   const dispatch = useDispatch<Dispatch>()
   const toggleMenu = useCallback(() => dispatch.app.toggleMenuCollapsed(), [dispatch.app])
   const history = useHistory()
-  console.log('loading', loading)
   const onClickMenu = useCallback((path: string) => history.push(path), [history])
+
+  const location = useLocation()
+  const menuSelectedKeys = useMemo(() => [location.pathname], [location.pathname])
 
   return (
     <ConfigProvider locale={zhCN}>
@@ -40,7 +42,7 @@ function App () {
           <div className={classNames(styles.logo, { [styles.collapsed]: menuCollapsed })}>
             <div>{ !menuCollapsed && '志坚包装' }</div>
           </div>
-          <Menu className={styles.menus} theme="dark" mode="inline" defaultSelectedKeys={['1']}>
+          <Menu className={styles.menus} theme="dark" mode="inline" selectedKeys={menuSelectedKeys}>
             {
               menus.map(({ path, name, icon }) => {
                 const menuIcon = (
@@ -60,18 +62,17 @@ function App () {
           <Content className={styles.content}>
             <div className={styles.view}>
               <Switch>
-                <Route>
-                  {
-                    menus.map(({ path, page }) => {
-                      const Page = (pages as { [key: string]: React.ComponentType<any> })[page]
-                      return (
-                        <Route key={path} path={path} exact strict sensitive>
-                          <Page />
-                        </Route>
-                      )
-                    })
-                  }
-                </Route>
+                {
+                  menus.map(({ path, page }) => {
+                    const Page = (pages as { [key: string]: React.ComponentType<any> })[page]
+                    return (
+                      <Route key={path} path={path} exact strict sensitive>
+                        <Page />
+                      </Route>
+                    )
+                  })
+                }
+                { !!menus.length && <Redirect from='/' to={menus[0].path} /> }
               </Switch>
             </div>
           </Content>

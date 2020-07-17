@@ -7,10 +7,17 @@ import { RootModel, models } from './models'
 const store = init({
   models,
   plugins: [
+    loading(),
     immerWithPersist({
-      storage
-    }),
-    loading()
+      immerOptions: {
+        blacklist: ['loading']
+      },
+      persistOptions: {
+        persistConfig: {
+          storage
+        }
+      }
+    })
   ]
 })
 

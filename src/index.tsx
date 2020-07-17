@@ -8,23 +8,18 @@ import { BrowserRouter } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import { getPersistor } from 'rematch-immer-combine-persist'
 import { PersistGate } from 'redux-persist/integration/react'
-import { request } from './libs'
 import store from './rematch'
 import App from './App'
 import * as serviceWorker from './serviceWorker'
 
-request.post('/login/userLogin', { user: 'admin', password: '123456' })
-
 ReactDOM.render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <Provider store={store}>
-        <PersistGate persistor={getPersistor()}>
-          <App />
-        </PersistGate>
-      </Provider>
-    </BrowserRouter>
-  </React.StrictMode>,
+  <BrowserRouter>
+    <Provider store={store}>
+      <PersistGate persistor={getPersistor()}>
+        <App />
+      </PersistGate>
+    </Provider>
+  </BrowserRouter>,
   document.getElementById('root')
 )
 

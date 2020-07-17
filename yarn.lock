@@ -10130,14 +10130,13 @@ relateurl@^0.2.7:
   resolved "https://registry.yarnpkg.com/relateurl/-/relateurl-0.2.7.tgz#54dbf377e51440aca90a4cd274600d3ff2d888a9"
   integrity sha1-VNvzd+UUQKypCkzSdGANP/LYiKk=
 
-rematch-immer-combine-persist@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.npm.taobao.org/rematch-immer-combine-persist/download/rematch-immer-combine-persist-1.0.2.tgz#d0096f0d78f9b463d2782d9366f6b3411703310c"
-  integrity sha1-0AlvDXj5tGPSeC2TZvazQRcDMQw=
+rematch-immer-combine-persist@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.npm.taobao.org/rematch-immer-combine-persist/download/rematch-immer-combine-persist-2.0.0.tgz#b6b519a2b54ac76e14f36b1fc91892831b1c771a"
+  integrity sha1-trUZorVKx24U82sfyRiSgxscdxo=
   dependencies:
     "@rematch/core" "^1.4.0"
     immer "^7.0.5"
-    redux "^4.0.5"
     redux-persist "^6.0.0"
 
 remove-trailing-separator@^1.0.1:

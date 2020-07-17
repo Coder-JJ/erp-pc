@@ -1,10 +1,6 @@
-import { type } from "os"
-
 export interface State {
   menuCollapsed: boolean
 }
-
-export type Dispatch = {}
 
 export const app = {
   state: {
@@ -17,14 +13,9 @@ export const app = {
       }
       return state
     },
-    test (state: State): State {
+    toggleMenuCollapsed (state: State): State {
       state.menuCollapsed = !state.menuCollapsed
       return state
     }
-  },
-  effects: (dispatch: any) => ({
-    toggleMenuCollapsed () {
-      (dispatch.app as any).test()
-    }
-  })
+  }
 }

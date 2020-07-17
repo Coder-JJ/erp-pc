@@ -1,13 +1,8 @@
 import styles from './index.less'
-import React, { useEffect } from 'react'
+import React from 'react'
 import { Table, Input, Button } from 'antd'
-import { request } from '../../libs'
 
 const CheckOut: React.FC = function () {
-  useEffect(() => {
-    request.post('/order/selectByKeyword')
-  }, [])
-
   return (
     <div className={styles.wrap}>
       <header className={styles.header}>
