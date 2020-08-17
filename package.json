@@ -8,10 +8,6 @@
     "@loadable/component": "^5.12.0",
     "@rematch/core": "^1.4.0",
     "@rematch/loading": "^1.2.1",
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.3.2",
-    "@testing-library/user-event": "^7.1.2",
-    "@types/jest": "^24.0.0",
     "@types/node": "^12.0.0",
     "@types/react": "^16.9.0",
     "@types/react-dom": "^16.9.0",
@@ -32,11 +28,7 @@
   "scripts": {
     "start": "nodemon --exec \"craco start\"",
     "build": "craco build",
-    "test": "craco test",
     "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": "react-app"
   },
   "browserslist": {
     "production": [
@@ -63,6 +55,11 @@
     "craco-antd": "^1.18.1",
     "craco-less": "^1.17.0",
     "craco-plugin-react-hot-reload": "^0.1.0",
+    "eslint": "^7.7.0",
+    "eslint-plugin-jun": "^1.0.1",
+    "eslint-plugin-react-hooks": "^4.0.8",
+    "husky": "^4.2.5",
+    "lint-staged": "^10.2.11",
     "nodemon": "^2.0.4",
     "react-hot-loader": "^4.12.21",
     "webpack-bundle-analyzer": "^3.8.0",

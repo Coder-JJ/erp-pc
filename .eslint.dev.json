@@ -1,0 +1,14 @@
+{
+  "plugins": [
+    "jun"
+  ],
+  "extends": [
+    "plugin:jun/ts-dev",
+    "plugin:jun/react-dev"
+  ],
+  "rules": {
+    "no-param-reassign": [1, { "props": true, "ignorePropertyModificationsFor": ["state"] }],
+    "react/no-multi-comp": 0,
+    "react/prop-types": 0
+  }
+}

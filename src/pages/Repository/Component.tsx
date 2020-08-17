@@ -2,7 +2,7 @@ import styles from './index.less'
 import React from 'react'
 import { Table, Input } from 'antd'
 
-const CheckOut: React.FC = function () {
+const Repository: React.FC = function () {
   return (
     <div className={styles.wrap}>
       <header className={styles.header}>
@@ -16,4 +16,4 @@ const CheckOut: React.FC = function () {
   )
 }
 
-export default React.memo(CheckOut)
+export default React.memo(Repository)

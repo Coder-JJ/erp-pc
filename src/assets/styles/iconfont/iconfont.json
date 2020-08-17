@@ -6,6 +6,34 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "3702630",
+      "name": "字典管理",
+      "font_class": "navicon-zdgl",
+      "unicode": "e641",
+      "unicode_decimal": 58945
+    },
+    {
+      "icon_id": "3702924",
+      "name": "供应商档案",
+      "font_class": "navicon-gysda",
+      "unicode": "e64d",
+      "unicode_decimal": 58957
+    },
+    {
+      "icon_id": "3702996",
+      "name": "仓库档案设置",
+      "font_class": "navicon-ckdasz",
+      "unicode": "e660",
+      "unicode_decimal": 58976
+    },
+    {
+      "icon_id": "3734025",
+      "name": "库存分类",
+      "font_class": "navicon-kcfl",
+      "unicode": "e674",
+      "unicode_decimal": 58996
+    },
+    {
       "icon_id": "3702975",
       "name": "其他出库单审批",
       "font_class": "qtckdsp",

@@ -1,0 +1,3 @@
+{
+  "src/**/*.{js,jsx,ts,tsx}": "npx eslint -c ./.eslint.prod.json"
+}

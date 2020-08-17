@@ -1,0 +1,14 @@
+{
+  "plugins": [
+    "jun"
+  ],
+  "extends": [
+    "plugin:jun/ts-prod",
+    "plugin:jun/react-prod"
+  ],
+  "rules": {
+    "no-param-reassign": [2, { "props": true, "ignorePropertyModificationsFor": ["state"] }],
+    "react/no-multi-comp": 0,
+    "react/prop-types": 0
+  }
+}

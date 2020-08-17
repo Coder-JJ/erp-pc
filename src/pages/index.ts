@@ -1,2 +1,5 @@
+export { default as Supplier } from './Supplier'
+export { default as Repository } from './Repository'
+export { default as Stock } from './Stock'
 export { default as CheckIn } from './CheckIn'
 export { default as CheckOut } from './CheckOut'

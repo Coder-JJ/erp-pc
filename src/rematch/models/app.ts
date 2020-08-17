@@ -17,5 +17,6 @@ export const app = {
       state.menuCollapsed = !state.menuCollapsed
       return state
     }
-  }
+  },
+  effects: {}
 }
