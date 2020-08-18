@@ -61,7 +61,12 @@
     "husky": "^4.2.5",
     "lint-staged": "^10.2.11",
     "nodemon": "^2.0.4",
+    "prettier": "^2.0.5",
     "react-hot-loader": "^4.12.21",
+    "stylelint": "^13.6.1",
+    "stylelint-config-prettier": "^8.0.2",
+    "stylelint-prettier": "^1.1.2",
+    "stylelint-webpack-plugin": "^2.1.0",
     "webpack-bundle-analyzer": "^3.8.0",
     "webpackbar": "^4.0.0"
   }

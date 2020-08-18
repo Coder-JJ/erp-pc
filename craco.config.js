@@ -1,13 +1,14 @@
 const path = require('path')
 const WebpackBar = require('webpackbar')
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
+const StylelintPlugin = require('stylelint-webpack-plugin')
 const LessPlugin = require('craco-less')
 const ReactHotReloadPlugin = require('craco-plugin-react-hot-reload')
 const AntDesignPlugin = require('craco-antd')
 const AntdDayjsWebpackPlugin = require('antd-dayjs-webpack-plugin')
-const packageName = require('./package.json').name;
+const packageName = require('./package.json').name
 
-module.exports = function () {
+module.exports = function ({ env }) {
   return {
     webpack: {
       configure: {
@@ -20,18 +21,21 @@ module.exports = function () {
       plugins: [
         new WebpackBar({ profile: true }),
         ...(process.env.NODE_ENV === 'development' ? [new BundleAnalyzerPlugin({ openAnalyzer: false })] : []),
+        new StylelintPlugin({
+          files: 'src/**/*.(c|le)ss'
+        }),
         new AntdDayjsWebpackPlugin()
       ]
     },
     eslint: {
       mode: "file",
-      loaderOptions (eslintOptions, context) {
+      loaderOptions (eslintOptions) {
         return {
           ...eslintOptions,
           cache: false,
           resolvePluginsRelativeTo: path.resolve(__dirname, './node_modules'),
           eslintPath: require.resolve('eslint'),
-          configFile: path.resolve(__dirname, './.eslint.dev.json'),
+          configFile: path.resolve(__dirname, env === 'production' ? './.eslintrc.prod.json' : './.eslintrc.json'),
           ignore: true,
           ignorePath: path.resolve(__dirname, './.eslintignore')
         }

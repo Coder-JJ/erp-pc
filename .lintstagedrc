@@ -1,3 +1,8 @@
 {
-  "src/**/*.{js,jsx,ts,tsx}": "npx eslint -c ./.eslint.prod.json"
+  "src/**/*.{js,jsx,ts,tsx}": [
+    "npx eslint -c ./.eslintrc.prod.json"
+  ],
+  "src/**/*.{css,less}": [
+    "npx stylelint"
+  ]
 }
