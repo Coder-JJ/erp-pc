@@ -1,8 +1,9 @@
 {
   "src/**/*.{js,jsx,ts,tsx}": [
-    "npx eslint -c ./.eslintrc.prod.json"
+    "npx eslint -c ./.eslintrc.prod.json --fix"
   ],
   "src/**/*.{css,less}": [
-    "npx stylelint"
+    "npx stylelint",
+    "prettier --write"
   ]
 }
