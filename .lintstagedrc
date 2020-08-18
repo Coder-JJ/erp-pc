@@ -3,7 +3,7 @@
     "npx eslint -c ./.eslintrc.prod.json --fix"
   ],
   "src/**/*.{css,less}": [
-    "npx stylelint",
-    "prettier --write"
+    "npx stylelint --fix",
+    "npx prettier --write"
   ]
 }
