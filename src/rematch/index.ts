@@ -6,6 +6,11 @@ import { RootModel, models } from './models'
 
 const store = init({
   models,
+  redux: {
+    rootReducers: {
+      RESET: () => undefined
+    }
+  },
   plugins: [
     loading(),
     immerWithPersist({

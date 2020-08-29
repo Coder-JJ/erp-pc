@@ -9,14 +9,14 @@ import { MenuProps } from 'antd/lib/menu'
 import zhCN from 'antd/es/locale/zh_CN'
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons'
 import classNames from 'classnames'
-import * as pages from './pages'
+import * as views from './views'
 import { RootState, Dispatch } from './rematch'
 import AppContext, { ContextType } from './AppContext'
 
 export interface MenuItem {
   key: string
   name: string
-  page: string
+  view: string
   icon?: string
 }
 
@@ -31,12 +31,12 @@ export type MenuType = MenuFolder | MenuItem
 
 export interface RouteType {
   path: string
-  page: string
+  view: string
 }
 
 const { Header, Sider, Content } = Layout
 
-const Pages = pages as { [key: string]: React.ComponentType<any> }
+const Views = views as { [key: string]: React.ComponentType<any> }
 
 const menus: MenuType[] = [
   {
@@ -44,13 +44,13 @@ const menus: MenuType[] = [
     name: '资料管理',
     icon: 'icon-navicon-zdgl',
     children: [
-      { key: 'supplier', name: '供应商', icon: 'icon-navicon-gysda', page: 'Supplier' },
-      { key: 'repository', name: '仓库', icon: 'icon-navicon-ckdasz', page: 'Repository' },
-      { key: 'stock', name: '库存分类', icon: 'icon-navicon-kcfl', page: 'Stock' }
+      { key: 'supplier', name: '供应商', icon: 'icon-navicon-gysda', view: 'Supplier' },
+      { key: 'repository', name: '仓库', icon: 'icon-navicon-ckdasz', view: 'Repository' },
+      { key: 'stock', name: '库存分类', icon: 'icon-navicon-kcfl', view: 'Stock' }
     ]
   },
-  { key: 'checkin', name: '入库单', page: 'CheckIn', icon: 'icon-rkd' },
-  { key: 'checkout', name: '出库单', page: 'CheckOut', icon: 'icon-ckd' }
+  { key: 'checkin', name: '入库单', view: 'CheckIn', icon: 'icon-rkd' },
+  { key: 'checkout', name: '出库单', view: 'CheckOut', icon: 'icon-ckd' }
 ]
 
 const isMenuFolder = (menu: MenuType): menu is MenuFolder => {
@@ -58,7 +58,7 @@ const isMenuFolder = (menu: MenuType): menu is MenuFolder => {
 }
 
 const isMenuItem = (menu: MenuType): menu is MenuItem => {
-  return (menu as MenuItem).page !== undefined
+  return (menu as MenuItem).view !== undefined
 }
 
 const getOpenedMenusBySelectedMenu = (menus: MenuType[], pathname: string, prefixPath: string = ''): string[] | undefined => {
@@ -82,7 +82,7 @@ const getRoutesFromMenus = (menus: MenuType[], prefixPath: string = ''): RouteTy
     if (isMenuFolder(menu) && menu.children.length) {
       routes.push(...getRoutesFromMenus(menu.children, path))
     } else if (isMenuItem(menu)) {
-      routes.push({ path, page: menu.page })
+      routes.push({ path, view: menu.view })
     }
   }
   return routes
@@ -164,11 +164,11 @@ function App (): React.ReactElement {
               <div className={styles.view}>
                 <Switch>
                   {
-                    routes.map(({ path, page }) => {
-                      const Page = Pages[page]
+                    routes.map(({ path, view }) => {
+                      const View = Views[view]
                       return (
                         <Route key={path} path={path} exact strict sensitive>
-                          <Page />
+                          <View />
                         </Route>
                       )
                     })
