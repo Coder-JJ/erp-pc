@@ -1,43 +1,99 @@
 import styles from './index.less'
-import React from 'react'
-import { useSelector } from 'react-redux'
-import { Table, Input, Button } from 'antd'
+import React, { useMemo, useCallback, useState } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+import { Input, Button, Popconfirm, Row, Col } from 'antd'
 import { ColumnsType } from 'antd/lib/table'
-import { RootState } from '../../rematch'
+import { ExpandableConfig } from 'antd/lib/table/interface'
+import { RootState, Dispatch } from '../../rematch'
 import { Supplier } from '../../rematch/models/supplier'
-import { useFooter } from '../../hooks'
-import { AddForm } from './FormModal'
+import { useFooter, useEnterEvent, useSuppliers } from '../../hooks'
+import { ScrollTable } from '../../components'
+import { AddForm, EditForm } from './FormModal'
 
-const columns: ColumnsType<Supplier> = [
-  { dataIndex: 'code', title: '供应商代码' },
-  { dataIndex: 'name', title: '供应商名称' },
-  {
-    dataIndex: 'operations',
-    width: 140,
-    render (value, record) {
+const Component: React.FC = function () {
+  const [, data] = useSuppliers()
+  const keyword = useSelector((store: RootState) => store.supplier.keyword)
+  const loading = useSelector((store: RootState) => store.loading.effects.supplier.loadSuppliers)
+  const deleting = useSelector((store: RootState) => store.loading.effects.supplier.deleteSupplier)
+
+  const dispatch = useDispatch<Dispatch>()
+  const onKeywordChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => dispatch.supplier.updateState({ keyword: e.target.value }), [dispatch.supplier])
+
+  const [onDeleteId, setDeleteId] = useState<number | undefined>()
+  const deleteSupplier = useCallback(async () => {
+    if (onDeleteId) {
+      setDeleteId(onDeleteId)
+      await dispatch.supplier.deleteSupplier(onDeleteId)
+      setDeleteId(undefined)
+    }
+  }, [onDeleteId, dispatch.supplier])
+  const columns: ColumnsType<Supplier> = useMemo(() => [
+    { dataIndex: 'id', title: '编号' },
+    { dataIndex: 'name', title: '供应商名称' },
+    { dataIndex: 'leader', title: '负责人' },
+    { dataIndex: 'leaderPhone', title: '负责人手机号码' },
+    { dataIndex: 'phone', title: '座机号' },
+    { dataIndex: 'fax', title: '传真号' },
+    {
+      dataIndex: 'id',
+      width: 140,
+      render (id, record) {
+        return (
+          <>
+            <EditForm>
+              <Button type='link' onMouseEnter={() => dispatch.supplier.updateEditForm(record)}>编辑</Button>
+            </EditForm>
+            <Popconfirm
+              visible={id === onDeleteId}
+              onVisibleChange={visible => setDeleteId(visible || deleting ? id : undefined)}
+              onConfirm={deleteSupplier}
+              okButtonProps={{ loading: deleting }}
+              arrowPointAtCenter
+              title='是否确定删除该供应商'
+              placement='topRight'
+            >
+              <Button type='link' danger>删除</Button>
+            </Popconfirm>
+          </>
+        )
+      }
+    }
+  ], [dispatch.supplier, onDeleteId, deleteSupplier, deleting])
+
+  const expandable = useMemo<ExpandableConfig<Supplier>>(() => ({
+    expandedRowRender ({ address, addressDetail, bank, bankAccount, bankAccountName, mail, website, remark }) {
       return (
         <>
-          <Button type='link'>编辑</Button>
-          <Button type='link' danger>删除</Button>
+          <Row gutter={[16, 16]}>
+            <Col span={8}>地址：{ address }</Col>
+            <Col span={16}>详细地址：{ addressDetail }</Col>
+          </Row>
+          <Row gutter={[16, 16]}>
+            <Col span={8}>开户行：{ bank }</Col>
+            <Col span={8}>银行账号：{ bankAccount }</Col>
+            <Col span={8}>银行账户名：{ bankAccountName }</Col>
+          </Row>
+          <Row gutter={[16, 16]}>
+            <Col span={8}>邮箱：{ mail }</Col>
+            <Col span={8}>官网：{ website }</Col>
+            <Col span={8}>备注：{ remark }</Col>
+          </Row>
         </>
       )
     }
-  }
-]
+  }), [])
 
-const Component: React.FC = function () {
-  const { data } = useSelector((store: RootState) => store.supplier)
-
+  useEnterEvent(deleteSupplier, !!onDeleteId)
   const renderFooter = useFooter()
 
   return (
     <div className={styles.wrap}>
       <header className={styles.header}>
         <span>关键字：</span>
-        <Input className={styles.input} placeholder='请输入关键字' />
+        <Input className={styles.input} value={keyword} onChange={onKeywordChange} placeholder='请输入关键字' />
       </header>
       <footer className={styles.footer}>
-        <Table<Supplier> rowKey='code' columns={columns} dataSource={data} pagination={false} size='middle' />
+        <ScrollTable<Supplier> rowKey='id' columns={columns} dataSource={data} loading={loading} expandable={expandable} />
       </footer>
       {
         renderFooter(

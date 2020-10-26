@@ -1,11 +1,7 @@
-// import React from 'react'
-// import loadable from "@loadable/component"
-// import { GlobalLoading } from '../../components'
+import React from 'react'
+import loadable from '@loadable/component'
+import { GlobalLoading } from '../../components'
 
-// const LoadableComponent = loadable(() => import("./Component"), { fallback: <GlobalLoading /> })
+const LoadableComponent = loadable(() => import('./Component'), { fallback: <GlobalLoading /> })
 
-// export default LoadableComponent
-
-import Component from './Component'
-
-export default Component
+export default LoadableComponent

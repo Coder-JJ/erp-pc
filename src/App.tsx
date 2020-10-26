@@ -2,22 +2,28 @@ import styles from './App.less'
 import { hot } from 'react-hot-loader/root'
 import React, { useCallback, useMemo, useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { Switch, Route, useHistory, useLocation, Redirect } from 'react-router-dom'
+import { Switch, Route, useHistory, useLocation, Redirect, RouteProps } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
+import { OpenEventHandler } from 'rc-menu/lib/interface'
 import { ConfigProvider, Layout, Menu } from 'antd'
 import { MenuProps } from 'antd/lib/menu'
-import zhCN from 'antd/es/locale/zh_CN'
+import zhCN from 'antd/lib/locale/zh_CN'
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons'
+import dayjs from 'dayjs'
+import 'dayjs/locale/zh-cn'
 import classNames from 'classnames'
 import * as views from './views'
 import { RootState, Dispatch } from './rematch'
 import AppContext, { ContextType } from './AppContext'
+
+export type CustomRouteProps = Pick<RouteProps, 'exact' | 'sensitive' | 'strict'>
 
 export interface MenuItem {
   key: string
   name: string
   view: string
   icon?: string
+  routeProps?: CustomRouteProps
 }
 
 export interface MenuFolder {
@@ -29,10 +35,12 @@ export interface MenuFolder {
 
 export type MenuType = MenuFolder | MenuItem
 
-export interface RouteType {
+export interface RouteType extends CustomRouteProps {
   path: string
   view: string
 }
+
+dayjs.locale('zh-cn')
 
 const { Header, Sider, Content } = Layout
 
@@ -42,15 +50,17 @@ const menus: MenuType[] = [
   {
     key: 'data',
     name: '资料管理',
-    icon: 'icon-navicon-zdgl',
+    icon: 'icon-zdgl',
     children: [
-      { key: 'supplier', name: '供应商', icon: 'icon-navicon-gysda', view: 'Supplier' },
-      { key: 'repository', name: '仓库', icon: 'icon-navicon-ckdasz', view: 'Repository' },
-      { key: 'stock', name: '库存分类', icon: 'icon-navicon-kcfl', view: 'Stock' }
+      { key: 'supplier', name: '供应商', icon: 'icon-gysda', view: 'Supplier' },
+      { key: 'customer', name: '客户', icon: 'icon-gysda', view: 'Customer' },
+      { key: 'repository', name: '仓库', icon: 'icon-ckdasz', view: 'Repository' },
+      { key: 'goods', name: '货物', icon: 'icon-chdasz', view: 'Goods' }
     ]
   },
-  { key: 'checkin', name: '入库单', view: 'CheckIn', icon: 'icon-rkd' },
-  { key: 'checkout', name: '出库单', view: 'CheckOut', icon: 'icon-ckd' }
+  { key: 'checkin', name: '入库登记', view: 'CheckIn', icon: 'icon-rkd' },
+  { key: 'checkout', name: '出库登记', view: 'CheckOut', icon: 'icon-ckd' },
+  { key: 'stock', name: '查看库存', view: 'Stock', icon: 'icon-kcpd' }
 ]
 
 const isMenuFolder = (menu: MenuType): menu is MenuFolder => {
@@ -82,11 +92,13 @@ const getRoutesFromMenus = (menus: MenuType[], prefixPath: string = ''): RouteTy
     if (isMenuFolder(menu) && menu.children.length) {
       routes.push(...getRoutesFromMenus(menu.children, path))
     } else if (isMenuItem(menu)) {
-      routes.push({ path, view: menu.view })
+      routes.push({ path, view: menu.view, ...(menu.routeProps || {}) })
     }
   }
   return routes
 }
+
+// const getPopupContainer: (triggerNode: HTMLElement) => HTMLElement = triggerNode => triggerNode?.parentElement || document.body
 
 function App (): React.ReactElement {
   const { menuCollapsed } = useSelector((store: RootState) => store.app)
@@ -98,13 +110,14 @@ function App (): React.ReactElement {
   const location = useLocation()
   const menuSelectedKeys = useMemo(() => [location.pathname], [location.pathname])
   const [menuOpenedKeys, setMenuOpenedKeys] = useState(getOpenedMenusBySelectedMenu(menus, location.pathname) || [])
+  const onMenuOpenChange: OpenEventHandler = useCallback(keys => setMenuOpenedKeys(keys as string[]), [])
   useEffect(() => {
     const nextMenuOpenedKeys = getOpenedMenusBySelectedMenu(menus, location.pathname) || []
     if (nextMenuOpenedKeys.length) {
       setMenuOpenedKeys(nextMenuOpenedKeys)
     }
   }, [location.pathname])
-  const menuProps = useMemo<MenuProps>(() => menuCollapsed ? {} : { openKeys: menuOpenedKeys, onOpenChange: setMenuOpenedKeys }, [menuCollapsed, menuOpenedKeys])
+  const menuProps = useMemo<MenuProps>(() => menuCollapsed ? {} : { openKeys: menuOpenedKeys, onOpenChange: onMenuOpenChange }, [menuCollapsed, menuOpenedKeys, onMenuOpenChange])
   const onClickMenu = useCallback((path: string) => history.push(path), [history])
   const renderMenus = useCallback((menus: MenuType[], prefixPath: string = '') => {
     return menus.map(menu => {
@@ -150,7 +163,7 @@ function App (): React.ReactElement {
             <div className={classNames(styles.logo, { [styles.collapsed]: menuCollapsed })}>
               <div>{ !menuCollapsed && '志坚包装' }</div>
             </div>
-            <Menu className={styles.menus} {...menuProps} selectedKeys={menuSelectedKeys} mode='inline' theme='dark'>
+            <Menu {...menuProps} selectedKeys={menuSelectedKeys} mode='inline' theme='dark'>
               {
                 renderMenus(menus)
               }
@@ -164,16 +177,21 @@ function App (): React.ReactElement {
               <div className={styles.view}>
                 <Switch>
                   {
-                    routes.map(({ path, view }) => {
-                      const View = Views[view]
+                    routes.map(({ path, view, ...routeProps }) => {
+                      const View = Views[view] || Views.NoMatch
                       return (
-                        <Route key={path} path={path} exact strict sensitive>
+                        <Route key={path} path={path} exact strict sensitive {...routeProps}>
                           <View />
                         </Route>
                       )
                     })
                   }
-                  { !!routes.length && <Redirect from='*' to={routes[0].path} /> }
+                  {
+                    !!routes.length && <Redirect from='/' to={routes[0].path} exact strict />
+                  }
+                  <Route path='*'>
+                    <Views.NoMatch />
+                  </Route>
                 </Switch>
               </div>
             </Content>

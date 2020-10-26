@@ -11,13 +11,13 @@ const packageName = require('./package.json').name
 module.exports = function ({ env }) {
   return {
     webpack: {
-      configure: {
-        output: {
-          library: packageName,
-          libraryTarget: 'umd',
-          jsonpFunction: `webpackJsonp_${packageName}`
-        }
-      },
+      // configure: {
+      //   output: {
+      //     library: packageName,
+      //     libraryTarget: 'umd',
+      //     jsonpFunction: `webpackJsonp_${packageName}`
+      //   }
+      // },
       plugins: [
         new WebpackBar({ profile: true }),
         ...(process.env.NODE_ENV === 'development' ? [new BundleAnalyzerPlugin({ openAnalyzer: false })] : []),

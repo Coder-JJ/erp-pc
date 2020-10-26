@@ -1,0 +1,48 @@
+@import "../../../assets/styles/theme.less";
+
+.loading {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.wrap {
+  display: grid;
+  align-content: start;
+  grid-template-columns: repeat(auto-fill, 256px);
+  column-gap: 48px;
+  row-gap: 48px;
+
+  .repository {
+    .title {
+      margin-right: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .content {
+      padding-left: 64px;
+      background-image: url("../../../assets/images/repository.png");
+      background-size: 48px;
+      background-position: 0 center;
+      background-repeat: no-repeat;
+
+      .types,
+      .count {
+        height: 24px;
+        line-height: 24px;
+        font-size: 16px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        .num {
+          color: @primary-color;
+          font-weight: bold;
+        }
+      }
+    }
+  }
+}

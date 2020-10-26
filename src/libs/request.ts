@@ -8,6 +8,13 @@ export interface Response<T = any> {
   result: T
 }
 
+export interface Page<T> {
+  data: T[]
+  pageNum: number
+  pageSize: number
+  total: number
+}
+
 const urlPrefix = '/f-api'
 
 const instance = axios.create()
@@ -45,7 +52,7 @@ instance.interceptors.response.use(
   },
   e => {
     if (!axios.isCancel(e)) {
-      notification.error({ message: '错误', description: e.message })
+      notification.error({ message: '错误', description: e?.message || e })
     }
     return Promise.reject(e)
   }

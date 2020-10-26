@@ -19,7 +19,8 @@ const store = init({
       },
       persistOptions: {
         persistConfig: {
-          storage
+          storage,
+          whitelist: ['cache']
         }
       }
     })
@@ -30,7 +31,7 @@ export default store
 
 export type Store = typeof store
 export type Dispatch = RematchDispatch<RootModel>
-export type RootState = RematchRootState<RootModel>
+export type ModelState = RematchRootState<RootModel>
 
 type MapEffectsToBoolean<effects extends ModelEffects<any>> = {
   [key in keyof effects]: boolean
@@ -56,3 +57,5 @@ export interface LoadingState {
     }
   }
 }
+
+export type RootState = ModelState & LoadingState

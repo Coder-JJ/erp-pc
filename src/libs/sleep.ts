@@ -1,1 +1,1 @@
-export default (s: number): Promise<NodeJS.Timeout> => new Promise<NodeJS.Timeout>(resolve => setTimeout(resolve, s * 1000))
+export default (ms: number): Promise<NodeJS.Timeout> => new Promise<NodeJS.Timeout>(resolve => setTimeout(resolve, ms))
