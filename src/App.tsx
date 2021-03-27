@@ -159,7 +159,7 @@ function App (): React.ReactElement {
         <Layout className={styles.wrap}>
           <Sider trigger={null} collapsible collapsed={menuCollapsed}>
             <div className={classNames(styles.logo, { [styles.collapsed]: menuCollapsed })}>
-              <div>{ !menuCollapsed && '志坚包装' }</div>
+              <div>{ !menuCollapsed && 'ERP' }</div>
             </div>
             <Menu {...menuProps} selectedKeys={menuSelectedKeys} mode='inline' theme='dark'>
               {
