@@ -8,6 +8,7 @@ export interface Goods {
   brand: string
   texture: string
   size: string
+  price: number | null
   remark: string
 }
 
@@ -16,6 +17,8 @@ export type GoodsProps = Omit<Goods, 'id' | 'remark'>
 export type AddForm = Omit<Goods, 'id'>
 
 export interface State {
+  didMount: boolean
+  shouldUpdate: boolean
   keyword: string
   data: Goods[]
   addForm: AddForm
@@ -29,7 +32,8 @@ const getInitialAddForm = (): AddForm => ({
   brand: '',
   texture: '',
   size: '',
-  remark: ''
+  remark: '',
+  price: null
 })
 
 const getInitialEditForm = (): Goods => ({
@@ -38,6 +42,8 @@ const getInitialEditForm = (): Goods => ({
 })
 
 const state: State = {
+  didMount: false,
+  shouldUpdate: false,
   keyword: '',
   data: [],
   addForm: getInitialAddForm(),
@@ -47,9 +53,13 @@ const state: State = {
 export const goods = {
   state,
   reducers: {
+    shouldUpdate (state: State): State {
+      state.shouldUpdate = true
+      return state
+    },
     updateState (state: State, keyValues: Partial<State>): State {
       for (const [key, value] of Object.entries(keyValues)) {
-        state[key as keyof State] = value as any
+        state[key as keyof State] = value as never
       }
       return state
     },
@@ -86,16 +96,16 @@ export const goods = {
     },
     async addGoods (goods: AddForm): Promise<number> {
       const id = await request.post<number, number>('/goods/insert', goods)
-      dispatch.goods.loadGoods()
+      dispatch.goods.shouldUpdate()
       return id
     },
     async editGoods (goods: Goods) {
       await request.put('/goods/update', goods)
-      dispatch.goods.loadGoods()
+      dispatch.goods.shouldUpdate()
     },
     async deleteGoods (id: number) {
       await request.delete(`/goods/delete/${id}`)
-      dispatch.goods.loadGoods()
+      dispatch.goods.shouldUpdate()
     }
   })
 }

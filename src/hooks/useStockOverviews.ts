@@ -4,13 +4,14 @@ import { RootState, Dispatch } from '../rematch'
 import { StockOverview } from '../rematch/models/stock'
 
 const useStockOverviews = (): StockOverview[] => {
-  const overviews = useSelector((store: RootState) => store.stock.overviews)
+  const { didMount, shouldUpdate, overviews } = useSelector((store: RootState) => store.stock)
   const dispatch = useDispatch<Dispatch>()
   useEffect(() => {
-    if (!overviews.length) {
+    if (!didMount || shouldUpdate) {
       dispatch.stock.loadStockOverviews()
+      dispatch.stock.updateState({ didMount: true, shouldUpdate: false })
     }
-  }, [overviews.length, dispatch.stock])
+  }, [didMount, shouldUpdate, dispatch.stock])
   return overviews
 }
 

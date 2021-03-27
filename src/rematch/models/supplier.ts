@@ -23,6 +23,8 @@ export interface Supplier {
 export type AddForm = Omit<Supplier, 'id'>
 
 export interface State {
+  didMount: boolean
+  shouldUpdate: boolean
   keyword: string
   data: Supplier[]
   addForm: AddForm
@@ -54,6 +56,8 @@ const getInitialEditForm = (): Supplier => ({
 })
 
 const state: State = {
+  didMount: false,
+  shouldUpdate: false,
   keyword: '',
   data: [],
   addForm: getInitialAddForm(),
@@ -63,9 +67,13 @@ const state: State = {
 export const supplier = {
   state,
   reducers: {
+    shouldUpdate (state: State): State {
+      state.shouldUpdate = true
+      return state
+    },
     updateState (state: State, keyValues: Partial<State>): State {
       for (const [key, value] of Object.entries(keyValues)) {
-        state[key as keyof State] = value as any
+        state[key as keyof State] = value as never
       }
       return state
     },
@@ -102,16 +110,16 @@ export const supplier = {
     },
     async addSupplier (supplier: AddForm) {
       const id = await request.post<number, number>('/supplier/insert', supplier)
-      dispatch.supplier.loadSuppliers()
+      dispatch.supplier.shouldUpdate()
       return id
     },
     async editSupplier (supplier: Supplier) {
       await request.put('/supplier/update', supplier)
-      dispatch.supplier.loadSuppliers()
+      dispatch.supplier.shouldUpdate()
     },
     async deleteSupplier (id: number) {
       await request.delete(`/supplier/delete/${id}`)
-      dispatch.supplier.loadSuppliers()
+      dispatch.supplier.shouldUpdate()
     }
   })
 }

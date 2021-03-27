@@ -4,14 +4,15 @@ import { RootState, Dispatch } from '../rematch'
 import { Goods } from '../rematch/models/goods'
 
 const useGoods = (): [Goods[], Goods[]] => {
-  const data = useSelector((store: RootState) => store.goods.data)
+  const { didMount, shouldUpdate, data } = useSelector((store: RootState) => store.goods)
   const keyword = useSelector((store: RootState) => store.goods.keyword.trim())
   const dispatch = useDispatch<Dispatch>()
   useEffect(() => {
-    if (!data.length) {
+    if (!didMount || shouldUpdate) {
       dispatch.goods.loadGoods()
+      dispatch.goods.updateState({ didMount: true, shouldUpdate: false })
     }
-  }, [data.length, dispatch.goods])
+  }, [didMount, shouldUpdate, dispatch.goods])
   const goods = useMemo(() => data.length ? data.filter(({ name, brand, texture, size, remark }) => name.includes(keyword) || brand.includes(keyword) || texture.includes(keyword) || size.includes(keyword) || remark.includes(keyword)) : data, [keyword, data])
   return [data, goods]
 }

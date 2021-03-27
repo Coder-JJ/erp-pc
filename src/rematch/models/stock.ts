@@ -16,6 +16,7 @@ export interface StockDetail {
   goodBrand: string
   goodSize: string
   goodTexture: string
+  goodPrice: number | null
   goodRemark: string
   num: number
 }
@@ -25,21 +26,51 @@ export interface StockDetails {
 }
 
 export interface State {
+  didMount: boolean
+  shouldUpdate: boolean
+  detailsDidMount: {
+    [key: string]: boolean
+  }
+  detailsShouldUpdate: {
+    [key: string]: boolean
+  }
   overviews: StockOverview[]
   details: StockDetails
+  detailFilter: string
 }
 
 const state: State = {
+  didMount: false,
+  shouldUpdate: false,
+  detailsDidMount: {},
+  detailsShouldUpdate: {},
   overviews: [],
-  details: {}
+  details: {},
+  detailFilter: ''
 }
 
 export const stock = {
   state,
   reducers: {
+    shouldUpdate (state: State): State {
+      state.shouldUpdate = true
+      return state
+    },
+    detailDidMount (state: State, id: number): State {
+      state.detailsDidMount[id] = true
+      return state
+    },
+    detailShouldUpdate (state: State, id: number): State {
+      state.detailsShouldUpdate[id] = true
+      return state
+    },
+    detailDidUpdate (state: State, id: number): State {
+      state.detailsShouldUpdate[id] = false
+      return state
+    },
     updateState (state: State, keyValues: Partial<State>): State {
       for (const [key, value] of Object.entries(keyValues)) {
-        state[key as keyof State] = value as any
+        state[key as keyof State] = value as never
       }
       return state
     },

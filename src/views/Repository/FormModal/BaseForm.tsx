@@ -47,7 +47,7 @@ const BaseForm: React.FC<Props> = function (props) {
   return (
     <>
       { React.cloneElement(children, { onClick: openModal }) }
-      <Modal visible={visible} onOk={onOk} onCancel={closeModal} title={title} confirmLoading={saving}>
+      <Modal visible={visible} onOk={onOk} onCancel={closeModal} title={title} confirmLoading={saving} zIndex={2000}>
         <Form layout='vertical'>
           <Form.Item label='仓库名称' required>
             <Input value={value.name} onChange={onNameChange} placeholder='请输入仓库名称' />

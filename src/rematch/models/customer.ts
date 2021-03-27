@@ -22,6 +22,8 @@ export interface Customer {
 export type AddForm = Omit<Customer, 'id'>
 
 export interface State {
+  didMount: boolean
+  shouldUpdate: boolean
   keyword: string
   data: Customer[]
   addForm: AddForm
@@ -52,6 +54,8 @@ const getInitialEditForm = (): Customer => ({
 })
 
 const state: State = {
+  didMount: false,
+  shouldUpdate: false,
   keyword: '',
   data: [],
   addForm: getInitialAddForm(),
@@ -61,9 +65,13 @@ const state: State = {
 export const customer = {
   state,
   reducers: {
+    shouldUpdate (state: State): State {
+      state.shouldUpdate = true
+      return state
+    },
     updateState (state: State, keyValues: Partial<State>): State {
       for (const [key, value] of Object.entries(keyValues)) {
-        state[key as keyof State] = value as any
+        state[key as keyof State] = value as never
       }
       return state
     },
@@ -99,16 +107,17 @@ export const customer = {
       dispatch.customer.updateState(({ data }))
     },
     async addCustomer (customer: AddForm) {
-      await request.post('/custom/insert', customer)
-      dispatch.customer.loadCustomers()
+      const id = await request.post<number, number>('/custom/insert', customer)
+      dispatch.customer.shouldUpdate()
+      return id
     },
     async editCustomer (customer: Customer) {
       await request.put('/custom/update', customer)
-      dispatch.customer.loadCustomers()
+      dispatch.customer.shouldUpdate()
     },
     async deleteCustomer (id: number) {
       await request.delete(`/custom/delete/${id}`)
-      dispatch.customer.loadCustomers()
+      dispatch.customer.shouldUpdate()
     }
   })
 }

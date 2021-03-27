@@ -12,7 +12,7 @@ import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
 import classNames from 'classnames'
-import * as views from './views'
+import views from './views'
 import { RootState, Dispatch } from './rematch'
 import AppContext, { ContextType } from './AppContext'
 
@@ -44,18 +44,16 @@ dayjs.locale('zh-cn')
 
 const { Header, Sider, Content } = Layout
 
-const Views = views as { [key: string]: React.ComponentType<any> }
-
 const menus: MenuType[] = [
   {
     key: 'data',
     name: '资料管理',
     icon: 'icon-zdgl',
     children: [
-      { key: 'supplier', name: '供应商', icon: 'icon-gysda', view: 'Supplier' },
-      { key: 'customer', name: '客户', icon: 'icon-gysda', view: 'Customer' },
-      { key: 'repository', name: '仓库', icon: 'icon-ckdasz', view: 'Repository' },
-      { key: 'goods', name: '货物', icon: 'icon-chdasz', view: 'Goods' }
+      { key: 'supplier', name: '供应商', view: 'Supplier', icon: 'icon-gysda' },
+      { key: 'customer', name: '客户', view: 'Customer', icon: 'icon-gysda' },
+      { key: 'repository', name: '仓库', view: 'Repository', icon: 'icon-ckdasz' },
+      { key: 'goods', name: '货物', view: 'Goods', icon: 'icon-chdasz' }
     ]
   },
   { key: 'checkin', name: '入库登记', view: 'CheckIn', icon: 'icon-rkd' },
@@ -178,7 +176,7 @@ function App (): React.ReactElement {
                 <Switch>
                   {
                     routes.map(({ path, view, ...routeProps }) => {
-                      const View = Views[view] || Views.NoMatch
+                      const View = views[view] || views.NoMatch
                       return (
                         <Route key={path} path={path} exact strict sensitive {...routeProps}>
                           <View />
@@ -190,7 +188,7 @@ function App (): React.ReactElement {
                     !!routes.length && <Redirect from='/' to={routes[0].path} exact strict />
                   }
                   <Route path='*'>
-                    <Views.NoMatch />
+                    <views.NoMatch />
                   </Route>
                 </Switch>
               </div>

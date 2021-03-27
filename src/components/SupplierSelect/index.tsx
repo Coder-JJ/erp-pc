@@ -1,10 +1,11 @@
 import styles from './index.less'
-import React, { useMemo } from 'react'
+import React, { useMemo, useCallback } from 'react'
 import { Select, Divider, Button } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import { SelectProps } from 'antd/lib/select'
 import { useSuppliers } from '../../hooks'
 import { AddForm } from '../../views/Supplier/FormModal'
+import { Supplier } from '../../rematch/models/supplier'
 
 const { Option } = Select
 
@@ -34,14 +35,36 @@ const SupplierSelect: React.FC<Props> = function ({ addButtonVisible, onAdd, ...
     return {}
   }, [addButtonVisible, onAdd])
 
+  const itemFilter: Props['filterOption'] = useCallback((keyword, option) => {
+    const trimedKeyword = keyword.trim()
+    const { name, leader } = (option.data as Supplier)
+    return name?.includes(trimedKeyword) || leader?.includes(trimedKeyword)
+  }, [])
+
   return (
     <Select<number>
       placeholder='请选择供应商'
+      showSearch
+      filterOption={itemFilter}
       {...dropdownRender}
+      dropdownMatchSelectWidth={false}
       {...props}
+      optionLabelProp='name'
     >
       {
-        suppliers.map(supplier => <Option key={supplier.id} value={supplier.id}>{ supplier.name }</Option>)
+        suppliers.map(supplier => (
+          <Option key={supplier.id} value={supplier.id} data={supplier} name={supplier.name}>
+            <span>{ supplier.name }</span>
+            {
+              !!supplier.leader?.trim() && (
+                <>
+                  <Divider type='vertical' />
+                  <span>{ supplier.leader }</span>
+                </>
+              )
+            }
+          </Option>
+        ))
       }
     </Select>
   )

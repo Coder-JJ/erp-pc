@@ -4,10 +4,11 @@ import { Modal, message, Form, Input, Table, InputNumber, Button } from 'antd'
 import { ColumnsType } from 'antd/lib/table'
 import { GetRowKey } from 'antd/lib/table/interface'
 import dayjs, { Dayjs } from 'dayjs'
+import { Goods } from '../../../rematch/models/goods'
 import { AddForm as CheckIn, GoodsForm } from '../../../rematch/models/checkIn'
 import { getCheckInPrice, getGoodsPrice } from '../../../utils'
 import { useEnterEvent } from '../../../hooks'
-import { DatePicker, RepositorySelect, GoodsSelect, DiscountInput, PaidInput, SupplierSelect } from '../../../components'
+import { DatePicker, RepositorySelect, GoodsSelect, DiscountInput, PriceInput, SupplierSelect } from '../../../components'
 
 interface Props {
   title: string
@@ -43,6 +44,13 @@ const BaseForm: React.FC<Props> = function (props) {
   const onRepositoryChange = useCallback((value: number) => onChange('warehouseId', value), [onChange])
   const onSupplierChange = useCallback((value: number) => onChange('supplierId', value), [onChange])
   const onGoodsChange = useCallback((index: number, key: keyof GoodsForm, value: any) => onGoodsPropChange(index, key, value), [onGoodsPropChange])
+  const onSelectGoods = useCallback((index: number, value: number | undefined, goods: Goods[]) => {
+    onGoodsChange(index, 'goodsId', value)
+    const selectedGoods = goods.find(({ id }) => id === value)
+    if (selectedGoods && typeof selectedGoods.price === 'number') {
+      onGoodsChange(index, 'price', selectedGoods.price)
+    }
+  }, [onGoodsChange])
   const addGoods = useCallback(() => onAddGoods(), [onAddGoods])
   const deleteGoods = useCallback((index: number) => onDeleteGoods(index), [onDeleteGoods])
   const onSignerChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('signer', e.target.value), [onChange])
@@ -88,7 +96,7 @@ const BaseForm: React.FC<Props> = function (props) {
       dataIndex: 'goodsId',
       title: '货物',
       render (goodsId, record, index) {
-        return <GoodsSelect value={goodsId} onChange={value => onGoodsChange(index, 'goodsId', value)} onAdd={id => onGoodsChange(index, 'goodsId', id)} allowClear addButtonVisible />
+        return <GoodsSelect value={goodsId} onChange={(value, goods) => onSelectGoods(index, value, goods)} onAdd={(id, goods) => onSelectGoods(index, id, goods)} allowClear addButtonVisible />
       }
     },
     {
@@ -102,7 +110,7 @@ const BaseForm: React.FC<Props> = function (props) {
       dataIndex: 'price',
       title: '单价',
       render (price, record, index) {
-        return <InputNumber value={price} onChange={value => onGoodsChange(index, 'price', value)} precision={2} min={0} />
+        return <PriceInput value={price} onChange={value => onGoodsChange(index, 'price', value)} />
       }
     },
     {
@@ -118,7 +126,7 @@ const BaseForm: React.FC<Props> = function (props) {
       render (value, record, index) {
         const price = getGoodsPrice(record)
         const placeholder = typeof value === 'number' ? { placeholder: `${value}` } : (price ? { placeholder: `${price.toFixed(2)}` } : {})
-        return <PaidInput value={value} onChange={value => onGoodsChange(index, 'paid', value)} {...placeholder} />
+        return <PriceInput value={value} onChange={value => onGoodsChange(index, 'paid', value)} {...placeholder} />
       }
     },
     {
@@ -129,7 +137,7 @@ const BaseForm: React.FC<Props> = function (props) {
         return <Button type='primary' onClick={() => deleteGoods(index)} danger size='small'>删除</Button>
       }
     }
-  ], [onGoodsChange, addGoods, deleteGoods])
+  ], [onSelectGoods, onGoodsChange, addGoods, deleteGoods])
 
   return (
     <>
@@ -164,7 +172,7 @@ const BaseForm: React.FC<Props> = function (props) {
                 <DiscountInput value={value.discount} onChange={onDiscountChange} />
               </Form.Item>
               <Form.Item label='实付金额（可不填）'>
-                <PaidInput value={value.paid === null ? undefined : value.paid} onChange={onPaidChange} {...paidPlaceholder} />
+                <PriceInput value={value.paid === null ? undefined : value.paid} onChange={onPaidChange} {...paidPlaceholder} />
               </Form.Item>
             </div>
           </div>

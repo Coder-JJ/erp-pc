@@ -32,6 +32,7 @@ const Component: React.FC = function () {
     { dataIndex: 'brand', title: '商标' },
     { dataIndex: 'texture', title: '材质' },
     { dataIndex: 'size', title: '规格' },
+    { dataIndex: 'price', title: '单价' },
     { dataIndex: 'remark', title: '备注' },
     {
       dataIndex: 'id',

@@ -14,6 +14,8 @@ export interface Repository {
 export type AddForm = Omit<Repository, 'id'>
 
 export interface State {
+  didMount: boolean
+  shouldUpdate: boolean
   keyword: string
   data: Repository[]
   addForm: AddForm
@@ -36,6 +38,8 @@ const getInitialEditForm = (): Repository => ({
 })
 
 const state: State = {
+  didMount: false,
+  shouldUpdate: false,
   keyword: '',
   data: [],
   addForm: getInitialAddForm(),
@@ -45,9 +49,13 @@ const state: State = {
 export const repository = {
   state,
   reducers: {
+    shouldUpdate (state: State): State {
+      state.shouldUpdate = true
+      return state
+    },
     updateState (state: State, keyValues: Partial<State>): State {
       for (const [key, value] of Object.entries(keyValues)) {
-        state[key as keyof State] = value as any
+        state[key as keyof State] = value as never
       }
       return state
     },
@@ -84,16 +92,16 @@ export const repository = {
     },
     async addRepository (repository: AddForm) {
       const id = await request.post<number, number>('/warehouse/insert', repository)
-      dispatch.repository.loadRepositories()
+      dispatch.repository.shouldUpdate()
       return id
     },
     async editRepository (repository: Repository) {
       await request.put('/warehouse/update', repository)
-      dispatch.repository.loadRepositories()
+      dispatch.repository.shouldUpdate()
     },
     async deleteRepository (id: number) {
       await request.delete(`/warehouse/delete/${id}`)
-      dispatch.repository.loadRepositories()
+      dispatch.repository.shouldUpdate()
     }
   })
 }

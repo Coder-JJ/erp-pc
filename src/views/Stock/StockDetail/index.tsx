@@ -1,8 +1,8 @@
 import styles from './index.less'
-import React, { useEffect, useCallback } from 'react'
+import React, { useEffect, useCallback, useMemo } from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
-import { Button, Divider, Select } from 'antd'
+import { Button, Divider, Select, Input } from 'antd'
 import { ArrowLeftOutlined } from '@ant-design/icons'
 import { ColumnsType } from 'antd/lib/table'
 import { SelectProps } from 'antd/lib/select'
@@ -26,7 +26,17 @@ const columns: ColumnsType<StockDetail> = [
 const Stock: React.FC = function () {
   const { state: { warehouseId, warehouseName } } = useLocation<StockOverview>()
   const overviews = useStockOverviews()
-  const details = useSelector((store: RootState) => store.stock.details)
+  const { details, detailFilter } = useSelector((store: RootState) => store.stock)
+  const data = useMemo(() => {
+    const list = details[warehouseId] || []
+    const keyword = detailFilter.trim()
+    if (!keyword) {
+      return list
+    }
+    return list.filter(({ goodName, goodBrand, goodTexture, goodSize }) => {
+      return goodName?.includes(keyword) || goodBrand?.includes(keyword) || goodTexture?.includes(keyword) || goodSize?.includes(keyword)
+    })
+  }, [details, warehouseId, detailFilter])
   const loading = useSelector((store: RootState) => store.loading.effects.stock.loadStockDetail)
 
   const dispatch = useDispatch<Dispatch>()
@@ -38,6 +48,7 @@ const Stock: React.FC = function () {
 
   const history = useHistory()
   const onClickBack = useCallback(() => history.goBack(), [history])
+  const onDetailFilterChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => dispatch.stock.updateState({ detailFilter: e.target.value }), [dispatch.stock])
   const onRepositoryChange: NonNullable<SelectProps<number>['onChange']> = useCallback(value => {
     const overview = overviews.find(({ warehouseId }) => warehouseId === value)
     if (overview) {
@@ -53,17 +64,20 @@ const Stock: React.FC = function () {
           <Divider type='vertical' />
           <span className={styles.title}>{ warehouseName }</span>
         </div>
-        {
-          !!overviews.length && (
-            <Select<number> className={styles.repositories} value={warehouseId} onChange={onRepositoryChange}>
-              {
-                overviews.map(({ warehouseId, warehouseName }) => <Option key={warehouseId} value={warehouseId}>{ warehouseName }</Option>)
-              }
-            </Select>
-          )
-        }
+        <div className={styles.filters}>
+          <Input value={detailFilter} onChange={onDetailFilterChange} placeholder='名称/商标/材质/规格' />
+          {
+            !!overviews.length && (
+              <Select<number> className={styles.repositories} value={warehouseId} onChange={onRepositoryChange}>
+                {
+                  overviews.map(({ warehouseId, warehouseName }) => <Option key={warehouseId} value={warehouseId}>{ warehouseName }</Option>)
+                }
+              </Select>
+            )
+          }
+        </div>
       </header>
-      <ScrollTable rowKey='goodId' columns={columns} dataSource={details[warehouseId] || []} loading={loading} />
+      <ScrollTable rowKey='goodId' columns={columns} dataSource={data} loading={loading} />
     </div>
   )
 }

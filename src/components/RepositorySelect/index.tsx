@@ -1,10 +1,11 @@
 import styles from './index.less'
-import React, { useMemo } from 'react'
+import React, { useMemo, useCallback } from 'react'
 import { Select, Divider, Button } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import { SelectProps } from 'antd/lib/select'
 import { useRepositories } from '../../hooks'
 import { AddForm } from '../../views/Repository/FormModal'
+import { Repository } from '../../rematch/models/repository'
 
 const { Option } = Select
 
@@ -34,14 +35,36 @@ const RepositorySelect: React.FC<Props> = function ({ addButtonVisible, onAdd, .
     return {}
   }, [addButtonVisible, onAdd])
 
+  const itemFilter: Props['filterOption'] = useCallback((keyword, option) => {
+    const trimedKeyword = keyword.trim()
+    const { name, leader } = (option.data as Repository)
+    return name?.includes(trimedKeyword) || leader?.includes(trimedKeyword)
+  }, [])
+
   return (
     <Select<number>
       placeholder='请选择仓库'
       {...dropdownRender}
+      showSearch
+      filterOption={itemFilter}
+      dropdownMatchSelectWidth={false}
       {...props}
+      optionLabelProp='name'
     >
       {
-        repositories.map(repo => <Option key={repo.id} value={repo.id}>{ repo.name }</Option>)
+        repositories.map(repo => (
+          <Option key={repo.id} value={repo.id} data={repo} name={repo.name}>
+            <span>{ repo.name }</span>
+            {
+              !!repo.leader?.trim() && (
+                <>
+                  <Divider type='vertical' />
+                  <span>{ repo.leader }</span>
+                </>
+              )
+            }
+          </Option>
+        ))
       }
     </Select>
   )

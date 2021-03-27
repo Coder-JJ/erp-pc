@@ -62,7 +62,7 @@ const Component: React.FC = function () {
     },
     {
       dataIndex: 'paid',
-      title: '金额',
+      title: '应收金额',
       render (paid, record) {
         return getCheckOutPriceDisplay(record)
       }
@@ -110,7 +110,7 @@ const Component: React.FC = function () {
     },
     {
       dataIndex: 'paid',
-      title: '金额',
+      title: '应收金额',
       render (paid, record) {
         return getGoodsPriceDisplay(record)
       }

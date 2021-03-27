@@ -5,7 +5,7 @@ import { RootState, Dispatch } from '../../../rematch'
 import { Goods } from '../../../rematch/models/goods'
 
 interface Props {
-  onSave? (id: number): void
+  onSave? (goods: Goods): void
   children: React.ReactElement
 }
 
@@ -18,7 +18,7 @@ const AddForm: React.FC<Props> = function (props) {
   const onChange = useCallback((key: keyof Goods, value: any) => dispatch.goods.updateAddForm({ [key]: value }), [dispatch.goods])
   const onSave = useCallback(async (form: Goods) => {
     const id = await dispatch.goods.addGoods(form)
-    onSaveGoods && onSaveGoods(id)
+    onSaveGoods && onSaveGoods({ ...form, id })
     dispatch.goods.clearAddForm()
   }, [onSaveGoods, dispatch.goods])
 

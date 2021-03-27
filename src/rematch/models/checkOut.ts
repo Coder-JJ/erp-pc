@@ -13,7 +13,7 @@ export interface GoodsForm {
   paid: number | null
 }
 
-export interface Goods extends GoodsProps, GoodsForm {
+export interface Goods extends Omit<GoodsProps, 'price'>, GoodsForm {
   id: number
   remark: string
 }
@@ -96,7 +96,7 @@ const getInitialAddForm = (): AddForm => ({
   receiverPhone: '',
   receivedAddress: '',
   receivedTime: dayjs().valueOf(),
-  fetchGoodsRecordList: Array(5).fill(getInitialGoods()),
+  fetchGoodsRecordList: [],
   discount: 1,
   paid: null,
   otherCost: null,
@@ -210,14 +210,21 @@ export const checkOut = {
     async addCheckOut (checkOut: AddForm) {
       await request.post('/repertory/fetchRecord/insert', checkOut)
       dispatch.checkOut.loadCheckOuts()
+      dispatch.stock.shouldUpdate()
+      dispatch.stock.detailShouldUpdate(checkOut.warehouseId!)
     },
     async editCheckOut (checkOut: EditForm) {
       await request.put('/repertory/fetchRecord/update', checkOut)
       dispatch.checkOut.loadCheckOuts()
+      dispatch.stock.shouldUpdate()
+      dispatch.stock.detailShouldUpdate(checkOut.warehouseId)
     },
-    async deleteCheckOut (id: number) {
+    async deleteCheckOut (id: number, store: RootState) {
+      const repositoryId = store.checkOut.data.find(item => item.id === id)!.warehouseId
       await request.delete(`/repertory/fetchRecord/delete/${id}`)
       dispatch.checkOut.loadCheckOuts()
+      dispatch.stock.shouldUpdate()
+      dispatch.stock.detailShouldUpdate(repositoryId)
     }
   })
 }

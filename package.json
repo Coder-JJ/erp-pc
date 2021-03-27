@@ -54,6 +54,7 @@
     "@types/react-redux": "^7.1.9",
     "@types/react-router-dom": "^5.1.5",
     "@types/redux-persist": "^4.3.1",
+    "@types/webpack-env": "^1.16.0",
     "antd-dayjs-webpack-plugin": "^1.0.0",
     "craco-antd": "^1.18.1",
     "craco-less": "^1.17.0",

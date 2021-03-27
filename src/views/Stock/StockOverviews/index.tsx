@@ -2,7 +2,7 @@ import styles from './index.less'
 import React, { useCallback } from 'react'
 import { useHistory } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import { Card, Button, Spin } from 'antd'
+import { Card, Button, Spin, Empty } from 'antd'
 import { useStockOverviews } from '../../../hooks'
 import { RootState } from '../../../rematch'
 import { StockOverview } from '../../../rematch/models/stock'
@@ -16,8 +16,15 @@ const Stock: React.FC = function () {
 
   if (loading) {
     return (
-      <div className={styles.loading}>
+      <div className={styles.center}>
         <Spin />
+      </div>
+    )
+  }
+  if (!overviews.length) {
+    return (
+      <div className={styles.center}>
+        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
       </div>
     )
   }

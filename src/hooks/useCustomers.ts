@@ -4,14 +4,15 @@ import { RootState, Dispatch } from '../rematch'
 import { Customer } from '../rematch/models/customer'
 
 const useCustomers = (): [Customer[], Customer[]] => {
-  const data = useSelector((store: RootState) => store.customer.data)
+  const { didMount, shouldUpdate, data } = useSelector((store: RootState) => store.customer)
   const keyword = useSelector((store: RootState) => store.customer.keyword.trim())
   const dispatch = useDispatch<Dispatch>()
   useEffect(() => {
-    if (!data.length) {
+    if (!didMount || shouldUpdate) {
       dispatch.customer.loadCustomers()
+      dispatch.customer.updateState({ didMount: true, shouldUpdate: false })
     }
-  }, [data.length, dispatch.customer])
+  }, [didMount, shouldUpdate, dispatch.customer])
   const customers = useMemo(() => data.length ? data.filter(({ name, leader, leaderPhone, address, addressDetail, remark }) => name.includes(keyword) || leader.includes(keyword) || leaderPhone.includes(keyword) || address.includes(keyword) || addressDetail.includes(keyword) || remark.includes(keyword)) : data, [keyword, data])
   return [data, customers]
 }

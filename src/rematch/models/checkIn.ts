@@ -13,7 +13,7 @@ export interface GoodsForm {
   paid: number | null
 }
 
-export interface Goods extends GoodsProps, GoodsForm {
+export interface Goods extends Omit<GoodsProps, 'price'>, GoodsForm {
   id: number
   remark: string
 }
@@ -184,14 +184,21 @@ export const checkIn = {
     async addCheckIn (checkIn: AddForm) {
       await request.post('/repertory/saveRecord/insert', checkIn)
       dispatch.checkIn.loadCheckIns()
+      dispatch.stock.shouldUpdate()
+      dispatch.stock.detailShouldUpdate(checkIn.warehouseId!)
     },
     async editCheckIn (checkIn: EditForm) {
       await request.put('/repertory/saveRecord/update', checkIn)
       dispatch.checkIn.loadCheckIns()
+      dispatch.stock.shouldUpdate()
+      dispatch.stock.detailShouldUpdate(checkIn.warehouseId)
     },
-    async deleteCheckIn (id: number) {
+    async deleteCheckIn (id: number, store: RootState) {
+      const repositoryId = store.checkIn.data.find(item => item.id === id)!.warehouseId
       await request.delete(`/repertory/saveRecord/delete/${id}`)
       dispatch.checkIn.loadCheckIns()
+      dispatch.stock.shouldUpdate()
+      dispatch.stock.detailShouldUpdate(repositoryId)
     }
   })
 }

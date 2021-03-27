@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react'
 import { Modal, message, Form, Input } from 'antd'
 import { AddForm as Goods } from '../../../rematch/models/goods'
 import { useEnterEvent } from '../../../hooks'
+import { PriceInput } from '../../../components'
 
 interface Props {
   title: string
@@ -24,6 +25,7 @@ const BaseForm: React.FC<Props> = function (props) {
   const onMaterialChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('texture', e.target.value), [onChange])
   const onSizeChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('size', e.target.value), [onChange])
   const onRemarkChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('remark', e.target.value), [onChange])
+  const onPriceChange = useCallback((value: string | number | undefined) => onChange('price', value), [onChange])
 
   const onOk = useCallback(async () => {
     const form: Goods = {
@@ -32,14 +34,11 @@ const BaseForm: React.FC<Props> = function (props) {
       brand: value.brand.trim(),
       texture: value.texture.trim(),
       size: value.size.trim(),
+      price: typeof value.price === 'number' ? value.price : null,
       remark: value.remark.trim()
     }
     if (!form.name) {
       message.error('请输入货物名称')
-      return
-    }
-    if (!form.brand) {
-      message.error('请输入商标')
       return
     }
     await onSave(form)
@@ -51,12 +50,12 @@ const BaseForm: React.FC<Props> = function (props) {
   return (
     <>
       { React.cloneElement(children, { onClick: openModal }) }
-      <Modal visible={visible} onOk={onOk} onCancel={closeModal} title={title} confirmLoading={saving}>
+      <Modal visible={visible} onOk={onOk} onCancel={closeModal} title={title} confirmLoading={saving} zIndex={2000}>
         <Form layout='vertical'>
           <Form.Item label='货物名称' required>
             <Input value={value.name} onChange={onNameChange} placeholder='请输入货物名称' />
           </Form.Item>
-          <Form.Item label='商标' required>
+          <Form.Item label='商标'>
             <Input value={value.brand} onChange={onBrandChange} placeholder='请输入商标' />
           </Form.Item>
           <Form.Item label='材质'>
@@ -64,6 +63,9 @@ const BaseForm: React.FC<Props> = function (props) {
           </Form.Item>
           <Form.Item label='规格'>
             <Input value={value.size} onChange={onSizeChange} placeholder='请输入规格' />
+          </Form.Item>
+          <Form.Item label='单价'>
+            <PriceInput value={value.price || undefined} onChange={onPriceChange} />
           </Form.Item>
           <Form.Item label='备注'>
             <Input value={value.remark} onChange={onRemarkChange} placeholder='请输入备注' />
