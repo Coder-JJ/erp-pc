@@ -14,16 +14,17 @@ import { ScrollTable } from '../../components'
 import { AddForm, EditForm } from './FormModal'
 
 const Component: React.FC = function () {
-  const { filter, data, total, pageNum, pageSize } = useSelector((store: RootState) => store.checkIn)
+  const { didMount, shouldUpdate, filter, data, total, pageNum, pageSize } = useSelector((store: RootState) => store.checkIn)
   const loading = useSelector((store: RootState) => store.loading.effects.checkIn.loadCheckIns)
   const deleting = useSelector((store: RootState) => store.loading.effects.checkIn.deleteCheckIn)
 
   const dispatch = useDispatch<Dispatch>()
   useEffect(() => {
-    if (total === null) {
+    if (!didMount || shouldUpdate) {
       dispatch.checkIn.loadCheckIns()
+      dispatch.checkIn.updateState({ didMount: true, shouldUpdate: false })
     }
-  }, [total, dispatch.checkIn])
+  }, [didMount, shouldUpdate, dispatch.checkIn])
 
   const debouncedLoadCheckIns = useMemo(() => debounce<() => void>(dispatch.checkIn.loadCheckIns, 250), [dispatch.checkIn.loadCheckIns])
   const onOddChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,7 +41,6 @@ const Component: React.FC = function () {
     }
   }, [onDeleteId, dispatch.checkIn])
   const columns: ColumnsType<CheckIn> = useMemo(() => [
-    { dataIndex: 'id', title: '编号' },
     { dataIndex: 'odd', title: '单号' },
     { dataIndex: 'warehouseName', title: '入库仓库' },
     { dataIndex: 'supplierName', title: '供应商' },
@@ -52,7 +52,6 @@ const Component: React.FC = function () {
         return dayjs(receivedTime).format('YYYY-MM-DD')
       }
     },
-    { dataIndex: 'remark', title: '备注' },
     {
       dataIndex: 'discount',
       title: '折扣',
@@ -67,6 +66,7 @@ const Component: React.FC = function () {
         return getCheckInPriceDisplay(record)
       }
     },
+    { dataIndex: 'remark', title: '备注' },
     {
       dataIndex: 'id',
       width: 140,
@@ -94,13 +94,12 @@ const Component: React.FC = function () {
   ], [dispatch.checkIn, onDeleteId, deleteCheckIn, deleting])
 
   const goodsColumns: ColumnsType<Goods> = useMemo(() => [
-    { dataIndex: 'goodsId', title: '编号' },
     { dataIndex: 'name', title: '货物名称' },
     { dataIndex: 'brand', title: '商标' },
     { dataIndex: 'texture', title: '材质' },
     { dataIndex: 'size', title: '规格' },
-    { dataIndex: 'price', title: '单价' },
     { dataIndex: 'num', title: '数量' },
+    { dataIndex: 'price', title: '单价' },
     {
       dataIndex: 'discount',
       title: '折扣',
@@ -125,6 +124,11 @@ const Component: React.FC = function () {
   useEnterEvent(deleteCheckIn, !!onDeleteId)
   const renderFooter = useFooter()
 
+  const onPaginationChange = useCallback((pageNum: number, pageSize: number | undefined) => {
+    dispatch.checkIn.updateState({ pageNum, pageSize })
+    dispatch.checkIn.loadCheckIns()
+  }, [dispatch.checkIn])
+
   return (
     <div className={styles.wrap}>
       <header className={styles.header}>
@@ -141,7 +145,7 @@ const Component: React.FC = function () {
               <Button type='primary'>新增</Button>
             </AddForm>
             {
-              !!total && <Pagination current={pageNum} pageSize={pageSize} total={total} />
+              !!total && <Pagination current={pageNum} pageSize={pageSize} total={total} onChange={onPaginationChange} />
             }
           </>
         )

@@ -1,7 +1,6 @@
 import React, { useState, useCallback } from 'react'
 import { Modal, message, Form, Input } from 'antd'
 import { AddForm as Goods } from '../../../rematch/models/goods'
-import { useEnterEvent } from '../../../hooks'
 import { PriceInput } from '../../../components'
 
 interface Props {
@@ -45,8 +44,6 @@ const BaseForm: React.FC<Props> = function (props) {
     closeModal()
   }, [value, onSave, closeModal])
 
-  useEnterEvent(onOk, visible)
-
   return (
     <>
       { React.cloneElement(children, { onClick: openModal }) }
@@ -58,14 +55,14 @@ const BaseForm: React.FC<Props> = function (props) {
           <Form.Item label='商标'>
             <Input value={value.brand} onChange={onBrandChange} placeholder='请输入商标' />
           </Form.Item>
-          <Form.Item label='材质'>
-            <Input value={value.texture} onChange={onMaterialChange} placeholder='请输入材质' />
-          </Form.Item>
           <Form.Item label='规格'>
             <Input value={value.size} onChange={onSizeChange} placeholder='请输入规格' />
           </Form.Item>
           <Form.Item label='单价'>
             <PriceInput value={value.price || undefined} onChange={onPriceChange} />
+          </Form.Item>
+          <Form.Item label='材质'>
+            <Input value={value.texture} onChange={onMaterialChange} placeholder='请输入材质' />
           </Form.Item>
           <Form.Item label='备注'>
             <Input value={value.remark} onChange={onRemarkChange} placeholder='请输入备注' />

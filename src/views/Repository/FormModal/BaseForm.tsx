@@ -1,7 +1,6 @@
 import React, { useState, useCallback } from 'react'
 import { Modal, message, Form, Input, InputNumber } from 'antd'
 import { AddForm as Repository } from '../../../rematch/models/repository'
-import { useEnterEvent } from '../../../hooks'
 
 interface Props {
   title: string
@@ -41,8 +40,6 @@ const BaseForm: React.FC<Props> = function (props) {
     await onSave(form)
     closeModal()
   }, [value, onSave, closeModal])
-
-  useEnterEvent(onOk, visible)
 
   return (
     <>

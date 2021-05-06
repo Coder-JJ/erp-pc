@@ -41,23 +41,24 @@ const Component: React.FC = function () {
   }, [onDeleteId, dispatch.checkOut])
   const columns: ColumnsType<CheckOut> = useMemo(() => [
     { dataIndex: 'odd', title: '单号' },
-    { dataIndex: 'warehouseName', title: '出库仓库' },
-    { dataIndex: 'customName', title: '客户/商标' },
-    { dataIndex: 'receiverName', title: '收货方/厂家' },
+    { dataIndex: 'warehouseName', title: '入库仓库' },
+    { dataIndex: 'supplierName', title: '供应商' },
+    { dataIndex: 'signer', title: '签收人' },
     {
-      dataIndex: 'dealTime',
-      title: '开单时间',
+      dataIndex: 'receivedTime',
+      title: '签收时间',
       render (receivedTime, record) {
         return dayjs(receivedTime).format('YYYY-MM-DD')
       }
     },
-    // {
-    //   dataIndex: 'discount',
-    //   title: '折扣',
-    //   render (discount) {
-    //     return discount === 1 ? '--' : discount
-    //   }
-    // },
+    { dataIndex: 'remark', title: '备注' },
+    {
+      dataIndex: 'discount',
+      title: '折扣',
+      render (discount) {
+        return discount === 1 ? '--' : discount
+      }
+    },
     {
       dataIndex: 'paid',
       title: '应收金额',
@@ -65,7 +66,6 @@ const Component: React.FC = function () {
         return getCheckOutPriceDisplay(record)
       }
     },
-    { dataIndex: 'remark', title: '备注' },
     {
       dataIndex: 'id',
       width: 140,
@@ -97,15 +97,15 @@ const Component: React.FC = function () {
     { dataIndex: 'brand', title: '商标' },
     { dataIndex: 'texture', title: '材质' },
     { dataIndex: 'size', title: '规格' },
-    { dataIndex: 'num', title: '数量' },
     { dataIndex: 'price', title: '单价' },
-    // {
-    //   dataIndex: 'discount',
-    //   title: '折扣',
-    //   render (discount) {
-    //     return discount === 1 ? '--' : discount
-    //   }
-    // },
+    { dataIndex: 'num', title: '数量' },
+    {
+      dataIndex: 'discount',
+      title: '折扣',
+      render (discount) {
+        return discount === 1 ? '--' : discount
+      }
+    },
     {
       dataIndex: 'paid',
       title: '应收金额',
@@ -123,11 +123,6 @@ const Component: React.FC = function () {
   useEnterEvent(deleteCheckOut, !!onDeleteId)
   const renderFooter = useFooter()
 
-  const onPaginationChange = useCallback((pageNum: number, pageSize: number | undefined) => {
-    dispatch.checkOut.updateState({ pageNum, pageSize })
-    dispatch.checkOut.loadCheckOuts()
-  }, [dispatch.checkOut])
-
   return (
     <div className={styles.wrap}>
       <header className={styles.header}>
@@ -144,7 +139,7 @@ const Component: React.FC = function () {
               <Button type='primary'>新增</Button>
             </AddForm>
             {
-              !!total && <Pagination current={pageNum} pageSize={pageSize} total={total} onChange={onPaginationChange} />
+              !!total && <Pagination current={pageNum} pageSize={pageSize} total={total} />
             }
           </>
         )

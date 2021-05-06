@@ -49,6 +49,8 @@ export interface Filter {
 }
 
 export interface State {
+  didMount: boolean
+  shouldUpdate: boolean
   filter: Filter
   data: CheckIn[]
   total: number | null
@@ -89,6 +91,8 @@ const getInitialEditForm = (): EditForm => ({
 })
 
 const state: State = {
+  didMount: false,
+  shouldUpdate: false,
   filter: {
     odd: '',
     warehouseId: undefined,
@@ -106,9 +110,13 @@ const state: State = {
 export const checkIn = {
   state,
   reducers: {
+    shouldUpdate (state: State): State {
+      state.shouldUpdate = true
+      return state
+    },
     updateState (state: State, keyValues: Partial<State>): State {
       for (const [key, value] of Object.entries(keyValues)) {
-        state[key as keyof State] = value as any
+        state[key as keyof State] = value as never
       }
       return state
     },
@@ -174,12 +182,15 @@ export const checkIn = {
       }
       const filter: Filter = {
         ...store.checkIn.filter,
-        odd: store.checkIn.filter.odd.trim()
+        odd: store.checkIn.filter.odd.trim(),
+        pageNum: store.checkIn.pageNum,
+        pageSize: store.checkIn.pageSize
       }
       cancelTokenSource = axios.CancelToken.source()
       const result = await request.get<Page<CheckIn>, Page<CheckIn>>('/repertory/saveRecord/list', { params: filter, cancelToken: cancelTokenSource.token })
       cancelTokenSource = undefined
       dispatch.checkIn.updateState(result || {})
+      dispatch.checkIn.updateFilter({ pageNum: filter.pageNum, pageSize: filter.pageSize })
     },
     async addCheckIn (checkIn: AddForm) {
       await request.post('/repertory/saveRecord/insert', checkIn)

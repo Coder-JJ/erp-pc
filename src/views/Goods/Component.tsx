@@ -27,12 +27,11 @@ const Component: React.FC = function () {
     }
   }, [onDeleteId, dispatch.goods])
   const columns: ColumnsType<Goods> = useMemo(() => [
-    { dataIndex: 'id', title: '编号' },
     { dataIndex: 'name', title: '货物名称' },
     { dataIndex: 'brand', title: '商标' },
-    { dataIndex: 'texture', title: '材质' },
     { dataIndex: 'size', title: '规格' },
     { dataIndex: 'price', title: '单价' },
+    { dataIndex: 'texture', title: '材质' },
     { dataIndex: 'remark', title: '备注' },
     {
       dataIndex: 'id',

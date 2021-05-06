@@ -1,7 +1,6 @@
 import React, { useState, useCallback } from 'react'
 import { Modal, message, Form, Input, InputNumber } from 'antd'
 import { AddForm as Customer } from '../../../rematch/models/customer'
-import { useEnterEvent } from '../../../hooks'
 
 interface Props {
   title: string
@@ -22,15 +21,15 @@ const BaseForm: React.FC<Props> = function (props) {
   const onNameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('name', e.target.value), [onChange])
   const onLeaderChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('leader', e.target.value), [onChange])
   const onLeaderPhoneChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('leaderPhone', e.target.value), [onChange])
-  const onPhoneChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('phone', e.target.value), [onChange])
-  const onFaxChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('fax', e.target.value), [onChange])
+  // const onPhoneChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('phone', e.target.value), [onChange])
+  // const onFaxChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('fax', e.target.value), [onChange])
   const onAddressChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('address', e.target.value), [onChange])
   const onAddressDetailChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('addressDetail', e.target.value), [onChange])
-  const onBankChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('bank', e.target.value), [onChange])
-  const onBankAccountChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('bankAccount', e.target.value), [onChange])
-  const onBankAccountNameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('bankAccountName', e.target.value), [onChange])
-  const onMailChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('mail', e.target.value), [onChange])
-  const onRemarkChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('remark', e.target.value), [onChange])
+  // const onBankChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('bank', e.target.value), [onChange])
+  // const onBankAccountChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('bankAccount', e.target.value), [onChange])
+  // const onBankAccountNameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('bankAccountName', e.target.value), [onChange])
+  // const onMailChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('mail', e.target.value), [onChange])
+  // const onRemarkChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('remark', e.target.value), [onChange])
   const onSortChange = useCallback((value: string | number | undefined) => onChange('sort', value), [onChange])
 
   const onOk = useCallback(async () => {
@@ -58,8 +57,6 @@ const BaseForm: React.FC<Props> = function (props) {
     closeModal()
   }, [value, onSave, closeModal])
 
-  useEnterEvent(onOk, visible)
-
   return (
     <>
       { React.cloneElement(children, { onClick: openModal }) }
@@ -74,19 +71,19 @@ const BaseForm: React.FC<Props> = function (props) {
           <Form.Item label='负责人手机号码'>
             <Input value={value.leaderPhone} onChange={onLeaderPhoneChange} placeholder='请输入负责人手机号码' />
           </Form.Item>
-          <Form.Item label='座机号'>
+          { /* <Form.Item label='座机号'>
             <Input value={value.phone} onChange={onPhoneChange} placeholder='请输入座机号' />
           </Form.Item>
           <Form.Item label='传真号'>
             <Input value={value.fax} onChange={onFaxChange} placeholder='请输入传真号' />
-          </Form.Item>
+          </Form.Item> */ }
           <Form.Item label='地址（省市区）'>
             <Input value={value.address} onChange={onAddressChange} placeholder='请输入省市区' />
           </Form.Item>
           <Form.Item label='详细地址'>
             <Input value={value.addressDetail} onChange={onAddressDetailChange} placeholder='请输入详细地址' />
           </Form.Item>
-          <Form.Item label='开户行'>
+          { /* <Form.Item label='开户行'>
             <Input value={value.bank} onChange={onBankChange} placeholder='请输入开户行' />
           </Form.Item>
           <Form.Item label='银行账号'>
@@ -100,7 +97,7 @@ const BaseForm: React.FC<Props> = function (props) {
           </Form.Item>
           <Form.Item label='备注'>
             <Input value={value.remark} onChange={onRemarkChange} placeholder='请输入备注' />
-          </Form.Item>
+          </Form.Item> */ }
           <Form.Item label='顺序号'>
             <InputNumber value={value.sort} onChange={onSortChange} placeholder='请输入顺序号' />
           </Form.Item>

@@ -200,29 +200,35 @@ export const checkOut = {
       }
       const filter: Filter = {
         ...store.checkOut.filter,
-        odd: store.checkOut.filter.odd.trim()
+        odd: store.checkOut.filter.odd.trim(),
+        pageNum: store.checkOut.pageNum,
+        pageSize: store.checkOut.pageSize
       }
       cancelTokenSource = axios.CancelToken.source()
       const result = await request.get<Page<CheckOut>, Page<CheckOut>>('/repertory/fetchRecord/list', { params: filter, cancelToken: cancelTokenSource.token })
       cancelTokenSource = undefined
       dispatch.checkOut.updateState(result || {})
+      dispatch.checkOut.updateFilter({ pageNum: filter.pageNum, pageSize: filter.pageSize })
     },
     async addCheckOut (checkOut: AddForm) {
-      await request.post('/repertory/fetchRecord/insert', checkOut)
+      await request.post('/repertory/fetchAndSaveRecord/insert', checkOut)
       dispatch.checkOut.loadCheckOuts()
+      dispatch.checkIn.shouldUpdate()
       dispatch.stock.shouldUpdate()
       dispatch.stock.detailShouldUpdate(checkOut.warehouseId!)
     },
     async editCheckOut (checkOut: EditForm) {
-      await request.put('/repertory/fetchRecord/update', checkOut)
+      await request.put('/repertory/fetchAndSaveRecord/update', checkOut)
       dispatch.checkOut.loadCheckOuts()
+      dispatch.checkIn.shouldUpdate()
       dispatch.stock.shouldUpdate()
       dispatch.stock.detailShouldUpdate(checkOut.warehouseId)
     },
     async deleteCheckOut (id: number, store: RootState) {
       const repositoryId = store.checkOut.data.find(item => item.id === id)!.warehouseId
-      await request.delete(`/repertory/fetchRecord/delete/${id}`)
+      await request.delete(`/repertory/fetchAndSaveRecord/delete/${id}`)
       dispatch.checkOut.loadCheckOuts()
+      dispatch.checkIn.shouldUpdate()
       dispatch.stock.shouldUpdate()
       dispatch.stock.detailShouldUpdate(repositoryId)
     }

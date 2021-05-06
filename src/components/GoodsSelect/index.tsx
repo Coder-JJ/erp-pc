@@ -38,10 +38,10 @@ const GoodsSelect: React.FC<Props> = function ({ addButtonVisible, onChange, onA
     return {}
   }, [addButtonVisible, onAddGoods])
 
-  const itemFilter: Props['filterOption'] = useCallback((keyword, option) => {
+  const itemFilter: Props['filterOption'] = useCallback((keyword: string, option) => {
     const trimedKeyword = keyword.trim()
     const { name, brand, texture, size } = (option.data as Goods)
-    return name?.includes(trimedKeyword) || brand?.includes(trimedKeyword) || texture?.includes(trimedKeyword) || size?.includes(trimedKeyword)
+    return name?.toLowerCase()?.includes(trimedKeyword.toLowerCase()) || brand?.toLowerCase()?.includes(trimedKeyword.toLowerCase()) || texture?.includes(trimedKeyword) || size?.includes(trimedKeyword)
   }, [])
 
   return (
@@ -56,35 +56,48 @@ const GoodsSelect: React.FC<Props> = function ({ addButtonVisible, onChange, onA
       onChange={onGoodsChange}
     >
       {
-        goods.map(goods => (
-          <Option key={goods.id} value={goods.id} data={goods} name={goods.name}>
-            {
-              !!goods.brand?.trim() && (
-                <>
-                  <span>{ goods.brand }</span>
-                  <Divider type='vertical' />
-                </>
-              )
-            }
-            <span>{ goods.name }</span>
-            {
-              !!goods.size?.trim() && (
-                <>
-                  <Divider type='vertical' />
-                  <span>{ goods.size }</span>
-                </>
-              )
-            }
-            {
-              !!goods.texture?.trim() && (
-                <>
-                  <Divider type='vertical' />
-                  <span>{ goods.texture }</span>
-                </>
-              )
-            }
-          </Option>
-        ))
+        goods.map(goods => {
+          let name: string | React.ReactElement = goods.name
+          if (goods.size?.trim()) {
+            name = (
+              <div>
+                <span>{ goods.name }</span>
+                <Divider type='vertical' />
+                <span>{ goods.size }</span>
+              </div>
+            )
+          }
+
+          return (
+            <Option key={goods.id} value={goods.id} data={goods} name={name}>
+              {
+                !!goods.brand?.trim() && (
+                  <>
+                    <span>{ goods.brand }</span>
+                    <Divider type='vertical' />
+                  </>
+                )
+              }
+              <span>{ goods.name }</span>
+              {
+                !!goods.size?.trim() && (
+                  <>
+                    <Divider type='vertical' />
+                    <span>{ goods.size }</span>
+                  </>
+                )
+              }
+              {
+                !!goods.texture?.trim() && (
+                  <>
+                    <Divider type='vertical' />
+                    <span>{ goods.texture }</span>
+                  </>
+                )
+              }
+            </Option>
+          )
+        })
       }
     </Select>
   )

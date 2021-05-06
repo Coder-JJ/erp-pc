@@ -28,7 +28,6 @@ const Component: React.FC = function () {
     }
   }, [onDeleteId, dispatch.supplier])
   const columns: ColumnsType<Supplier> = useMemo(() => [
-    { dataIndex: 'id', title: '编号' },
     { dataIndex: 'name', title: '供应商名称' },
     { dataIndex: 'leader', title: '负责人' },
     { dataIndex: 'leaderPhone', title: '负责人手机号码' },

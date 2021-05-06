@@ -14,7 +14,6 @@ import { ScrollTable } from '../../../components'
 const { Option } = Select
 
 const columns: ColumnsType<StockDetail> = [
-  { dataIndex: 'goodId', title: '编号' },
   { dataIndex: 'goodName', title: '名称' },
   { dataIndex: 'goodBrand', title: '商标' },
   { dataIndex: 'goodSize', title: '规格' },

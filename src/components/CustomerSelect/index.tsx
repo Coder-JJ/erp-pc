@@ -1,5 +1,5 @@
 import styles from './index.less'
-import React, { useMemo, useCallback } from 'react'
+import React, { useMemo, useCallback, useState } from 'react'
 import { Select, Divider, Button } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import { SelectProps } from 'antd/lib/select'
@@ -15,6 +15,12 @@ interface Props extends SelectProps<number> {
 }
 
 const CustomerSelect: React.FC<Props> = function ({ addButtonVisible, onAdd, ...props }) {
+  const [open, setOpen] = useState(false)
+  const onFocus = useCallback(() => setOpen(true), [])
+  const onBlur = useCallback(() => setOpen(false), [])
+  const onInputKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    // console.log(e.keyCode)
+  }, [])
   const [customers] = useCustomers()
   const dropdownRender = useMemo<{} | { dropdownRender: Props['dropdownRender'] }>(() => {
     if (addButtonVisible) {
@@ -35,14 +41,18 @@ const CustomerSelect: React.FC<Props> = function ({ addButtonVisible, onAdd, ...
     return {}
   }, [addButtonVisible, onAdd])
 
-  const itemFilter: Props['filterOption'] = useCallback((keyword, option) => {
+  const itemFilter: Props['filterOption'] = useCallback((keyword: string, option) => {
     const trimedKeyword = keyword.trim()
     const { name, leader } = (option.data as Customer)
-    return name?.includes(trimedKeyword) || leader?.includes(trimedKeyword)
+    return name?.toLowerCase()?.includes(trimedKeyword.toLowerCase()) || leader?.toLowerCase()?.includes(trimedKeyword.toLowerCase())
   }, [])
 
   return (
     <Select<number>
+      open={open}
+      onFocus={onFocus}
+      onBlur={onBlur}
+      onInputKeyDown={onInputKeyDown}
       placeholder='请选择'
       {...dropdownRender}
       showSearch

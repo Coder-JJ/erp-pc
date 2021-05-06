@@ -4,10 +4,10 @@ import { Modal, message, Form, Input, Table, InputNumber, Button } from 'antd'
 import { ColumnsType } from 'antd/lib/table'
 import { GetRowKey } from 'antd/lib/table/interface'
 import dayjs, { Dayjs } from 'dayjs'
-import { Goods } from '../../../rematch/models/goods'
+import { StockDetail } from '../../../rematch/models/stock'
 import { AddForm as CheckOut, GoodsForm } from '../../../rematch/models/checkOut'
 import { getCheckOutPrice, getGoodsPrice } from '../../../utils'
-import { DatePicker, RepositorySelect, PriceInput, CustomerSelect, GoodsSelect } from '../../../components'
+import { DatePicker, RepositorySelect, RepositoryGoodsSelect, PriceInput, CustomerSelect } from '../../../components'
 
 interface Props {
   title: string
@@ -39,10 +39,7 @@ const BaseForm: React.FC<Props> = function (props) {
   const closeModal = useCallback(() => !saving && setVisible(false), [saving])
 
   const addGoods = useCallback(() => onAddGoods(), [onAddGoods])
-  const onDealTimeChange = useCallback((value: Dayjs | null, dateString: string) => {
-    onChange('dealTime', value!.valueOf())
-    onChange('receivedTime', value!.valueOf())
-  }, [onChange])
+  const onDealTimeChange = useCallback((value: Dayjs | null, dateString: string) => onChange('dealTime', value!.valueOf()), [onChange])
   const onOddChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('odd', e.target.value), [onChange])
   const onRepositoryChange = useCallback((value: number) => {
     onChange('warehouseId', value)
@@ -51,25 +48,25 @@ const BaseForm: React.FC<Props> = function (props) {
   }, [onChange, addGoods])
   const onCustomerChange = useCallback((value: number) => onChange('customId', value), [onChange])
   const onReceiverIdChange = useCallback((value: number) => onChange('receiverId', value), [onChange])
-  // const onReceiverChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('receiver', e.target.value), [onChange])
-  // const onReceiverPhoneChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('receiverPhone', e.target.value), [onChange])
-  // const onReceivedAddressChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('receivedAddress', e.target.value), [onChange])
-  const onReceivedTimeChange = useCallback((value: Dayjs | null, dateString: string) => onChange('receivedTime', value ? value.valueOf() : null), [onChange])
+  const onReceiverChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('receiver', e.target.value), [onChange])
+  const onReceiverPhoneChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('receiverPhone', e.target.value), [onChange])
+  const onReceivedAddressChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('receivedAddress', e.target.value), [onChange])
+  const onReceivedTimeChange = useCallback((value: Dayjs | null, dateString: string) => onChange('dealTime', value ? value.valueOf() : null), [onChange])
   const onGoodsPropChange = useCallback((index: number, key: keyof GoodsForm, value: any) => passedOnGoodsPropChange(index, key, value), [passedOnGoodsPropChange])
-  const onSelectGoods = useCallback((index: number, value: number | undefined, goods: Goods[]) => {
+  const onSelectGoods = useCallback((index: number, value: number | undefined, goods: StockDetail[]) => {
     onGoodsPropChange(index, 'goodsId', value)
-    const selectedGoods = goods.find(({ id }) => id === value)
-    if (selectedGoods && typeof selectedGoods.price === 'number') {
-      onGoodsPropChange(index, 'price', selectedGoods.price)
+    const selectedGoods = goods.find(({ goodId }) => goodId === value)
+    if (selectedGoods && typeof selectedGoods.goodPrice === 'number') {
+      onGoodsPropChange(index, 'price', selectedGoods.goodPrice)
     }
   }, [onGoodsPropChange])
   const deleteGoods = useCallback((index: number) => onDeleteGoods(index), [onDeleteGoods])
-  // const onSignerChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('signer', e.target.value), [onChange])
+  const onSignerChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('signer', e.target.value), [onChange])
   // const onDiscountChange = useCallback((value: string | number | undefined) => onChange('discount', value), [onChange])
   const onPaidChange = useCallback((value: string | number | undefined) => onChange('paid', value), [onChange])
   const onRemarkChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('remark', e.target.value), [onChange])
-  // const onOtherCostNameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('otherCostName', e.target.value), [onChange])
-  // const onOtherCostChange = useCallback((value: string | number | undefined) => onChange('otherCost', value), [onChange])
+  const onOtherCostNameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('otherCostName', e.target.value), [onChange])
+  const onOtherCostChange = useCallback((value: string | number | undefined) => onChange('otherCost', value), [onChange])
 
   const onOk = useCallback(async () => {
     const form: CheckOut = {
@@ -87,22 +84,18 @@ const BaseForm: React.FC<Props> = function (props) {
       message.error('请输入单号')
       return
     }
-    if (!form.warehouseId) {
-      message.error('请选择出库仓库')
-      return
-    }
     if (!form.dealTime) {
       message.error('请选择开单时间')
       return
     }
-    if (typeof form.customId !== 'number' && typeof form.receiverId !== 'number') {
-      message.error('请选择客户/商标/厂家')
+    if (!form.warehouseId) {
+      message.error('请选择出库仓库')
       return
     }
-    // if (!form.fetchGoodsRecordList.length) {
-    //   message.error('请正确填写出库货物')
-    //   return
-    // }
+    if (!form.fetchGoodsRecordList.length) {
+      message.error('请正确填写出库货物')
+      return
+    }
     await onSave(form)
     closeModal()
   }, [value, onSave, closeModal])
@@ -113,7 +106,7 @@ const BaseForm: React.FC<Props> = function (props) {
       dataIndex: 'goodsId',
       title: '货物',
       render (goodsId, record, index) {
-        return <GoodsSelect value={goodsId} onChange={(value, goods) => onSelectGoods(index, value, goods)} onAdd={(id, goods) => onSelectGoods(index, id, goods)} allowClear addButtonVisible />
+        return <RepositoryGoodsSelect repositoryId={value.warehouseId!} value={goodsId} onChange={(value, goods) => onSelectGoods(index, value, goods)} allowClear />
       }
     },
     {
@@ -162,7 +155,7 @@ const BaseForm: React.FC<Props> = function (props) {
   return (
     <>
       { React.cloneElement(children, { onClick: openModal }) }
-      <Modal wrapClassName={styles.wrap} visible={visible} onOk={onOk} onCancel={closeModal} width={800} title={title} confirmLoading={saving}>
+      <Modal wrapClassName={styles.wrap} visible={visible} onOk={onOk} onCancel={closeModal} width={1000} title={title} confirmLoading={saving}>
         <Form>
           <div className={styles.spaceBetween}>
             <Form.Item className={styles.item} label='开单时间' required>
@@ -186,7 +179,7 @@ const BaseForm: React.FC<Props> = function (props) {
               <DatePicker value={value.receivedTime === null ? null : dayjs(value.receivedTime)} onChange={onReceivedTimeChange} placeholder='请选择收货时间' />
             </Form.Item>
           </div>
-          { /* <div className={styles.spaceBetween}>
+          <div className={styles.spaceBetween}>
             <Form.Item className={styles.item} label='收货联系人'>
               <Input value={value.receiver} onChange={onReceiverChange} placeholder='请输入收货联系人' />
             </Form.Item>
@@ -196,21 +189,18 @@ const BaseForm: React.FC<Props> = function (props) {
             <Form.Item className={styles.item} label='收货地址'>
               <Input value={value.receivedAddress} onChange={onReceivedAddressChange} placeholder='请输入收货地址' />
             </Form.Item>
-          </div> */ }
+          </div>
           <Form.Item>
             <Table<GoodsForm> rowKey={goodsTableRowKey} columns={goodsColumns} dataSource={value.fetchGoodsRecordList} bordered pagination={false} size='middle' />
           </Form.Item>
           <div className={styles.spaceBetween}>
             <div className={styles.flex}>
-              <Form.Item label='备注' className={styles.item}>
-                <Input value={value.remark} onChange={onRemarkChange} placeholder='请输入备注' />
-              </Form.Item>
-              { /* <Form.Item label='其他费用'>
+              <Form.Item label='其他费用'>
                 <PriceInput value={value.otherCost === null ? undefined : value.otherCost} onChange={onOtherCostChange} placeholder='请输入费用金额' />
               </Form.Item>
               <Form.Item label='费用说明'>
                 <Input value={value.otherCostName} onChange={onOtherCostNameChange} placeholder='请输入费用说明' />
-              </Form.Item> */ }
+              </Form.Item>
             </div>
             <div className={styles.flex}>
               { /* <Form.Item label='折扣'>
@@ -221,14 +211,14 @@ const BaseForm: React.FC<Props> = function (props) {
               </Form.Item>
             </div>
           </div>
-          { /* <div className={styles.spaceBetween}>
+          <div className={styles.spaceBetween}>
             <Form.Item label='备注' className={styles.item}>
               <Input value={value.remark} onChange={onRemarkChange} placeholder='请输入备注' />
             </Form.Item>
             <Form.Item className={styles.item} label='签收人'>
               <Input value={value.signer} onChange={onSignerChange} placeholder='请输入签收人' />
             </Form.Item>
-          </div> */ }
+          </div>
         </Form>
       </Modal>
     </>

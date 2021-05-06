@@ -15,10 +15,10 @@ const RepositoryGoodsSelect: React.FC<Props> = function ({ onChange, ...props })
   const goods = useRepostitoryGoods(props.repositoryId)
   const onGoodsChange = useCallback((value: number | undefined) => onChange && onChange(value, goods), [onChange, goods])
 
-  const itemFilter: Props['filterOption'] = useCallback((keyword, option) => {
+  const itemFilter: Props['filterOption'] = useCallback((keyword: string, option) => {
     const trimedKeyword = keyword.trim()
     const { goodName, goodBrand, goodTexture, goodSize } = (option.data as StockDetail)
-    return goodName?.includes(trimedKeyword) || goodBrand?.includes(trimedKeyword) || goodTexture?.includes(trimedKeyword) || goodSize?.includes(trimedKeyword)
+    return goodName?.toLowerCase()?.includes(trimedKeyword.toLowerCase()) || goodBrand?.toLowerCase()?.includes(trimedKeyword.toLowerCase()) || goodTexture?.includes(trimedKeyword) || goodSize?.includes(trimedKeyword)
   }, [])
 
   return (
@@ -32,36 +32,48 @@ const RepositoryGoodsSelect: React.FC<Props> = function ({ onChange, ...props })
       onChange={onGoodsChange}
     >
       {
-        goods.map(goods => (
-          <Option key={goods.goodId} value={goods.goodId} data={goods} name={goods.goodName}>
+        goods.map(goods => {
+          let name: string | React.ReactElement = goods.goodName
+          if (goods.goodSize?.trim()) {
+            name = (
+              <div>
+                <span>{ goods.goodName }</span>
+                <Divider type='vertical' />
+                <span>{ goods.goodSize }</span>
+              </div>
+            )
+          }
 
-            {
-              !!goods.goodBrand?.trim() && (
-                <>
-                  <span>{ goods.goodBrand }</span>
-                  <Divider type='vertical' />
-                </>
-              )
-            }
-            <span>{ goods.goodName }</span>
-            {
-              !!goods.goodSize?.trim() && (
-                <>
-                  <Divider type='vertical' />
-                  <span>{ goods.goodSize }</span>
-                </>
-              )
-            }
-            {
-              !!goods.goodTexture?.trim() && (
-                <>
-                  <Divider type='vertical' />
-                  <span>{ goods.goodTexture }</span>
-                </>
-              )
-            }
-          </Option>
-        ))
+          return (
+            <Option key={goods.goodId} value={goods.goodId} data={goods} name={name}>
+              {
+                !!goods.goodBrand?.trim() && (
+                  <>
+                    <span>{ goods.goodBrand }</span>
+                    <Divider type='vertical' />
+                  </>
+                )
+              }
+              <span>{ goods.goodName }</span>
+              {
+                !!goods.goodSize?.trim() && (
+                  <>
+                    <Divider type='vertical' />
+                    <span>{ goods.goodSize }</span>
+                  </>
+                )
+              }
+              {
+                !!goods.goodTexture?.trim() && (
+                  <>
+                    <Divider type='vertical' />
+                    <span>{ goods.goodTexture }</span>
+                  </>
+                )
+              }
+            </Option>
+          )
+        })
       }
     </Select>
   )

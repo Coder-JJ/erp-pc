@@ -1,5 +1,5 @@
 import styles from './index.less'
-import React, { useMemo, useCallback } from 'react'
+import React, { useMemo, useCallback, useEffect } from 'react'
 import { Select, Divider, Button } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import { SelectProps } from 'antd/lib/select'
@@ -9,12 +9,13 @@ import { Repository } from '../../rematch/models/repository'
 
 const { Option } = Select
 
-interface Props extends SelectProps<number> {
+interface Props extends Omit<SelectProps<number>, 'onChange'> {
   addButtonVisible?: boolean
+  onChange (id: number): void
   onAdd? (id: number): void
 }
 
-const RepositorySelect: React.FC<Props> = function ({ addButtonVisible, onAdd, ...props }) {
+const RepositorySelect: React.FC<Props> = function ({ value, addButtonVisible, onAdd, onChange, ...props }) {
   const [repositories] = useRepositories()
   const dropdownRender = useMemo<{} | { dropdownRender: Props['dropdownRender'] }>(() => {
     if (addButtonVisible) {
@@ -41,14 +42,24 @@ const RepositorySelect: React.FC<Props> = function ({ addButtonVisible, onAdd, .
     return name?.includes(trimedKeyword) || leader?.includes(trimedKeyword)
   }, [])
 
+  const onSelectChange = useCallback((value: number) => onChange && onChange(value), [onChange])
+
+  useEffect(() => {
+    if (typeof value !== 'number' && repositories.length === 1) {
+      onSelectChange(repositories[0].id)
+    }
+  }, [value, repositories, onSelectChange])
+
   return (
     <Select<number>
+      value={value}
       placeholder='请选择仓库'
       {...dropdownRender}
       showSearch
       filterOption={itemFilter}
       dropdownMatchSelectWidth={false}
       {...props}
+      onChange={onSelectChange}
       optionLabelProp='name'
     >
       {

@@ -28,7 +28,6 @@ const Component: React.FC = function () {
     }
   }, [onDeleteId, dispatch.customer])
   const columns: ColumnsType<Customer> = useMemo(() => [
-    { dataIndex: 'id', title: '编号' },
     { dataIndex: 'name', title: '客户名称' },
     { dataIndex: 'leader', title: '负责人' },
     { dataIndex: 'leaderPhone', title: '负责人手机号码' },

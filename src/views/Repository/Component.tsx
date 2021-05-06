@@ -27,7 +27,6 @@ const Component: React.FC = function () {
     }
   }, [onDeleteId, dispatch.repository])
   const columns: ColumnsType<Repository> = useMemo(() => [
-    { dataIndex: 'id', title: '编号' },
     { dataIndex: 'name', title: '仓库名称' },
     { dataIndex: 'leader', title: '负责人' },
     { dataIndex: 'leaderPhone', title: '负责人手机号码' },
