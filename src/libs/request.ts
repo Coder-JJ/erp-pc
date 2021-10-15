@@ -1,5 +1,7 @@
 import axios, { AxiosResponse } from 'axios'
 import { notification } from 'antd'
+import store from '../rematch'
+import { LoginStatus } from '../rematch/models/app'
 
 export interface Response<T = any> {
   status: boolean
@@ -42,7 +44,7 @@ instance.interceptors.response.use(
       if (status) {
         return result
       } else if (statusCode === '401') {
-        // 登录过期
+        store.dispatch.app.updateState({ loginStatus: LoginStatus.LoginTimeout })
       }
       notification.error({ message: '错误', description: statusMessage || statusCode })
       return Promise.reject(statusMessage || statusCode)

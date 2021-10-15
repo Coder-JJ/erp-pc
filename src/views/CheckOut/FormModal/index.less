@@ -1,7 +1,7 @@
 .wrap {
   :global {
     .ant-table-cell {
-      > * {
+      > :not(.ant-btn) {
         width: 100%;
       }
     }
@@ -24,7 +24,7 @@
 }
 
 .item {
-  width: 240px;
+  width: 300px;
 
   :global {
     .ant-picker,
@@ -38,4 +38,8 @@
   :global(.ant-input-number-input)::placeholder {
     color: rgba(0, 0, 0, 0.85);
   }
+}
+
+.hidden {
+  display: none;
 }

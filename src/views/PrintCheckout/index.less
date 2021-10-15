@@ -1,0 +1,116 @@
+@page {
+  size: 241mm 93mm;
+  margin: 0;
+}
+
+.wrap {
+  position: relative;
+  margin: 0 auto;
+
+  * {
+    color: #000 !important;
+  }
+}
+
+.odd {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 8mm;
+  line-height: 8mm;
+  font-size: 20pt;
+}
+
+.company {
+  box-sizing: content-box;
+  width: 90mm;
+  height: 8mm;
+  line-height: 8mm;
+  padding-bottom: 2mm;
+  margin: 0 auto;
+  border-bottom: 3pt double #000;
+  font-size: 20pt;
+  text-align: center;
+  text-indent: 4mm;
+  letter-spacing: 4mm;
+}
+
+.caption {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 6mm;
+  margin-top: 2mm;
+  font-size: 12pt;
+
+  .year {
+    width: 10mm;
+
+    &::after {
+      content: "年";
+      margin-left: 2mm;
+    }
+  }
+
+  .month {
+    width: 10mm;
+    margin-left: 2mm;
+
+    &::after {
+      content: "月";
+      margin-left: 2mm;
+    }
+  }
+
+  .day {
+    width: 10mm;
+    margin-left: 2mm;
+
+    &::after {
+      content: "日";
+      margin-left: 2mm;
+    }
+  }
+}
+
+.table {
+  width: 100%;
+  margin-top: 2mm;
+  border-right: 1pt solid #000;
+  border-bottom: 1pt solid #000;
+  border-spacing: 0;
+  border-collapse: separate;
+  font-size: 12pt;
+
+  th,
+  td {
+    height: 7mm;
+    padding: 0 2pt;
+    border-top: 1pt solid #000;
+    border-left: 1pt solid #000;
+  }
+
+  tfoot {
+    letter-spacing: 1pt;
+
+    td + td {
+      border-left: 0;
+      text-indent: 1pt;
+    }
+  }
+}
+
+.footer {
+  line-height: 6mm;
+  margin-top: 2mm;
+  font-size: 12pt;
+
+  .tr {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .tr + .tr {
+    margin-top: 1mm;
+  }
+}

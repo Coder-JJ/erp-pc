@@ -17,7 +17,7 @@ const columns: ColumnsType<StockDetail> = [
   { dataIndex: 'goodName', title: '名称' },
   { dataIndex: 'goodBrand', title: '商标' },
   { dataIndex: 'goodSize', title: '规格' },
-  { dataIndex: 'goodTexture', title: '材质' },
+  // { dataIndex: 'goodTexture', title: '材质' },
   { dataIndex: 'num', title: '数量' },
   { dataIndex: 'goodRemark', title: '备注' }
 ]

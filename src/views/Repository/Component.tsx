@@ -1,7 +1,7 @@
 import styles from './index.less'
 import React, { useMemo, useCallback, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { Input, Button, Popconfirm } from 'antd'
+import { Input, Button, Popconfirm, Form } from 'antd'
 import { ColumnsType } from 'antd/lib/table'
 import { RootState, Dispatch } from '../../rematch'
 import { Repository } from '../../rematch/models/repository'
@@ -63,8 +63,11 @@ const Component: React.FC = function () {
   return (
     <div className={styles.wrap}>
       <header className={styles.header}>
-        <span>关键字：</span>
-        <Input className={styles.input} value={keyword} onChange={onKeywordChange} placeholder='请输入关键字' />
+        <Form layout='inline'>
+          <Form.Item label='关键字'>
+            <Input className={styles.input} value={keyword} onChange={onKeywordChange} placeholder='请输入关键字' />
+          </Form.Item>
+        </Form>
       </header>
       <footer className={styles.footer}>
         <ScrollTable<Repository> rowKey='id' columns={columns} dataSource={data} loading={loading} />

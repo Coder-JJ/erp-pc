@@ -9,12 +9,14 @@ import { Customer } from '../../rematch/models/customer'
 
 const { Option } = Select
 
-interface Props extends SelectProps<number> {
+type SelectValue = number | number[]
+
+interface Props<T> extends SelectProps<T> {
   addButtonVisible?: boolean
   onAdd? (id: number): void
 }
 
-const CustomerSelect: React.FC<Props> = function ({ addButtonVisible, onAdd, ...props }) {
+const CustomerSelect = function <T extends SelectValue = SelectValue> ({ addButtonVisible, onAdd, ...props }: React.PropsWithChildren<Props<T>>): React.ReactElement {
   const [open, setOpen] = useState(false)
   const onFocus = useCallback(() => setOpen(true), [])
   const onBlur = useCallback(() => setOpen(false), [])
@@ -22,7 +24,7 @@ const CustomerSelect: React.FC<Props> = function ({ addButtonVisible, onAdd, ...
     // console.log(e.keyCode)
   }, [])
   const [customers] = useCustomers()
-  const dropdownRender = useMemo<{} | { dropdownRender: Props['dropdownRender'] }>(() => {
+  const dropdownRender = useMemo<{} | { dropdownRender: Props<T>['dropdownRender'] }>(() => {
     if (addButtonVisible) {
       return {
         dropdownRender: menu => (
@@ -41,14 +43,14 @@ const CustomerSelect: React.FC<Props> = function ({ addButtonVisible, onAdd, ...
     return {}
   }, [addButtonVisible, onAdd])
 
-  const itemFilter: Props['filterOption'] = useCallback((keyword: string, option) => {
+  const itemFilter: Props<T>['filterOption'] = useCallback((keyword: string, option) => {
     const trimedKeyword = keyword.trim()
     const { name, leader } = (option.data as Customer)
     return name?.toLowerCase()?.includes(trimedKeyword.toLowerCase()) || leader?.toLowerCase()?.includes(trimedKeyword.toLowerCase())
   }, [])
 
   return (
-    <Select<number>
+    <Select<T>
       open={open}
       onFocus={onFocus}
       onBlur={onBlur}
@@ -80,4 +82,4 @@ const CustomerSelect: React.FC<Props> = function ({ addButtonVisible, onAdd, ...
   )
 }
 
-export default React.memo(CustomerSelect)
+export default React.memo(CustomerSelect) as typeof CustomerSelect

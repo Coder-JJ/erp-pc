@@ -1,5 +1,5 @@
 import { useContext, useEffect } from 'react'
-import AppContext, { RenderFooter } from '../AppContext'
+import AppContext, { RenderFooter } from '../LayoutContext'
 
 const useFooter = (): RenderFooter => {
   const { showFooter, hideFooter, renderFooter } = useContext(AppContext)

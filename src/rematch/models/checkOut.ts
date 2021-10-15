@@ -1,8 +1,9 @@
+import { createModel } from '@rematch/core'
+import type { RootModel } from '.'
 import axios, { CancelTokenSource } from 'axios'
 import dayjs from 'dayjs'
 import { request } from '../../libs'
 import { Page } from '../../libs/request'
-import { Dispatch, RootState } from '../../rematch'
 import { GoodsProps } from './goods'
 
 export interface GoodsForm {
@@ -11,6 +12,9 @@ export interface GoodsForm {
   price: number
   discount: number
   paid: number | null
+  reticule: number
+  shoeCover: number
+  container: number
 }
 
 export interface Goods extends Omit<GoodsProps, 'price'>, GoodsForm {
@@ -76,14 +80,21 @@ export interface State {
   editForm: EditForm
 }
 
+export const loadCheckOut = (id: number | string, cancelTokenSource?: CancelTokenSource): Promise<CheckOut> => {
+  return request.get<CheckOut, CheckOut>(`/repertory/fetchRecord/${id}`, { cancelToken: cancelTokenSource?.token })
+}
+
 let cancelTokenSource: CancelTokenSource | undefined
 
-const getInitialGoods = (): GoodsForm => ({
+export const getInitialGoods = (): GoodsForm => ({
   goodsId: undefined,
   num: 0,
   price: 0,
   discount: 1,
-  paid: null
+  paid: null,
+  reticule: 0,
+  shoeCover: 0,
+  container: 0
 })
 
 const getInitialAddForm = (): AddForm => ({
@@ -129,7 +140,7 @@ const state: State = {
   editForm: getInitialEditForm()
 }
 
-export const checkOut = {
+export const checkOut = createModel<RootModel>()({
   state,
   reducers: {
     updateState (state: State, keyValues: Partial<State>): State {
@@ -193,8 +204,8 @@ export const checkOut = {
       return state
     }
   },
-  effects: (dispatch: Dispatch) => ({
-    async loadCheckOuts (_: any, store: RootState) {
+  effects: dispatch => ({
+    async loadCheckOuts (_: any, store) {
       if (cancelTokenSource) {
         cancelTokenSource.cancel('cancel repetitive request.')
       }
@@ -224,7 +235,7 @@ export const checkOut = {
       dispatch.stock.shouldUpdate()
       dispatch.stock.detailShouldUpdate(checkOut.warehouseId)
     },
-    async deleteCheckOut (id: number, store: RootState) {
+    async deleteCheckOut (id: number, store) {
       const repositoryId = store.checkOut.data.find(item => item.id === id)!.warehouseId
       await request.delete(`/repertory/fetchAndSaveRecord/delete/${id}`)
       dispatch.checkOut.loadCheckOuts()
@@ -233,4 +244,4 @@ export const checkOut = {
       dispatch.stock.detailShouldUpdate(repositoryId)
     }
   })
-}
+})

@@ -1,7 +1,7 @@
 import styles from './index.less'
 import React, { useMemo, useCallback, useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { Input, Button, Popconfirm, Pagination } from 'antd'
+import { Input, Button, Popconfirm, Pagination, Form } from 'antd'
 import Table, { ColumnsType } from 'antd/lib/table'
 import { ExpandableConfig } from 'antd/lib/table/interface'
 import { debounce } from 'lodash'
@@ -96,7 +96,7 @@ const Component: React.FC = function () {
   const goodsColumns: ColumnsType<Goods> = useMemo(() => [
     { dataIndex: 'name', title: '货物名称' },
     { dataIndex: 'brand', title: '商标' },
-    { dataIndex: 'texture', title: '材质' },
+    // { dataIndex: 'texture', title: '材质' },
     { dataIndex: 'size', title: '规格' },
     { dataIndex: 'num', title: '数量' },
     { dataIndex: 'price', title: '单价' },
@@ -132,8 +132,11 @@ const Component: React.FC = function () {
   return (
     <div className={styles.wrap}>
       <header className={styles.header}>
-        <span>单号：</span>
-        <Input className={styles.input} value={filter.odd} onChange={onOddChange} placeholder='请输入单号' />
+        <Form layout='inline'>
+          <Form.Item label='单号'>
+            <Input className={styles.input} value={filter.odd} onChange={onOddChange} placeholder='请输入单号' />
+          </Form.Item>
+        </Form>
       </header>
       <footer className={styles.footer}>
         <ScrollTable<CheckIn> rowKey='id' columns={columns} dataSource={data} loading={loading} expandable={expandable} />

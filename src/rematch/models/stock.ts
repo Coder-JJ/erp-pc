@@ -1,5 +1,6 @@
+import { createModel } from '@rematch/core'
+import type { RootModel } from '.'
 import { request } from '../../libs'
-import { Dispatch } from '../../rematch'
 
 export interface StockOverview {
   warehouseId: number
@@ -49,7 +50,7 @@ const state: State = {
   detailFilter: ''
 }
 
-export const stock = {
+export const stock = createModel<RootModel>()({
   state,
   reducers: {
     shouldUpdate (state: State): State {
@@ -79,7 +80,7 @@ export const stock = {
       return state
     }
   },
-  effects: (dispatch: Dispatch) => ({
+  effects: dispatch => ({
     async loadStockOverviews () {
       const overviews = await request.get<StockOverview[], StockOverview[]>('/warehouse/statistics')
       dispatch.stock.updateState({ overviews })
@@ -89,4 +90,4 @@ export const stock = {
       dispatch.stock.updateDetails({ id, data })
     }
   })
-}
+})

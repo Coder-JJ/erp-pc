@@ -4,6 +4,7 @@ import { Modal, message, Form, Input, Table, InputNumber, Button } from 'antd'
 import { ColumnsType } from 'antd/lib/table'
 import { GetRowKey } from 'antd/lib/table/interface'
 import dayjs, { Dayjs } from 'dayjs'
+import { useGoods } from '../../../hooks'
 import { Goods } from '../../../rematch/models/goods'
 import { AddForm as CheckOut, GoodsForm } from '../../../rematch/models/checkOut'
 import { getCheckOutPrice, getGoodsPrice } from '../../../utils'
@@ -51,18 +52,53 @@ const BaseForm: React.FC<Props> = function (props) {
   }, [onChange, addGoods])
   const onCustomerChange = useCallback((value: number) => onChange('customId', value), [onChange])
   const onReceiverIdChange = useCallback((value: number) => onChange('receiverId', value), [onChange])
-  // const onReceiverChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('receiver', e.target.value), [onChange])
-  // const onReceiverPhoneChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('receiverPhone', e.target.value), [onChange])
-  // const onReceivedAddressChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('receivedAddress', e.target.value), [onChange])
+  const onReceiverChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('receiver', e.target.value), [onChange])
+  const onReceiverPhoneChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('receiverPhone', e.target.value), [onChange])
+  const onReceivedAddressChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('receivedAddress', e.target.value), [onChange])
   const onReceivedTimeChange = useCallback((value: Dayjs | null, dateString: string) => onChange('receivedTime', value ? value.valueOf() : null), [onChange])
   const onGoodsPropChange = useCallback((index: number, key: keyof GoodsForm, value: any) => passedOnGoodsPropChange(index, key, value), [passedOnGoodsPropChange])
-  const onSelectGoods = useCallback((index: number, value: number | undefined, goods: Goods[]) => {
+  const onSelectGoods = useCallback((index: number, record: GoodsForm, value: number | undefined, goods: Goods[]) => {
     onGoodsPropChange(index, 'goodsId', value)
-    const selectedGoods = goods.find(({ id }) => id === value)
-    if (selectedGoods && typeof selectedGoods.price === 'number') {
-      onGoodsPropChange(index, 'price', selectedGoods.price)
+    const item = goods.find(({ id }) => id === value)
+    if (!item) {
+      return
+    }
+    const { price, ifNeedReticule, ifNeedShoeCover, containerSize } = item
+    if (typeof price === 'number') {
+      onGoodsPropChange(index, 'price', price)
+    }
+    if (!record.num) {
+      return
+    }
+    if (ifNeedReticule && record.reticule === 0) {
+      onGoodsPropChange(index, 'reticule', record.num)
+    }
+    if (ifNeedShoeCover && record.shoeCover === 0) {
+      onGoodsPropChange(index, 'shoeCover', record.num)
+    }
+    if (typeof containerSize === 'number' && containerSize > 0 && record.container === 0) {
+      onGoodsPropChange(index, 'container', Math.ceil((record.num || 0) / containerSize))
     }
   }, [onGoodsPropChange])
+  const [goods] = useGoods()
+  const onGoodsNumChange = useCallback((index: number, record: GoodsForm, value: any) => {
+    const currentNum = record.num
+    onGoodsPropChange(index, 'num', value)
+    const item = goods.find(({ id }) => id === record.goodsId)
+    if (!item) {
+      return
+    }
+    const { ifNeedReticule, ifNeedShoeCover, containerSize } = item
+    if (ifNeedReticule && record.reticule === currentNum) {
+      onGoodsPropChange(index, 'reticule', value)
+    }
+    if (ifNeedShoeCover && record.shoeCover === currentNum) {
+      onGoodsPropChange(index, 'shoeCover', value)
+    }
+    if (typeof containerSize === 'number' && containerSize > 0 && record.container === Math.ceil(currentNum / containerSize)) {
+      onGoodsPropChange(index, 'container', Math.ceil((value || 0) / containerSize))
+    }
+  }, [goods, onGoodsPropChange])
   const deleteGoods = useCallback((index: number) => onDeleteGoods(index), [onDeleteGoods])
   // const onSignerChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('signer', e.target.value), [onChange])
   // const onDiscountChange = useCallback((value: string | number | undefined) => onChange('discount', value), [onChange])
@@ -82,10 +118,6 @@ const BaseForm: React.FC<Props> = function (props) {
       discount: value.discount || 1,
       paid: typeof value.paid === 'number' ? value.paid : null,
       otherCost: typeof value.otherCost === 'number' ? value.otherCost : null
-    }
-    if (!form.odd) {
-      message.error('请输入单号')
-      return
     }
     if (!form.warehouseId) {
       message.error('请选择出库仓库')
@@ -113,23 +145,47 @@ const BaseForm: React.FC<Props> = function (props) {
       dataIndex: 'goodsId',
       title: '货物',
       render (goodsId, record, index) {
-        return <GoodsSelect value={goodsId} onChange={(value, goods) => onSelectGoods(index, value, goods)} onAdd={(id, goods) => onSelectGoods(index, id, goods)} allowClear addButtonVisible />
+        return <GoodsSelect<number> value={goodsId} onChange={(value, goods) => onSelectGoods(index, record, value, goods)} onAdd={(id, goods) => onSelectGoods(index, record, id, goods)} allowClear addButtonVisible />
       }
     },
     {
       dataIndex: 'num',
       title: '数量',
-      width: 110,
+      width: 100,
       render (num, record, index) {
-        return <InputNumber value={num} onChange={value => onGoodsPropChange(index, 'num', value)} precision={0} min={0} />
+        return <InputNumber value={num} onChange={value => onGoodsNumChange(index, record, value)} precision={0} min={0} />
       }
     },
     {
       dataIndex: 'price',
       title: '单价',
-      width: 110,
+      width: 100,
       render (price, record, index) {
         return <PriceInput value={price} onChange={value => onGoodsPropChange(index, 'price', value)} />
+      }
+    },
+    {
+      dataIndex: 'reticule',
+      title: '手提袋',
+      width: 100,
+      render (reticule, record, index) {
+        return <InputNumber value={reticule} onChange={value => onGoodsPropChange(index, 'reticule', value)} precision={0} min={0} />
+      }
+    },
+    {
+      dataIndex: 'shoeCover',
+      title: '鞋套',
+      width: 100,
+      render (shoeCover, record, index) {
+        return <InputNumber value={shoeCover} onChange={value => onGoodsPropChange(index, 'shoeCover', value)} precision={0} min={0} />
+      }
+    },
+    {
+      dataIndex: 'container',
+      title: '外箱',
+      width: 100,
+      render (container, record, index) {
+        return <InputNumber value={container} onChange={value => onGoodsPropChange(index, 'container', value)} precision={0} min={0} />
       }
     },
     // {
@@ -142,7 +198,7 @@ const BaseForm: React.FC<Props> = function (props) {
     {
       dataIndex: 'paid',
       title: '实付金额',
-      width: 150,
+      width: 135,
       render (value, record, index) {
         const price = getGoodsPrice(record)
         const placeholder = typeof value === 'number' ? { placeholder: `${value}` } : (price ? { placeholder: `${price.toFixed(2)}` } : {})
@@ -151,42 +207,44 @@ const BaseForm: React.FC<Props> = function (props) {
     },
     {
       dataIndex: 'operation',
-      title: <Button type='primary' onClick={addGoods} disabled={typeof value.warehouseId !== 'number'} size='small'>新增</Button>,
+      // title: <Button type='primary' onClick={addGoods} disabled={typeof value.warehouseId !== 'number'} size='small'>新增</Button>,
       width: 70,
       render (value, record, index) {
         return <Button type='primary' onClick={() => deleteGoods(index)} danger size='small'>删除</Button>
       }
     }
-  ], [onSelectGoods, onGoodsPropChange, value.warehouseId, addGoods, deleteGoods])
+  ], [onSelectGoods, onGoodsPropChange, onGoodsNumChange, deleteGoods])
 
   return (
     <>
       { React.cloneElement(children, { onClick: openModal }) }
-      <Modal wrapClassName={styles.wrap} visible={visible} onOk={onOk} onCancel={closeModal} width={800} title={title} confirmLoading={saving}>
+      <Modal wrapClassName={styles.wrap} visible={visible} onOk={onOk} onCancel={closeModal} width={1000} title={title} confirmLoading={saving}>
         <Form>
           <div className={styles.spaceBetween}>
             <Form.Item className={styles.item} label='开单时间' required>
               <DatePicker value={dayjs(value.dealTime)} onChange={onDealTimeChange} allowClear={false} placeholder='请选择开单时间' />
             </Form.Item>
-            <Form.Item className={styles.item} label='出库仓库' required>
-              <RepositorySelect value={value.warehouseId} onChange={onRepositoryChange} onAdd={onRepositoryChange} addButtonVisible />
-            </Form.Item>
-            <Form.Item className={styles.item} label='单号' required>
+            <Form.Item className={styles.item} label='单号'>
               <Input value={value.odd} onChange={onOddChange} placeholder='请输入单号' />
             </Form.Item>
           </div>
           <div className={styles.spaceBetween}>
-            <Form.Item className={styles.item} label='客户/商标'>
-              <CustomerSelect value={value.customId || undefined} onChange={onCustomerChange} onAdd={onCustomerChange} addButtonVisible allowClear />
+            <Form.Item className={styles.item} label='客户/商标' required>
+              <CustomerSelect value={value.customId || undefined} onChange={onCustomerChange} onAdd={onCustomerChange} addButtonVisible />
             </Form.Item>
-            <Form.Item className={styles.item} label='收货方/厂家'>
-              <CustomerSelect value={value.receiverId || undefined} onChange={onReceiverIdChange} onAdd={onReceiverIdChange} addButtonVisible allowClear />
+            <Form.Item className={styles.item} label='收货方/厂家' required>
+              <CustomerSelect value={value.receiverId || undefined} onChange={onReceiverIdChange} onAdd={onReceiverIdChange} addButtonVisible />
             </Form.Item>
-            <Form.Item className={styles.item} label='收货时间'>
+          </div>
+          <div className={styles.hidden}>
+            <Form.Item className={styles.item} label='出库仓库' required>
+              <RepositorySelect value={value.warehouseId} onChange={onRepositoryChange} onAdd={onRepositoryChange} addButtonVisible />
+            </Form.Item>
+            <Form.Item className={styles.item} label='收货时间' required>
               <DatePicker value={value.receivedTime === null ? null : dayjs(value.receivedTime)} onChange={onReceivedTimeChange} placeholder='请选择收货时间' />
             </Form.Item>
           </div>
-          { /* <div className={styles.spaceBetween}>
+          <div className={styles.hidden}>
             <Form.Item className={styles.item} label='收货联系人'>
               <Input value={value.receiver} onChange={onReceiverChange} placeholder='请输入收货联系人' />
             </Form.Item>
@@ -196,7 +254,7 @@ const BaseForm: React.FC<Props> = function (props) {
             <Form.Item className={styles.item} label='收货地址'>
               <Input value={value.receivedAddress} onChange={onReceivedAddressChange} placeholder='请输入收货地址' />
             </Form.Item>
-          </div> */ }
+          </div>
           <Form.Item>
             <Table<GoodsForm> rowKey={goodsTableRowKey} columns={goodsColumns} dataSource={value.fetchGoodsRecordList} bordered pagination={false} size='middle' />
           </Form.Item>

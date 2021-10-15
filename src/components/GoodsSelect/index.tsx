@@ -9,17 +9,19 @@ import { Goods } from '../../rematch/models/goods'
 
 const { Option } = Select
 
-interface Props extends Omit<SelectProps<number>, 'onChange'> {
+type SelectValue = number | number[]
+
+interface Props<T> extends Omit<SelectProps<T>, 'onChange'> {
   addButtonVisible?: boolean
-  onChange? (value: number | undefined, goods: Goods[]): void
+  onChange? (value: T | undefined, goods: Goods[]): void
   onAdd? (id: number, goods: Goods[]): void
 }
 
-const GoodsSelect: React.FC<Props> = function ({ addButtonVisible, onChange, onAdd, ...props }) {
+const GoodsSelect = function <T extends SelectValue = SelectValue> ({ addButtonVisible, onChange, onAdd, ...props }: React.PropsWithChildren<Props<T>>): React.ReactElement {
   const [goods] = useGoods()
-  const onGoodsChange = useCallback((value: number) => onChange && onChange(value, goods), [onChange, goods])
+  const onGoodsChange = useCallback((value: T) => onChange && onChange(value, goods), [onChange, goods])
   const onAddGoods = useCallback((goods: Goods) => onAdd && onAdd(goods.id, [goods]), [onAdd])
-  const dropdownRender = useMemo<{} | { dropdownRender: Props['dropdownRender'] }>(() => {
+  const dropdownRender = useMemo<{} | { dropdownRender: Props<T>['dropdownRender'] }>(() => {
     if (addButtonVisible) {
       return {
         dropdownRender: menu => (
@@ -38,14 +40,14 @@ const GoodsSelect: React.FC<Props> = function ({ addButtonVisible, onChange, onA
     return {}
   }, [addButtonVisible, onAddGoods])
 
-  const itemFilter: Props['filterOption'] = useCallback((keyword: string, option) => {
+  const itemFilter: Props<T>['filterOption'] = useCallback((keyword: string, option) => {
     const trimedKeyword = keyword.trim()
     const { name, brand, texture, size } = (option.data as Goods)
-    return name?.toLowerCase()?.includes(trimedKeyword.toLowerCase()) || brand?.toLowerCase()?.includes(trimedKeyword.toLowerCase()) || texture?.includes(trimedKeyword) || size?.includes(trimedKeyword)
+    return name.toLowerCase().includes(trimedKeyword.toLowerCase()) || brand.toLowerCase().includes(trimedKeyword.toLowerCase()) || texture?.includes(trimedKeyword) || size?.includes(trimedKeyword)
   }, [])
 
   return (
-    <Select<number>
+    <Select<T>
       placeholder='请选择货物'
       {...dropdownRender}
       showSearch
@@ -70,14 +72,6 @@ const GoodsSelect: React.FC<Props> = function ({ addButtonVisible, onChange, onA
 
           return (
             <Option key={goods.id} value={goods.id} data={goods} name={name}>
-              {
-                !!goods.brand?.trim() && (
-                  <>
-                    <span>{ goods.brand }</span>
-                    <Divider type='vertical' />
-                  </>
-                )
-              }
               <span>{ goods.name }</span>
               {
                 !!goods.size?.trim() && (
@@ -103,4 +97,4 @@ const GoodsSelect: React.FC<Props> = function ({ addButtonVisible, onChange, onA
   )
 }
 
-export default React.memo(GoodsSelect)
+export default React.memo(GoodsSelect) as typeof GoodsSelect

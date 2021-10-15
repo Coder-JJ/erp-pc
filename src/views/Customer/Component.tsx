@@ -1,7 +1,7 @@
 import styles from './index.less'
 import React, { useMemo, useCallback, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { Input, Button, Popconfirm, Row, Col } from 'antd'
+import { Input, Button, Popconfirm, Row, Col, Pagination, Form } from 'antd'
 import { ColumnsType } from 'antd/lib/table'
 import { ExpandableConfig } from 'antd/lib/table/interface'
 import { RootState, Dispatch } from '../../rematch'
@@ -13,8 +13,11 @@ import { AddForm, EditForm } from './FormModal'
 const Component: React.FC = function () {
   const [, data] = useCustomers()
   const keyword = useSelector((store: RootState) => store.customer.keyword)
+  const pageNum = useSelector((store: RootState) => store.customer.pageNum)
+  const pageSize = useSelector((store: RootState) => store.customer.pageSize)
   const loading = useSelector((store: RootState) => store.loading.effects.customer.loadCustomers)
   const deleting = useSelector((store: RootState) => store.loading.effects.customer.deleteCustomer)
+  const dataSource = useMemo(() => data.slice((pageNum - 1) * pageSize, pageNum * pageSize), [data, pageNum, pageSize])
 
   const dispatch = useDispatch<Dispatch>()
   const onKeywordChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => dispatch.customer.updateState({ keyword: e.target.value }), [dispatch.customer])
@@ -84,20 +87,28 @@ const Component: React.FC = function () {
   useEnterEvent(deleteCustomer, !!onDeleteId)
   const renderFooter = useFooter()
 
+  const onPaginationChange = useCallback((pageNum: number, pageSize?: number | undefined) => dispatch.customer.updateState({ pageNum, pageSize }), [dispatch.customer])
+
   return (
     <div className={styles.wrap}>
       <header className={styles.header}>
-        <span>关键字：</span>
-        <Input className={styles.input} value={keyword} onChange={onKeywordChange} placeholder='请输入关键字' />
+        <Form layout='inline'>
+          <Form.Item label='关键字'>
+            <Input className={styles.input} value={keyword} onChange={onKeywordChange} placeholder='请输入关键字' />
+          </Form.Item>
+        </Form>
       </header>
       <footer className={styles.footer}>
-        <ScrollTable<Customer> rowKey='id' columns={columns} dataSource={data} loading={loading} expandable={expandable} />
+        <ScrollTable<Customer> rowKey='id' columns={columns} dataSource={dataSource} loading={loading} expandable={expandable} />
       </footer>
       {
         renderFooter(
-          <AddForm>
-            <Button type='primary'>新增</Button>
-          </AddForm>
+          <>
+            <AddForm>
+              <Button type='primary'>新增</Button>
+            </AddForm>
+            <Pagination total={data.length} current={pageNum} pageSize={pageSize} onChange={onPaginationChange} hideOnSinglePage />
+          </>
         )
       }
     </div>

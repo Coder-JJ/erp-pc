@@ -1,3 +1,5 @@
+export { default as useSelector } from './useSelector'
+export { default as useDispatch } from './useDispatch'
 export { default as useFooter } from './useFooter'
 export { default as useEnterEvent } from './useEnterEvent'
 export { default as useRepositories } from './useRepositories'

@@ -1,8 +1,8 @@
 import styles from './index.less'
-import React, { useMemo, useCallback, useState, useEffect } from 'react'
+import React, { useMemo, useCallback, useState, useEffect, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { Input, Button, Popconfirm, Pagination } from 'antd'
-import Table, { ColumnsType } from 'antd/lib/table'
+import { Input, Button, Popconfirm, Pagination, Table, Form } from 'antd'
+import { ColumnsType } from 'antd/lib/table'
 import { ExpandableConfig } from 'antd/lib/table/interface'
 import { debounce } from 'lodash'
 import dayjs from 'dayjs'
@@ -10,7 +10,7 @@ import { RootState, Dispatch } from '../../rematch'
 import { Goods, CheckOut } from '../../rematch/models/checkOut'
 import { getCheckOutPriceDisplay, getGoodsPriceDisplay } from '../../utils'
 import { useFooter, useEnterEvent } from '../../hooks'
-import { ScrollTable } from '../../components'
+import { ScrollTable, CustomerSelect } from '../../components'
 import { AddForm, EditForm } from './FormModal'
 
 const Component: React.FC = function () {
@@ -30,6 +30,10 @@ const Component: React.FC = function () {
     dispatch.checkOut.updateFilter({ odd: e.target.value })
     debouncedLoadCheckOuts()
   }, [dispatch.checkOut, debouncedLoadCheckOuts])
+  const onCustomerChange = useCallback((customId: number) => {
+    dispatch.checkOut.updateFilter({ customId })
+    debouncedLoadCheckOuts()
+  }, [dispatch.checkOut, debouncedLoadCheckOuts])
 
   const [onDeleteId, setDeleteId] = useState<number | undefined>()
   const deleteCheckOut = useCallback(async () => {
@@ -39,6 +43,29 @@ const Component: React.FC = function () {
       setDeleteId(undefined)
     }
   }, [onDeleteId, dispatch.checkOut])
+
+  const [onPrintId, setPrintId] = useState<number | undefined>()
+  const [printParams, setPrintParams] = useState<string>('')
+  const ref = useRef<HTMLIFrameElement | null>(null)
+  useEffect(() => {
+    const onMessage = (e: MessageEvent<boolean>): void => {
+      if (e.data) {
+        ref.current?.contentWindow?.print()
+        setPrintId(undefined)
+        setPrintParams('')
+      }
+    }
+    window.addEventListener('message', onMessage)
+    return () => {
+      window.removeEventListener('message', onMessage)
+    }
+  }, [])
+  const print: React.MouseEventHandler<HTMLElement> = useCallback(e => {
+    const id = e.currentTarget.dataset.id!
+    setPrintId(Number(id))
+    setPrintParams(`id=${id}`)
+  }, [])
+
   const columns: ColumnsType<CheckOut> = useMemo(() => [
     { dataIndex: 'odd', title: '单号' },
     { dataIndex: 'warehouseName', title: '出库仓库' },
@@ -68,10 +95,11 @@ const Component: React.FC = function () {
     { dataIndex: 'remark', title: '备注' },
     {
       dataIndex: 'id',
-      width: 140,
+      width: 220,
       render (id, record) {
         return (
           <>
+            <Button type='link' data-id={id} onClick={print} loading={id === onPrintId}>打印</Button>
             <EditForm>
               <Button type='link' onMouseEnter={() => dispatch.checkOut.updateEditForm(record)}>编辑</Button>
             </EditForm>
@@ -90,15 +118,18 @@ const Component: React.FC = function () {
         )
       }
     }
-  ], [dispatch.checkOut, onDeleteId, deleteCheckOut, deleting])
+  ], [dispatch.checkOut, onPrintId, print, onDeleteId, deleteCheckOut, deleting])
 
   const goodsColumns: ColumnsType<Goods> = useMemo(() => [
     { dataIndex: 'name', title: '货物名称' },
     { dataIndex: 'brand', title: '商标' },
-    { dataIndex: 'texture', title: '材质' },
+    // { dataIndex: 'texture', title: '材质' },
     { dataIndex: 'size', title: '规格' },
     { dataIndex: 'num', title: '数量' },
     { dataIndex: 'price', title: '单价' },
+    { dataIndex: 'reticule', title: '手提袋' },
+    { dataIndex: 'shoeCover', title: '鞋套' },
+    { dataIndex: 'container', title: '外箱' },
     // {
     //   dataIndex: 'discount',
     //   title: '折扣',
@@ -131,8 +162,14 @@ const Component: React.FC = function () {
   return (
     <div className={styles.wrap}>
       <header className={styles.header}>
-        <span>单号：</span>
-        <Input className={styles.input} value={filter.odd} onChange={onOddChange} placeholder='请输入单号' />
+        <Form layout='inline'>
+          <Form.Item label='单号'>
+            <Input className={styles.input} value={filter.odd} onChange={onOddChange} placeholder='请输入单号' />
+          </Form.Item>
+          <Form.Item label='客户/商标'>
+            <CustomerSelect<number> className={styles.select} value={filter.customId} onChange={onCustomerChange} allowClear />
+          </Form.Item>
+        </Form>
       </header>
       <footer className={styles.footer}>
         <ScrollTable<CheckOut> rowKey='id' columns={columns} dataSource={data} loading={loading} expandable={expandable} />
@@ -149,6 +186,7 @@ const Component: React.FC = function () {
           </>
         )
       }
+      <iframe className={styles.print} src={`/print/checkout?${printParams}`} ref={ref} />
     </div>
   )
 }

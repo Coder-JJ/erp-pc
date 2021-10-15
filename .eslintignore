@@ -1,3 +1,4 @@
+node_modules
 src/serviceWorker.ts
 src/assets
 craco.config.js

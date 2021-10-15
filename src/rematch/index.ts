@@ -1,61 +1,29 @@
-import { init, RematchDispatch, RematchRootState, ModelConfig, ModelEffects } from '@rematch/core'
-import loading from '@rematch/loading'
-import immerWithPersist from 'rematch-immer-combine-persist'
-import storage from 'localforage'
-import { RootModel, models } from './models'
+import storage from 'redux-persist/lib/storage/session'
+import stateReconciler from 'redux-persist/lib/stateReconciler/autoMergeLevel2'
+import { init, RematchDispatch, RematchRootState } from '@rematch/core'
+import immerPlugin from '@rematch/immer'
+import loadingPlugin, { ExtraModelsFromLoading } from '@rematch/loading'
+import persistPlugin from '@rematch/persist'
+import { models, RootModel } from './models'
 
-const store = init({
+type FullModel = ExtraModelsFromLoading<RootModel>
+
+const store = init<RootModel, FullModel>({
   models,
-  redux: {
-    rootReducers: {
-      RESET: () => undefined
-    }
-  },
   plugins: [
-    loading(),
-    immerWithPersist({
-      immerOptions: {
-        blacklist: ['loading']
-      },
-      persistOptions: {
-        persistConfig: {
-          storage,
-          whitelist: ['cache']
-        }
-      }
+    immerPlugin(),
+    loadingPlugin(),
+    persistPlugin({
+      key: 'root',
+      storage,
+      stateReconciler,
+      whitelist: ['app', 'cache']
     })
   ]
 })
 
-export default store
-
 export type Store = typeof store
 export type Dispatch = RematchDispatch<RootModel>
-export type ModelState = RematchRootState<RootModel>
+export type RootState = RematchRootState<RootModel, FullModel>
 
-type MapEffectsToBoolean<effects extends ModelEffects<any>> = {
-  [key in keyof effects]: boolean
-}
-
-type EffectsBoolean<effects extends ModelConfig['effects']> = (
-  effects extends ((...args: any[]) => infer R) ? (
-    R extends ModelEffects<any> ? MapEffectsToBoolean<R> : {}
-  ) : (
-    effects extends ModelEffects<any> ? MapEffectsToBoolean<effects> : {}
-  )
-)
-type EffectsOfModel<M extends ModelConfig> = EffectsBoolean<M['effects']>
-
-export interface LoadingState {
-  loading: {
-    global: boolean
-    models: {
-      [key in keyof RootModel]: boolean
-    }
-    effects: {
-      [key in keyof RootModel]: EffectsOfModel<RootModel[key]>
-    }
-  }
-}
-
-export type RootState = ModelState & LoadingState
+export default store

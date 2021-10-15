@@ -99,6 +99,7 @@ const BaseForm: React.FC<Props> = function (props) {
     {
       dataIndex: 'num',
       title: '数量',
+      width: 160,
       render (num, record, index) {
         return <InputNumber value={num} onChange={value => onGoodsChange(index, 'num', value)} precision={0} min={0} />
       }
@@ -106,6 +107,7 @@ const BaseForm: React.FC<Props> = function (props) {
     {
       dataIndex: 'price',
       title: '单价',
+      width: 160,
       render (price, record, index) {
         return <PriceInput value={price} onChange={value => onGoodsChange(index, 'price', value)} />
       }
@@ -113,6 +115,7 @@ const BaseForm: React.FC<Props> = function (props) {
     {
       dataIndex: 'discount',
       title: '折扣',
+      width: 160,
       render (discount, record, index) {
         return <DiscountInput value={discount} onChange={value => onGoodsChange(index, 'discount', value)} />
       }
@@ -120,6 +123,7 @@ const BaseForm: React.FC<Props> = function (props) {
     {
       dataIndex: 'paid',
       title: '实付金额',
+      width: 160,
       render (value, record, index) {
         const price = getGoodsPrice(record)
         const placeholder = typeof value === 'number' ? { placeholder: `${value}` } : (price ? { placeholder: `${price.toFixed(2)}` } : {})

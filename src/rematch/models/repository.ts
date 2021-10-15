@@ -1,6 +1,7 @@
+import { createModel } from '@rematch/core'
+import type { RootModel } from '.'
 import axios, { CancelTokenSource } from 'axios'
 import { request } from '../../libs'
-import { Dispatch, RootState } from '../../rematch'
 
 export interface Repository {
   id: number
@@ -46,7 +47,7 @@ const state: State = {
   editForm: getInitialEditForm()
 }
 
-export const repository = {
+export const repository = createModel<RootModel>()({
   state,
   reducers: {
     shouldUpdate (state: State): State {
@@ -80,8 +81,8 @@ export const repository = {
       return state
     }
   },
-  effects: (dispatch: Dispatch) => ({
-    async loadRepositories (_: any, store: RootState) {
+  effects: dispatch => ({
+    async loadRepositories (_: any, store) {
       if (cancelTokenSource) {
         cancelTokenSource.cancel('cancel repetitive request.')
       }
@@ -104,4 +105,4 @@ export const repository = {
       dispatch.repository.shouldUpdate()
     }
   })
-}
+})

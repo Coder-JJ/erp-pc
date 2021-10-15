@@ -1,8 +1,9 @@
+import { createModel } from '@rematch/core'
+import type { RootModel } from '.'
 import axios, { CancelTokenSource } from 'axios'
 import dayjs from 'dayjs'
 import { request } from '../../libs'
 import { Page } from '../../libs/request'
-import { Dispatch, RootState } from '../../rematch'
 import { GoodsProps } from './goods'
 
 export interface GoodsForm {
@@ -107,7 +108,7 @@ const state: State = {
   editForm: getInitialEditForm()
 }
 
-export const checkIn = {
+export const checkIn = createModel<RootModel>()({
   state,
   reducers: {
     shouldUpdate (state: State): State {
@@ -175,8 +176,8 @@ export const checkIn = {
       return state
     }
   },
-  effects: (dispatch: Dispatch) => ({
-    async loadCheckIns (_: any, store: RootState) {
+  effects: dispatch => ({
+    async loadCheckIns (_: any, store) {
       if (cancelTokenSource) {
         cancelTokenSource.cancel('cancel repetitive request.')
       }
@@ -204,7 +205,7 @@ export const checkIn = {
       dispatch.stock.shouldUpdate()
       dispatch.stock.detailShouldUpdate(checkIn.warehouseId)
     },
-    async deleteCheckIn (id: number, store: RootState) {
+    async deleteCheckIn (id: number, store) {
       const repositoryId = store.checkIn.data.find(item => item.id === id)!.warehouseId
       await request.delete(`/repertory/saveRecord/delete/${id}`)
       dispatch.checkIn.loadCheckIns()
@@ -212,4 +213,4 @@ export const checkIn = {
       dispatch.stock.detailShouldUpdate(repositoryId)
     }
   })
-}
+})

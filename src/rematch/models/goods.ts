@@ -1,6 +1,12 @@
+import { createModel } from '@rematch/core'
+import type { RootModel } from '.'
 import axios, { CancelTokenSource } from 'axios'
 import { request } from '../../libs'
-import { Dispatch, RootState } from '../../rematch'
+
+export enum Whether {
+  Not,
+  Yes
+}
 
 export interface Goods {
   id: number
@@ -9,6 +15,9 @@ export interface Goods {
   texture: string
   size: string
   price: number | null
+  ifNeedReticule: Whether
+  ifNeedShoeCover: Whether
+  containerSize: number | null
   remark: string
 }
 
@@ -20,6 +29,8 @@ export interface State {
   didMount: boolean
   shouldUpdate: boolean
   keyword: string
+  pageNum: number
+  pageSize: number
   data: Goods[]
   addForm: AddForm
   editForm: Goods
@@ -33,7 +44,10 @@ const getInitialAddForm = (): AddForm => ({
   texture: '',
   size: '',
   remark: '',
-  price: null
+  price: null,
+  ifNeedReticule: Whether.Yes,
+  ifNeedShoeCover: Whether.Not,
+  containerSize: 30
 })
 
 const getInitialEditForm = (): Goods => ({
@@ -45,12 +59,14 @@ const state: State = {
   didMount: false,
   shouldUpdate: false,
   keyword: '',
+  pageNum: 1,
+  pageSize: 10,
   data: [],
   addForm: getInitialAddForm(),
   editForm: getInitialEditForm()
 }
 
-export const goods = {
+export const goods = createModel<RootModel>()({
   state,
   reducers: {
     shouldUpdate (state: State): State {
@@ -84,8 +100,8 @@ export const goods = {
       return state
     }
   },
-  effects: (dispatch: Dispatch) => ({
-    async loadGoods (_: any, store: RootState) {
+  effects: dispatch => ({
+    async loadGoods (_: any, store) {
       if (cancelTokenSource) {
         cancelTokenSource.cancel('cancel repetitive request.')
       }
@@ -108,4 +124,4 @@ export const goods = {
       dispatch.goods.shouldUpdate()
     }
   })
-}
+})
