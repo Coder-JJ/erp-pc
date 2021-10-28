@@ -38,17 +38,17 @@ export interface CheckOut {
   customName: string
   receiverId: number | undefined | null
   receiverName: string
-  receiver: string
-  receiverPhone: string
-  receivedAddress: string
+  receiver: string | null
+  receiverPhone: string | null
+  receivedAddress: string | null
   receivedTime: number | null
   fetchGoodsRecordList: Goods[]
   discount: number
   otherCost: number | null
-  otherCostName: string
+  otherCostName: string | null
   paid: number | null
-  signer: string
-  remark: string
+  signer: string | null
+  remark: string | null
   state: CheckOutState
   createTime: number
 }
@@ -103,17 +103,17 @@ const getInitialAddForm = (): AddForm => ({
   warehouseId: undefined,
   customId: undefined,
   receiverId: undefined,
-  receiver: '',
-  receiverPhone: '',
-  receivedAddress: '',
+  receiver: null,
+  receiverPhone: null,
+  receivedAddress: null,
   receivedTime: dayjs().valueOf(),
   fetchGoodsRecordList: [],
   discount: 1,
   paid: null,
   otherCost: null,
-  otherCostName: '',
-  signer: '',
-  remark: ''
+  otherCostName: null,
+  signer: null,
+  remark: null
 })
 
 const getInitialEditForm = (): EditForm => ({
@@ -171,12 +171,28 @@ export const checkOut = createModel<RootModel>()({
       }
       return state
     },
-    deleteAddFormGoods (state: State, index: number): State {
-      state.addForm.fetchGoodsRecordList.splice(index, 1)
+    resetAddFormGoodsProps (state: State, index: number): State {
+      const goods = state.addForm.fetchGoodsRecordList[index]
+      goods.goodsId = undefined
+      goods.num = 0
+      goods.price = 0
+      goods.discount = 1
+      goods.paid = null
+      goods.reticule = 0
+      goods.shoeCover = 0
+      goods.container = 0
       return state
     },
     clearAddForm (state: State): State {
       state.addForm = getInitialAddForm()
+      return state
+    },
+    setEditForm (state: State, form: EditForm): State {
+      for (const [key, value] of Object.entries(form)) {
+        state.editForm[key as keyof EditForm] = value as never
+      }
+      state.editForm.fetchGoodsRecordList.push(...Array(5).fill(0).map(() => getInitialGoods()))
+      state.editForm.fetchGoodsRecordList = state.editForm.fetchGoodsRecordList.slice(0, 5)
       return state
     },
     updateEditForm (state: State, keyValues: Partial<EditForm>): State {
@@ -195,8 +211,16 @@ export const checkOut = createModel<RootModel>()({
       }
       return state
     },
-    deleteEditFormGoods (state: State, index: number) {
-      state.editForm.fetchGoodsRecordList.splice(index, 1)
+    resetEditFormGoodsProps (state: State, index: number) {
+      const goods = state.editForm.fetchGoodsRecordList[index]
+      goods.goodsId = undefined
+      goods.num = 0
+      goods.price = 0
+      goods.discount = 1
+      goods.paid = null
+      goods.reticule = 0
+      goods.shoeCover = 0
+      goods.container = 0
       return state
     },
     clearEditForm (state: State) {

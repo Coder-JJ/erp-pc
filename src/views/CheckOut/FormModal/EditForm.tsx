@@ -17,13 +17,13 @@ const EditForm: React.FC<Props> = function (props) {
   const onChange = useCallback((key: keyof CheckOut, value: any) => dispatch.checkOut.updateEditForm({ [key]: value }), [dispatch.checkOut])
   const onGoodsPropChange = useCallback((index: number, key: keyof GoodsForm, value: any) => dispatch.checkOut.updateEditFormGoods({ index, key, value }), [dispatch.checkOut])
   const onAddGoods = useCallback(() => dispatch.checkOut.addEditFormGoods(), [dispatch.checkOut])
-  const onDeleteGoods = useCallback((index: number) => dispatch.checkOut.deleteEditFormGoods(index), [dispatch.checkOut])
+  const onResetGoodsProps = useCallback((index: number) => dispatch.checkOut.resetEditFormGoodsProps(index), [dispatch.checkOut])
   const onSave = useCallback(async (form: CheckOut) => {
     await dispatch.checkOut.editCheckOut(form)
     dispatch.checkOut.clearEditForm()
   }, [dispatch.checkOut])
 
-  return <BaseForm value={editForm} saving={loading} onChange={onChange} onGoodsPropChange={onGoodsPropChange} onAddGoods={onAddGoods} onDeleteGoods={onDeleteGoods} onSave={onSave} title='编辑入库单'>{ children }</BaseForm>
+  return <BaseForm value={editForm} saving={loading} onChange={onChange} onGoodsPropChange={onGoodsPropChange} onAddGoods={onAddGoods} onResetGoodsProps={onResetGoodsProps} onSave={onSave} title='编辑入库单'>{ children }</BaseForm>
 }
 
 export default React.memo(EditForm)

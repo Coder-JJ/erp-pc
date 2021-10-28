@@ -1,19 +1,18 @@
 import styles from './index.less'
 import React, { useMemo, useCallback, useRef, useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { Table, Form, Button, Row, Col, message } from 'antd'
-import { ColumnsType } from 'antd/lib/table'
-import { ExpandableConfig } from 'antd/lib/table/interface'
+import { Form, Button, Row, Col, message, Space } from 'antd'
 import { usePersistFn } from 'ahooks'
 import dayjs, { Dayjs } from 'dayjs'
 import { RootState, Dispatch } from '../../rematch'
-import { Goods, CheckOut } from '../../rematch/models/checkOut'
-import { getCheckOutPriceDisplay, getGoodsPriceDisplay } from '../../utils'
-import { ScrollTable, CustomerSelect, GoodsSelect, DatePicker } from '../../components'
+import { CustomerSelect, GoodsSelect, DatePicker } from '../../components'
+import BillPreview from '../../components/BillPreview'
 
 const Component: React.FC = function () {
   const { filter, data, params } = useSelector((store: RootState) => store.bill)
   const loading = useSelector((store: RootState) => store.loading.effects.bill.loadBill)
+  const startDate = useMemo(() => dayjs(filter.startTime), [filter.startTime])
+  const endDate = useMemo(() => dayjs(filter.endTime), [filter.endTime])
 
   const dispatch = useDispatch<Dispatch>()
   const onCustomersChange = useCallback((customIds: number[]) => {
@@ -31,51 +30,18 @@ const Component: React.FC = function () {
   const onEndTimeChange = useCallback((value: Dayjs | null) => {
     dispatch.bill.updateFilter({ endTime: dayjs(value!).endOf('d').format('YYYY-MM-DD HH:mm:ss') })
   }, [dispatch.bill])
-
-  const columns: ColumnsType<CheckOut> = useMemo(() => [
-    { dataIndex: 'odd', title: '单号' },
-    { dataIndex: 'warehouseName', title: '出库仓库' },
-    { dataIndex: 'customName', title: '客户/商标' },
-    { dataIndex: 'receiverName', title: '收货方/厂家' },
-    {
-      dataIndex: 'dealTime',
-      title: '开单时间',
-      render (receivedTime, record) {
-        return dayjs(receivedTime).format('YYYY-MM-DD')
-      }
-    },
-    {
-      dataIndex: 'paid',
-      title: '应收金额',
-      render (paid, record) {
-        return getCheckOutPriceDisplay(record)
-      }
-    },
-    { dataIndex: 'remark', title: '备注' }
-  ], [])
-
-  const goodsColumns: ColumnsType<Goods> = useMemo(() => [
-    { dataIndex: 'name', title: '货物名称' },
-    { dataIndex: 'brand', title: '商标' },
-    { dataIndex: 'size', title: '规格' },
-    { dataIndex: 'num', title: '数量' },
-    { dataIndex: 'price', title: '单价' },
-    { dataIndex: 'reticule', title: '手提袋' },
-    { dataIndex: 'shoeCover', title: '鞋套' },
-    { dataIndex: 'container', title: '外箱' },
-    {
-      dataIndex: 'paid',
-      title: '应收金额',
-      render (paid, record) {
-        return getGoodsPriceDisplay(record)
-      }
-    }
-  ], [])
-  const expandable = useMemo<ExpandableConfig<CheckOut>>(() => ({
-    expandedRowRender ({ fetchGoodsRecordList }) {
-      return <Table<Goods> rowKey='id' columns={goodsColumns} dataSource={fetchGoodsRecordList} bordered pagination={false} size='middle' />
-    }
-  }), [goodsColumns])
+  const setCurrentMonth = useCallback(() => {
+    dispatch.bill.updateFilter({
+      startTime: dayjs().startOf('M').startOf('d').format('YYYY-MM-DD HH:mm:ss'),
+      endTime: dayjs().endOf('M').endOf('d').format('YYYY-MM-DD HH:mm:ss')
+    })
+  }, [dispatch.bill])
+  const setPrevMonth = useCallback(() => {
+    dispatch.bill.updateFilter({
+      startTime: dayjs().subtract(1, 'M').startOf('M').startOf('d').format('YYYY-MM-DD HH:mm:ss'),
+      endTime: dayjs().subtract(1, 'M').endOf('M').endOf('d').format('YYYY-MM-DD HH:mm:ss')
+    })
+  }, [dispatch.bill])
 
   const printable = !!params && !!data.length
   const [isIframeReady, setIframeReady] = useState(false)
@@ -114,7 +80,7 @@ const Component: React.FC = function () {
           <Row gutter={24}>
             <Col span={8}>
               <Form.Item label='客户/商标' required>
-                <CustomerSelect<number[]> className={styles.select} value={filter.customIds} onChange={onCustomersChange} mode='multiple' allowClear placeholder='请选择客户/商标' />
+                <CustomerSelect<number[]> className={styles.select} value={filter.customIds} onChange={onCustomersChange} allowClear placeholder='请选择客户/商标' />
               </Form.Item>
             </Col>
             <Col span={8}>
@@ -131,25 +97,35 @@ const Component: React.FC = function () {
           <Row gutter={24}>
             <Col span={8}>
               <Form.Item label='开始时间' required>
-                <DatePicker className={styles['date-picker']} value={filter.startTime === null ? null : dayjs(filter.startTime)} onChange={onStartTimeChange} allowClear={false} placeholder='请选择开始时间' />
+                <DatePicker className={styles['date-picker']} value={startDate} onChange={onStartTimeChange} allowClear={false} placeholder='请选择开始时间' />
               </Form.Item>
             </Col>
             <Col span={8}>
               <Form.Item label='结束时间' required>
-                <DatePicker className={styles['date-picker']} value={filter.endTime === null ? null : dayjs(filter.endTime)} onChange={onEndTimeChange} allowClear={false} placeholder='请选择结束时间' />
+                <DatePicker className={styles['date-picker']} value={endDate} onChange={onEndTimeChange} allowClear={false} placeholder='请选择结束时间' />
               </Form.Item>
             </Col>
             <Col span={8}>
               <Form.Item>
-                <Button className={styles.button} type='primary' onClick={onSearch} loading={loading}>查询</Button>
-                <Button className={styles.button} onClick={print} disabled={!printable || !isIframeReady} loading={printable && !isIframeReady}>打印</Button>
+                <Space>
+                  <Button onClick={setCurrentMonth}>本月</Button>
+                  <Button onClick={setPrevMonth}>上月</Button>
+                </Space>
               </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={24}>
+            <Col className={styles.center} span={24}>
+              <Space size='large'>
+                <Button type='primary' onClick={onSearch} loading={loading}>查询</Button>
+                <Button onClick={print} disabled={!printable || !isIframeReady} loading={printable && !isIframeReady}>打印</Button>
+              </Space>
             </Col>
           </Row>
         </Form>
       </header>
       <footer className={styles.footer}>
-        <ScrollTable<CheckOut> rowKey='id' columns={columns} dataSource={data} loading={loading} expandable={expandable} />
+        <BillPreview checkOuts={data} startDate={startDate} endDate={endDate} />
       </footer>
       <iframe className={styles.print} src={`/print/bill?${params}`} ref={ref} />
     </div>

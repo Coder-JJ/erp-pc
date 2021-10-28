@@ -73,7 +73,7 @@ const Component: React.FC = function () {
     { dataIndex: 'receiverName', title: '收货方/厂家' },
     {
       dataIndex: 'dealTime',
-      title: '开单时间',
+      title: '开单日期',
       render (receivedTime, record) {
         return dayjs(receivedTime).format('YYYY-MM-DD')
       }
@@ -101,7 +101,7 @@ const Component: React.FC = function () {
           <>
             <Button type='link' data-id={id} onClick={print} loading={id === onPrintId}>打印</Button>
             <EditForm>
-              <Button type='link' onMouseEnter={() => dispatch.checkOut.updateEditForm(record)}>编辑</Button>
+              <Button type='link' onMouseEnter={() => dispatch.checkOut.setEditForm(record)}>编辑</Button>
             </EditForm>
             <Popconfirm
               visible={id === onDeleteId}
@@ -125,11 +125,11 @@ const Component: React.FC = function () {
     { dataIndex: 'brand', title: '商标' },
     // { dataIndex: 'texture', title: '材质' },
     { dataIndex: 'size', title: '规格' },
-    { dataIndex: 'num', title: '数量' },
-    { dataIndex: 'price', title: '单价' },
+    { dataIndex: 'num', title: '鞋盒' },
     { dataIndex: 'reticule', title: '手提袋' },
     { dataIndex: 'shoeCover', title: '鞋套' },
     { dataIndex: 'container', title: '外箱' },
+    { dataIndex: 'price', title: '单价' },
     // {
     //   dataIndex: 'discount',
     //   title: '折扣',

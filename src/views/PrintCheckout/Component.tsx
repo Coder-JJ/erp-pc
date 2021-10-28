@@ -29,8 +29,11 @@ const PrintCheckout: React.FC = function () {
 
   return (
     <div className={styles.wrap}>
-      <div className={styles.odd}>No：{ data?.odd }</div>
-      <div className={styles.company}>国骏印刷出库单</div>
+      <div className={styles.header}>
+        <div />
+        <div className={styles.company}>国骏印刷出库单</div>
+        <div className={styles.odd}>No：{ data?.odd }</div>
+      </div>
       <div className={styles.caption}>
         <div className={styles.receiver}>收货方：{ data?.receiverName || data?.customName }</div>
         { !!data?.receiverPhone && <div className={styles.phone}>手机号：{ data?.receiverPhone }</div> }
@@ -44,8 +47,8 @@ const PrintCheckout: React.FC = function () {
         <thead>
           <tr>
             <th style={{ width: '30mm', minWidth: '30mm' }}>货物</th>
-            <th style={{ width: '30mm', minWidth: '30mm' }}>规格</th>
-            <th style={{ width: '20mm', minWidth: '20mm' }}>数量</th>
+            <th style={{ width: '40mm', minWidth: '40mm' }}>规格</th>
+            <th style={{ width: '20mm', minWidth: '20mm' }}>鞋盒</th>
             <th style={{ width: '20mm', minWidth: '20mm' }}>鞋套</th>
             <th style={{ width: '20mm', minWidth: '20mm' }}>手提袋</th>
             <th style={{ width: '20mm', minWidth: '20mm' }}>外箱</th>
@@ -90,7 +93,7 @@ const PrintCheckout: React.FC = function () {
         <div className={styles.tr}>
           <div>开单：周旭旭</div>
           <div>审核：吴献忠</div>
-          <div style={{ paddingRight: '16mm' }}>收货：</div>
+          <div style={{ paddingRight: '20mm' }}>收货：</div>
         </div>
         <div className={styles.tr}>
           <div>①会计（红色）</div>

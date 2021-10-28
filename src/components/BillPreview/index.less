@@ -1,0 +1,71 @@
+@page {
+  size: A4 portrait;
+  margin: 0;
+}
+
+.wrap {
+  padding: 5mm;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+
+  .caption {
+    flex-shrink: 0;
+    text-align: center;
+    padding: 0 4pt;
+    border: 1pt solid #aaa;
+    border-bottom: 0;
+    font-weight: bold;
+  }
+
+  table {
+    flex-shrink: 0;
+    border-right: 1pt solid #aaa;
+    border-bottom: 1pt solid #aaa;
+    border-spacing: 0;
+    border-collapse: separate;
+  }
+
+  td {
+    padding: 0 4pt;
+    border-top: 1pt solid #aaa;
+    border-left: 1pt solid #aaa;
+  }
+
+  tr,
+  td {
+    page-break-inside: avoid;
+  }
+
+  .footer {
+    text-align: center;
+  }
+}
+
+.group + .group {
+  margin-top: 8mm;
+}
+
+@media print {
+  .wrap {
+    * {
+      color: #000 !important;
+    }
+  }
+
+  .group {
+    .caption {
+      border-color: #000 !important;
+    }
+
+    table {
+      border-color: #000 !important;
+    }
+
+    td {
+      border-color: #000 !important;
+    }
+  }
+}

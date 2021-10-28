@@ -1,24 +1,29 @@
 @page {
-  size: 241mm 93mm;
+  size: 24.1cm 9.3cm landscape;
   margin: 0;
 }
 
 .wrap {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 205mm;
+  height: 93mm;
   margin: 0 auto;
+  break-after: always;
+  page-break-after: always;
 
   * {
     color: #000 !important;
+    font-weight: normal;
   }
 }
 
-.odd {
-  position: absolute;
-  top: 0;
-  right: 0;
-  height: 8mm;
-  line-height: 8mm;
-  font-size: 20pt;
+.header {
+  position: relative;
+  display: flex;
+  justify-content: center;
 }
 
 .company {
@@ -27,12 +32,20 @@
   height: 8mm;
   line-height: 8mm;
   padding-bottom: 2mm;
-  margin: 0 auto;
   border-bottom: 3pt double #000;
-  font-size: 20pt;
+  font-size: 16pt;
   text-align: center;
   text-indent: 4mm;
   letter-spacing: 4mm;
+}
+
+.odd {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 8mm;
+  line-height: 8mm;
+  font-size: 16pt;
 }
 
 .caption {
@@ -40,8 +53,8 @@
   justify-content: space-between;
   align-items: center;
   height: 6mm;
-  margin-top: 2mm;
-  font-size: 12pt;
+  margin-top: 3mm;
+  font-size: 10pt;
 
   .year {
     width: 10mm;
@@ -74,17 +87,16 @@
 }
 
 .table {
-  width: 100%;
-  margin-top: 2mm;
+  margin-top: 1mm;
   border-right: 1pt solid #000;
   border-bottom: 1pt solid #000;
   border-spacing: 0;
   border-collapse: separate;
-  font-size: 12pt;
+  font-size: 10pt;
 
   th,
   td {
-    height: 7mm;
+    height: 5mm;
     padding: 0 2pt;
     border-top: 1pt solid #000;
     border-left: 1pt solid #000;
@@ -101,16 +113,12 @@
 }
 
 .footer {
-  line-height: 6mm;
+  line-height: 5mm;
   margin-top: 2mm;
-  font-size: 12pt;
+  font-size: 10pt;
 
   .tr {
     display: flex;
     justify-content: space-between;
-  }
-
-  .tr + .tr {
-    margin-top: 1mm;
   }
 }

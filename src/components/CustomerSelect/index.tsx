@@ -1,5 +1,5 @@
 import styles from './index.less'
-import React, { useMemo, useCallback, useState } from 'react'
+import React, { useMemo, useCallback } from 'react'
 import { Select, Divider, Button } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import { SelectProps } from 'antd/lib/select'
@@ -17,12 +17,6 @@ interface Props<T> extends SelectProps<T> {
 }
 
 const CustomerSelect = function <T extends SelectValue = SelectValue> ({ addButtonVisible, onAdd, ...props }: React.PropsWithChildren<Props<T>>): React.ReactElement {
-  const [open, setOpen] = useState(false)
-  const onFocus = useCallback(() => setOpen(true), [])
-  const onBlur = useCallback(() => setOpen(false), [])
-  const onInputKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
-    // console.log(e.keyCode)
-  }, [])
   const [customers] = useCustomers()
   const dropdownRender = useMemo<{} | { dropdownRender: Props<T>['dropdownRender'] }>(() => {
     if (addButtonVisible) {
@@ -51,10 +45,6 @@ const CustomerSelect = function <T extends SelectValue = SelectValue> ({ addButt
 
   return (
     <Select<T>
-      open={open}
-      onFocus={onFocus}
-      onBlur={onBlur}
-      onInputKeyDown={onInputKeyDown}
       placeholder='请选择'
       {...dropdownRender}
       showSearch

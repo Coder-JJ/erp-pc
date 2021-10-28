@@ -1,5 +1,6 @@
 import { createModel } from '@rematch/core'
 import type { RootModel } from '.'
+import dayjs from 'dayjs'
 import qs from 'qs'
 import axios, { CancelTokenSource } from 'axios'
 import { request } from '../../libs'
@@ -9,8 +10,8 @@ export interface Filter {
   customIds: number[]
   receiverIds: number[]
   goodsIds: number[]
-  startTime: string | null
-  endTime: string | null
+  startTime: string
+  endTime: string
 }
 
 export interface PrintRouteParams {
@@ -34,19 +35,12 @@ export const loadBill = (params: string, cancelTokenSource?: CancelTokenSource):
 let cancelTokenSource: CancelTokenSource | undefined
 
 const state: State = {
-  // filter: {
-  //   customIds: [],
-  //   receiverIds: [],
-  //   goodsIds: [],
-  //   startTime: null,
-  //   endTime: null
-  // },
   filter: {
     customIds: [],
-    receiverIds: [134],
+    receiverIds: [],
     goodsIds: [],
-    startTime: '2020-10-01',
-    endTime: '2021-10-01'
+    startTime: dayjs().startOf('M').startOf('d').format('YYYY-MM-DD HH:mm:ss'),
+    endTime: dayjs().endOf('M').endOf('d').format('YYYY-MM-DD HH:mm:ss')
   },
   data: [],
   params: ''
