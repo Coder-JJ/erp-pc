@@ -31,12 +31,19 @@ const PrintCheckout: React.FC = function () {
     <div className={styles.wrap}>
       <div className={styles.header}>
         <div />
-        <div className={styles.company}>国骏印刷出库单</div>
+        <div className={styles.company}>温州市国骏印刷出库单</div>
         <div className={styles.odd}>No：{ data?.odd }</div>
       </div>
       <div className={styles.caption}>
-        <div className={styles.receiver}>收货方：{ data?.receiverName || data?.customName }</div>
-        { !!data?.receiverPhone && <div className={styles.phone}>手机号：{ data?.receiverPhone }</div> }
+        <div className={styles.info}>
+          { data?.customId !== data?.receiverId && !!data?.customName && <div className={styles.customer}>客户：{ data.customName }</div> }
+          { !!data?.receiverName && <div className={styles.receiver}>收货方：{ data.receiverName }</div> }
+          { !!data?.receiverPhone && <div className={styles.phone}>联系号码：{ data.receiverPhone }</div> }
+          { !!data?.receivedAddress && <div className={styles.address}>收货地址：{ data.receivedAddress }</div> }
+        </div>
+        <div className={styles.empty} />
+        <div className={styles.empty} />
+        { /* <div className={styles.phone}>{ data?.receiverPhone && `联系号码：${data.receiverPhone}` }</div> */ }
         <div className={styles.date}>
           <span className={styles.year}>{ date?.format('YYYY') }</span>
           <span className={styles.month}>{ date?.format('MM') }</span>
@@ -47,13 +54,13 @@ const PrintCheckout: React.FC = function () {
         <thead>
           <tr>
             <th style={{ width: '30mm', minWidth: '30mm' }}>货物</th>
-            <th style={{ width: '40mm', minWidth: '40mm' }}>规格</th>
-            <th style={{ width: '20mm', minWidth: '20mm' }}>鞋盒</th>
-            <th style={{ width: '20mm', minWidth: '20mm' }}>鞋套</th>
-            <th style={{ width: '20mm', minWidth: '20mm' }}>手提袋</th>
-            <th style={{ width: '20mm', minWidth: '20mm' }}>外箱</th>
-            <th style={{ width: '20mm', minWidth: '20mm' }}>单价</th>
-            <th style={{ width: '30mm', minWidth: '30mm' }}>金额</th>
+            <th style={{ width: '30mm', minWidth: '30mm' }}>规格</th>
+            <th style={{ width: '18mm', minWidth: '18mm' }}>鞋盒</th>
+            <th style={{ width: '18mm', minWidth: '18mm' }}>鞋套</th>
+            <th style={{ width: '18mm', minWidth: '18mm' }}>手提袋</th>
+            <th style={{ width: '18mm', minWidth: '18mm' }}>外箱</th>
+            <th style={{ width: '18mm', minWidth: '18mm' }}>单价</th>
+            <th style={{ width: '25mm', minWidth: '25mm' }}>金额</th>
           </tr>
         </thead>
         <tbody>
@@ -70,8 +77,8 @@ const PrintCheckout: React.FC = function () {
                   <td>{ goods.shoeCover || '' }</td>
                   <td>{ goods.reticule || '' }</td>
                   <td>{ goods.container || '' }</td>
-                  <td>{ goods.price ? `${goods.price.toFixed(2)}¥` : '' }</td>
-                  <td>{ goods.price * goods.num ? `${(goods.price * goods.num).toFixed(2)}¥` : '' }</td>
+                  <td>{ goods.price ? `¥${goods.price.toFixed(2)}` : '' }</td>
+                  <td>{ goods.price * goods.num ? `¥${(goods.price * goods.num).toFixed(2)}` : '' }</td>
                 </tr>
               )
             })
@@ -81,7 +88,7 @@ const PrintCheckout: React.FC = function () {
           <tr>
             <td colSpan={6} />
             <td style={{ padding: 0, textAlign: 'right' }}>总计：</td>
-            <td>{ totalPrice ? `${totalPrice.toFixed(2)}¥` : '' }</td>
+            <td>{ totalPrice ? `¥${totalPrice.toFixed(2)}` : '' }</td>
           </tr>
           <tr>
             <td colSpan={3}>手机/支付宝：13777762887 周雪梅</td>
@@ -93,7 +100,7 @@ const PrintCheckout: React.FC = function () {
         <div className={styles.tr}>
           <div>开单：周旭旭</div>
           <div>审核：吴献忠</div>
-          <div style={{ paddingRight: '20mm' }}>收货：</div>
+          <div style={{ paddingRight: '15mm' }}>收货：</div>
         </div>
         <div className={styles.tr}>
           <div>①会计（红色）</div>

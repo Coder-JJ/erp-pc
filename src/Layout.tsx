@@ -45,6 +45,10 @@ dayjs.locale('zh-cn')
 
 const { Header, Sider, Content } = Layout
 
+const headerStyle: React.CSSProperties = {
+  padding: '0 24px 0 0'
+}
+
 const menus: MenuType[] = [
   {
     key: 'data',
@@ -165,6 +169,11 @@ function AppLayout (): React.ReactElement {
     }
   }), [footerRef])
 
+  const logout = useCallback(async () => {
+    await dispatch.app.logout()
+    history.push('/login')
+  }, [dispatch.app, history])
+
   return (
     <ConfigProvider locale={zhCN} prefixCls='ant'>
       <LayoutContext.Provider value={layoutContextValue}>
@@ -180,8 +189,9 @@ function AppLayout (): React.ReactElement {
             </Menu>
           </Sider>
           <Layout className={styles.right}>
-            <Header className={styles.header} style={{ padding: 0 }}>
+            <Header className={styles.header} style={headerStyle}>
               { menuCollapsed ? <MenuUnfoldOutlined className={styles.trigger} onClick={toggleMenu} /> : <MenuFoldOutlined className={styles.trigger} onClick={toggleMenu} /> }
+              <a onClick={logout}>注销</a>
             </Header>
             <Content className={styles.content}>
               <div className={styles.view}>

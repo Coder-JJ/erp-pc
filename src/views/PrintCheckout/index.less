@@ -8,7 +8,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  width: 205mm;
+  width: 180mm;
   height: 93mm;
   margin: 0 auto;
   break-after: always;
@@ -28,15 +28,15 @@
 
 .company {
   box-sizing: content-box;
-  width: 90mm;
+  width: 75mm;
   height: 8mm;
   line-height: 8mm;
   padding-bottom: 2mm;
   border-bottom: 3pt double #000;
   font-size: 16pt;
   text-align: center;
-  text-indent: 4mm;
-  letter-spacing: 4mm;
+  text-indent: 1mm;
+  letter-spacing: 1mm;
 }
 
 .odd {
@@ -49,12 +49,31 @@
 }
 
 .caption {
-  display: flex;
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   justify-content: space-between;
-  align-items: center;
-  height: 6mm;
+  height: 4.5mm;
   margin-top: 3mm;
   font-size: 10pt;
+
+  * {
+    line-height: 4.5mm;
+  }
+
+  .info {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+  }
+
+  .phone {
+    justify-self: center;
+  }
+
+  .date {
+    justify-self: right;
+  }
 
   .year {
     width: 10mm;
@@ -87,7 +106,7 @@
 }
 
 .table {
-  margin-top: 1mm;
+  margin-top: 1.5mm;
   border-right: 1pt solid #000;
   border-bottom: 1pt solid #000;
   border-spacing: 0;
@@ -96,7 +115,7 @@
 
   th,
   td {
-    height: 5mm;
+    height: 6mm;
     padding: 0 2pt;
     border-top: 1pt solid #000;
     border-left: 1pt solid #000;

@@ -2,7 +2,7 @@ import styles from './index.less'
 import React, { useMemo } from 'react'
 import dayjs, { Dayjs } from 'dayjs'
 import { getCheckOutPrice } from '../../utils'
-import { CheckOut, getInitialGoods } from '../../rematch/models/checkOut'
+import { CheckOut, CheckOutState, getInitialGoods } from '../../rematch/models/checkOut'
 
 export interface Props {
   checkOuts: CheckOut[]
@@ -19,9 +19,10 @@ export interface GroupedCheckOuts {
 const BillPreview: React.FC<Props> = function (props) {
   const { startDate, endDate, checkOuts } = props
 
+  const filteredCheckOuts = useMemo<CheckOut[]>(() => checkOuts.filter(({ state }) => state !== CheckOutState.Canceled), [checkOuts])
   const groupedCheckOuts = useMemo<GroupedCheckOuts[]>(() => {
     const result: GroupedCheckOuts[] = []
-    for (const checkOut of checkOuts) {
+    for (const checkOut of filteredCheckOuts) {
       let item = result.find(({ receiverId }) => receiverId === checkOut.receiverId)
       if (!item) {
         item = {
@@ -34,7 +35,7 @@ const BillPreview: React.FC<Props> = function (props) {
       item.checkOuts.push(checkOut)
     }
     return result
-  }, [checkOuts])
+  }, [filteredCheckOuts])
 
   return (
     <div className={styles.wrap}>
@@ -79,8 +80,8 @@ const BillPreview: React.FC<Props> = function (props) {
                                 <td>{ goods.shoeCover }</td>
                                 <td>{ goods.reticule }</td>
                                 <td>{ goods.container }</td>
-                                <td>{ goods.price.toFixed(2) }¥</td>
-                                <td rowSpan={rowSpan}>{ totalPrice.toFixed(2) }¥</td>
+                                <td>¥{ goods.price.toFixed(2) }</td>
+                                <td rowSpan={rowSpan}>¥{ totalPrice.toFixed(2) }</td>
                               </React.Fragment>
                             ))
                           }
@@ -103,7 +104,7 @@ const BillPreview: React.FC<Props> = function (props) {
                   })
                 }
                 <tr>
-                  <td className={styles.footer} colSpan={12}>共<b>{ group.checkOuts.length }</b>张回单，总金额：<b>{ group.checkOuts.map(row => getCheckOutPrice(row)).reduce((pv, cv) => pv + cv, 0).toFixed(2) }¥</b></td>
+                  <td className={styles.footer} colSpan={12}>共<b>{ group.checkOuts.length }</b>张回单，总金额：<b>¥{ group.checkOuts.map(row => getCheckOutPrice(row)).reduce((pv, cv) => pv + cv, 0).toFixed(2) }</b></td>
                 </tr>
                 <tr>
                   <td className={styles.footer} colSpan={12}>温州市国骏印刷有限公司，{ dayjs().format('YYYY-MM-DD') }</td>

@@ -25,7 +25,17 @@ export interface Goods extends Omit<GoodsProps, 'price'>, GoodsForm {
 export enum CheckOutState {
   InStock = 1,
   Delivered = 2,
-  Signed = 3
+  Signed = 3,
+  Paied = 4,
+  Canceled = 99
+}
+
+export const checkOutStateNameMap = {
+  1: '备货中',
+  2: '已发货',
+  3: '已签收',
+  4: '已收款',
+  99: '作废'
 }
 
 export interface CheckOut {
@@ -191,7 +201,7 @@ export const checkOut = createModel<RootModel>()({
       for (const [key, value] of Object.entries(form)) {
         state.editForm[key as keyof EditForm] = value as never
       }
-      state.editForm.fetchGoodsRecordList.push(...Array(5).fill(0).map(() => getInitialGoods()))
+      state.editForm.fetchGoodsRecordList = [...state.editForm.fetchGoodsRecordList, ...Array(5).fill(0).map(() => getInitialGoods())]
       state.editForm.fetchGoodsRecordList = state.editForm.fetchGoodsRecordList.slice(0, 5)
       return state
     },
@@ -254,6 +264,13 @@ export const checkOut = createModel<RootModel>()({
     },
     async editCheckOut (checkOut: EditForm) {
       await request.put('/repertory/fetchAndSaveRecord/update', checkOut)
+      dispatch.checkOut.loadCheckOuts()
+      dispatch.checkIn.shouldUpdate()
+      dispatch.stock.shouldUpdate()
+      dispatch.stock.detailShouldUpdate(checkOut.warehouseId)
+    },
+    async cancelCheckOut (checkOut: CheckOut) {
+      await request.patch(`/repertory/fetchAndSaveRecord/cancel/${checkOut.id}`)
       dispatch.checkOut.loadCheckOuts()
       dispatch.checkIn.shouldUpdate()
       dispatch.stock.shouldUpdate()

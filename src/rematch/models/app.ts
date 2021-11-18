@@ -41,6 +41,10 @@ export const app = createModel<RootModel>()({
       await request.post('/user/login', {}, { params })
       dispatch.app.updateState({ loginStatus: LoginStatus.Login })
       message.success('登录成功.')
+    },
+    async logout () {
+      await request.post('/user/logout')
+      dispatch.app.updateState({ loginStatus: LoginStatus.NotLogin })
     }
   })
 })

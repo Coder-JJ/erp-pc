@@ -65,10 +65,10 @@ const BaseForm: React.FC<Props> = function (props) {
           <Form.Item label='客户名称' required>
             <Input value={value.name} onChange={onNameChange} placeholder='请输入客户名称' />
           </Form.Item>
-          <Form.Item label='负责人'>
+          <Form.Item label='负责人' hidden>
             <Input value={value.leader} onChange={onLeaderChange} placeholder='请输入负责人姓名' />
           </Form.Item>
-          <Form.Item label='负责人手机号码'>
+          <Form.Item label='联系号码'>
             <Input value={value.leaderPhone} onChange={onLeaderPhoneChange} placeholder='请输入负责人手机号码' />
           </Form.Item>
           { /* <Form.Item label='座机号'>
@@ -77,10 +77,10 @@ const BaseForm: React.FC<Props> = function (props) {
           <Form.Item label='传真号'>
             <Input value={value.fax} onChange={onFaxChange} placeholder='请输入传真号' />
           </Form.Item> */ }
-          <Form.Item label='地址（省市区）'>
+          <Form.Item label='地址（省市区）' hidden>
             <Input value={value.address} onChange={onAddressChange} placeholder='请输入省市区' />
           </Form.Item>
-          <Form.Item label='详细地址'>
+          <Form.Item label='收货地址'>
             <Input value={value.addressDetail} onChange={onAddressDetailChange} placeholder='请输入详细地址' />
           </Form.Item>
           { /* <Form.Item label='开户行'>

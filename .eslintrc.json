@@ -7,6 +7,7 @@
     "plugin:jun/react-dev"
   ],
   "rules": {
+    "multiline-ternary": 0,
     "no-param-reassign": [1, { "props": true, "ignorePropertyModificationsFor": ["state"] }],
     "react/no-multi-comp": 0,
     "react/prop-types": 0

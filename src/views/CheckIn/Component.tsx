@@ -28,7 +28,7 @@ const Component: React.FC = function () {
 
   const debouncedLoadCheckIns = useMemo(() => debounce<() => void>(dispatch.checkIn.loadCheckIns, 250), [dispatch.checkIn.loadCheckIns])
   const onOddChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch.checkIn.updateFilter({ odd: e.target.value })
+    dispatch.checkIn.updateFilter({ odd: e.target.value, pageNum: 1 })
     debouncedLoadCheckIns()
   }, [dispatch.checkIn, debouncedLoadCheckIns])
 

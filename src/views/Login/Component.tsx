@@ -13,9 +13,7 @@ const Login: React.FC = function () {
   const dispatch = useDispatch<Dispatch>()
   const onLogin = useCallback(async (form: LoginFormType) => {
     await dispatch.app.login(form)
-    if (state) {
-      history.replace(state)
-    }
+    history.replace(state || '/checkout')
   }, [dispatch.app, state, history])
 
   return (

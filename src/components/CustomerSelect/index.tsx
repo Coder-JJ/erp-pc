@@ -11,13 +11,16 @@ const { Option } = Select
 
 type SelectValue = number | number[]
 
-interface Props<T> extends SelectProps<T> {
+interface Props<T> extends Omit<SelectProps<T>, 'onChange'> {
   addButtonVisible?: boolean
-  onAdd? (id: number): void
+  onChange? (value: T | undefined, customers: Customer[]): void
+  onAdd? (id: number, customers: Customer[]): void
 }
 
-const CustomerSelect = function <T extends SelectValue = SelectValue> ({ addButtonVisible, onAdd, ...props }: React.PropsWithChildren<Props<T>>): React.ReactElement {
-  const [customers] = useCustomers()
+const CustomerSelect = function <T extends SelectValue = SelectValue> ({ addButtonVisible, onChange, onAdd, ...props }: React.PropsWithChildren<Props<T>>): React.ReactElement {
+  const customers = useCustomers()
+  const onCustomersChange = useCallback((value: T) => onChange && onChange(value, customers), [onChange, customers])
+  const onAddCustomer = useCallback((customer: Customer) => onAdd && onAdd(customer.id, [customer]), [onAdd])
   const dropdownRender = useMemo<{} | { dropdownRender: Props<T>['dropdownRender'] }>(() => {
     if (addButtonVisible) {
       return {
@@ -26,7 +29,7 @@ const CustomerSelect = function <T extends SelectValue = SelectValue> ({ addButt
             { menu }
             <Divider className={styles.divider} />
             <div className={styles.add}>
-              <AddForm onSave={onAdd}>
+              <AddForm onSave={onAddCustomer}>
                 <Button type='link' block icon={<PlusOutlined />}>新增</Button>
               </AddForm>
             </div>
@@ -35,12 +38,12 @@ const CustomerSelect = function <T extends SelectValue = SelectValue> ({ addButt
       }
     }
     return {}
-  }, [addButtonVisible, onAdd])
+  }, [addButtonVisible, onAddCustomer])
 
   const itemFilter: Props<T>['filterOption'] = useCallback((keyword: string, option) => {
-    const trimedKeyword = keyword.trim()
+    const trimedKeyword = keyword.trim().toLowerCase()
     const { name, leader } = (option.data as Customer)
-    return name?.toLowerCase()?.includes(trimedKeyword.toLowerCase()) || leader?.toLowerCase()?.includes(trimedKeyword.toLowerCase())
+    return name?.toLowerCase().includes(trimedKeyword) || leader?.toLowerCase().includes(trimedKeyword) || false
   }, [])
 
   return (
@@ -52,6 +55,7 @@ const CustomerSelect = function <T extends SelectValue = SelectValue> ({ addButt
       dropdownMatchSelectWidth={false}
       {...props}
       optionLabelProp='name'
+      onChange={onCustomersChange}
     >
       {
         customers.map(customer => (

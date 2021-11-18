@@ -19,7 +19,7 @@ const Component: React.FC = function () {
   const dataSource = useMemo(() => data.slice((pageNum - 1) * pageSize, pageNum * pageSize), [data, pageNum, pageSize])
 
   const dispatch = useDispatch<Dispatch>()
-  const onKeywordChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => dispatch.goods.updateState({ keyword: e.target.value }), [dispatch.goods])
+  const onKeywordChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => dispatch.goods.updateState({ keyword: e.target.value, pageNum: 1 }), [dispatch.goods])
 
   const [onDeleteId, setDeleteId] = useState<number | undefined>()
   const deleteGoods = useCallback(async () => {
@@ -34,9 +34,9 @@ const Component: React.FC = function () {
     { dataIndex: 'brand', title: '商标' },
     { dataIndex: 'size', title: '规格' },
     { dataIndex: 'price', title: '单价' },
-    { dataIndex: 'ifNeedReticule', title: '手提袋', render: (value: Whether) => <Tag color={value === Whether.Yes ? 'success' : 'error'}>{ value === Whether.Yes ? '' : '不' }需要</Tag> },
-    { dataIndex: 'ifNeedShoeCover', title: '鞋套', render: (value: Whether) => <Tag color={value === Whether.Yes ? 'success' : 'error'}>{ value === Whether.Yes ? '' : '不' }需要</Tag> },
-    { dataIndex: 'containerSize', title: '外箱', render: (value: number | null) => <Tag color={typeof value === 'number' && value > 0 ? 'success' : 'error'}>{ typeof value === 'number' && value > 0 ? `${value}装/箱` : '不需要' }</Tag> },
+    { dataIndex: 'ifNeedReticule', title: '手提袋', render: (value: Whether) => <Tag color={value === Whether.Yes ? 'processing' : 'error'}>{ value === Whether.Yes ? '' : '不' }需要</Tag> },
+    { dataIndex: 'ifNeedShoeCover', title: '鞋套', render: (value: Whether) => <Tag color={value === Whether.Yes ? 'processing' : 'error'}>{ value === Whether.Yes ? '' : '不' }需要</Tag> },
+    { dataIndex: 'containerSize', title: '外箱', render: (value: number | null) => <Tag color={typeof value === 'number' && value > 0 ? 'processing' : 'error'}>{ typeof value === 'number' && value > 0 ? `${value}装/箱` : '不需要' }</Tag> },
     // { dataIndex: 'texture', title: '材质' },
     { dataIndex: 'remark', title: '备注' },
     {

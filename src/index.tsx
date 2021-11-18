@@ -7,9 +7,12 @@ import { BrowserRouter } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/lib/integration/react'
 import { getPersistor } from '@rematch/persist'
+import { message } from 'antd'
 import store from './rematch'
 import App from './App'
 import * as serviceWorker from './serviceWorker'
+
+message.config({ maxCount: 1 })
 
 ReactDOM.render(
   <BrowserRouter>

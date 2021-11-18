@@ -4,8 +4,9 @@ import { Modal, message, Form, Input, Table, InputNumber, Button } from 'antd'
 import { ColumnsType } from 'antd/lib/table'
 import { GetRowKey } from 'antd/lib/table/interface'
 import dayjs, { Dayjs } from 'dayjs'
-import { useGoods } from '../../../hooks'
+import { useCustomers, useGoods } from '../../../hooks'
 import { Goods } from '../../../rematch/models/goods'
+import { Customer } from '../../../rematch/models/customer'
 import { AddForm as CheckOut, GoodsForm } from '../../../rematch/models/checkOut'
 import { getCheckOutPrice, getGoodsPrice } from '../../../utils'
 import { DatePicker, RepositorySelect, PriceInput, CustomerSelect, GoodsSelect } from '../../../components'
@@ -34,6 +35,7 @@ const BaseForm: React.FC<Props> = function (props) {
     }
     return {}
   }, [value])
+  const customers = useCustomers()
 
   const [visible, setVisible] = useState(false)
   const openModal = useCallback(() => setVisible(true), [])
@@ -44,16 +46,25 @@ const BaseForm: React.FC<Props> = function (props) {
     onChange('dealTime', value!.valueOf())
     onChange('receivedTime', value!.valueOf())
   }, [onChange])
-  // const onOddChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('odd', e.target.value), [onChange])
+  const onOddChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('odd', e.target.value), [onChange])
   const onRepositoryChange = useCallback((value: number) => {
     onChange('warehouseId', value)
     onChange('fetchGoodsRecordList', [])
     addGoods()
   }, [onChange, addGoods])
   const onCustomerChange = useCallback((value: number) => onChange('customId', value), [onChange])
-  const onReceiverIdChange = useCallback((value: number) => onChange('receiverId', value), [onChange])
-  const copyCustomerId = useCallback(() => typeof value.customId === 'number' && onChange('receiverId', value.customId), [onChange, value.customId])
-  const copyReceiverId = useCallback(() => typeof value.receiverId === 'number' && onChange('customId', value.receiverId), [onChange, value.receiverId])
+  const onReceiverIdChange = useCallback((receiverId: number, customers: Customer[]) => {
+    onChange('receiverId', receiverId)
+    const customer = customers.find(c => c.id === receiverId)
+    if (!value.receiverPhone && customer?.leaderPhone) {
+      onChange('receiverPhone', customer.leaderPhone)
+    }
+    if (!value.receivedAddress && customer?.addressDetail) {
+      onChange('receivedAddress', customer.addressDetail)
+    }
+  }, [onChange, value.receiverPhone, value.receivedAddress])
+  const copyCustomerId = useCallback(() => typeof value.customId === 'number' && onReceiverIdChange(value.customId, customers), [onReceiverIdChange, customers, value.customId])
+  const copyReceiverId = useCallback(() => typeof value.receiverId === 'number' && onCustomerChange(value.receiverId), [onCustomerChange, value.receiverId])
   const onReceiverChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('receiver', e.target.value), [onChange])
   const onReceiverPhoneChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('receiverPhone', e.target.value), [onChange])
   const onReceivedAddressChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('receivedAddress', e.target.value), [onChange])
@@ -113,9 +124,9 @@ const BaseForm: React.FC<Props> = function (props) {
     const form: CheckOut = {
       ...value,
       odd: value.odd.trim(),
-      signer: value?.signer?.trim() || null,
-      remark: value?.remark?.trim() || null,
-      otherCostName: value?.otherCostName?.trim() || null,
+      signer: value?.signer?.trim() || '',
+      remark: value?.remark?.trim() || '',
+      otherCostName: value?.otherCostName?.trim() || '',
       fetchGoodsRecordList: value.fetchGoodsRecordList.filter(({ goodsId }) => goodsId !== undefined).map(({ price, discount, paid, ...rest }) => ({ ...rest, price: price || 0, discount: discount || 1, paid: typeof paid === 'number' ? paid : null })),
       discount: value.discount || 1,
       paid: typeof value.paid === 'number' ? value.paid : null,
@@ -137,10 +148,10 @@ const BaseForm: React.FC<Props> = function (props) {
       message.error('请选收货方/厂家')
       return
     }
-    // if (!form.fetchGoodsRecordList.length) {
-    //   message.error('请正确填写出库货物')
-    //   return
-    // }
+    if (!form.fetchGoodsRecordList.length) {
+      message.error('请正确填写出库货物')
+      return
+    }
     await onSave(form)
     closeModal()
   }, [value, onSave, closeModal])
@@ -230,7 +241,9 @@ const BaseForm: React.FC<Props> = function (props) {
             <Form.Item className={styles.item} label='开单日期' required>
               <DatePicker value={dayjs(value.dealTime)} onChange={onDealTimeChange} allowClear={false} placeholder='请选择开单日期' />
             </Form.Item>
-            <Form.Item className={styles.item} label='单号' hidden={!value.odd}>{ value.odd }</Form.Item>
+            <Form.Item className={styles.item} label='单号'>
+              <Input value={value.odd || ''} onChange={onOddChange} placeholder='请输入单号' />
+            </Form.Item>
           </div>
           <div className={styles.spaceBetween}>
             <Form.Item className={styles.item} label='客户/商标' required>
@@ -250,8 +263,8 @@ const BaseForm: React.FC<Props> = function (props) {
               <DatePicker value={value.receivedTime === null ? null : dayjs(value.receivedTime)} onChange={onReceivedTimeChange} placeholder='请选择收货时间' />
             </Form.Item>
           </div>
-          <div className={styles.hidden}>
-            <Form.Item className={styles.item} label='收货联系人'>
+          <div className={styles.spaceBetween}>
+            <Form.Item className={styles.item} label='收货联系人' hidden>
               <Input value={value.receiver || ''} onChange={onReceiverChange} placeholder='请输入收货联系人' />
             </Form.Item>
             <Form.Item className={styles.item} label='收货联系号码'>

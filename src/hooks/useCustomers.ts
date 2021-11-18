@@ -5,9 +5,8 @@ import { Customer } from '../rematch/models/customer'
 
 let loaded: boolean = false
 
-const useCustomers = (): [Customer[], Customer[]] => {
+const useCustomers = (keyword?: string): Customer[] => {
   const { didMount, shouldUpdate, data } = useSelector((store: RootState) => store.customer)
-  const keyword = useSelector((store: RootState) => store.customer.keyword.trim())
   const dispatch = useDispatch<Dispatch>()
   useEffect(() => {
     if ((!didMount && !loaded) || shouldUpdate) {
@@ -23,8 +22,12 @@ const useCustomers = (): [Customer[], Customer[]] => {
       }
     }
   }, [didMount, shouldUpdate, dispatch.customer])
-  const customers = useMemo(() => data.length ? data.filter(({ name, leader, leaderPhone, address, addressDetail, remark }) => name.toLowerCase().includes(keyword.toLowerCase()) || leader.includes(keyword) || leaderPhone.includes(keyword) || address.includes(keyword) || addressDetail.includes(keyword) || remark.includes(keyword)) : data, [keyword, data])
-  return [data, customers]
+  const finalKeyword = useMemo(() => (keyword?.trim() || '').toLowerCase(), [keyword])
+  return useMemo<Customer[]>(() => {
+    return data.filter(({ name, leader, leaderPhone, address, addressDetail, remark }) => {
+      return name.toLowerCase().includes(finalKeyword) || leader?.toLowerCase().includes(finalKeyword) || leaderPhone?.toLowerCase().includes(finalKeyword) || address?.toLowerCase().includes(finalKeyword) || addressDetail?.toLowerCase().includes(finalKeyword) || remark?.toLowerCase().includes(finalKeyword)
+    })
+  }, [data, finalKeyword])
 }
 
 export default useCustomers

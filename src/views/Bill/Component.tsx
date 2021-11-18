@@ -7,6 +7,7 @@ import dayjs, { Dayjs } from 'dayjs'
 import { RootState, Dispatch } from '../../rematch'
 import { CustomerSelect, GoodsSelect, DatePicker } from '../../components'
 import BillPreview from '../../components/BillPreview'
+import exportExcelHandler from './exportExcel'
 
 const Component: React.FC = function () {
   const { filter, data, params } = useSelector((store: RootState) => store.bill)
@@ -73,6 +74,10 @@ const Component: React.FC = function () {
   const ref = useRef<HTMLIFrameElement | null>(null)
   const print = useCallback(() => ref.current?.contentWindow?.print(), [])
 
+  const exportExcel = usePersistFn(() => {
+    exportExcelHandler()
+  })
+
   return (
     <div className={styles.wrap}>
       <header className={styles.header}>
@@ -80,7 +85,7 @@ const Component: React.FC = function () {
           <Row gutter={24}>
             <Col span={8}>
               <Form.Item label='客户/商标' required>
-                <CustomerSelect<number[]> className={styles.select} value={filter.customIds} onChange={onCustomersChange} allowClear placeholder='请选择客户/商标' />
+                <CustomerSelect<number[]> className={styles.select} value={filter.customIds} onChange={onCustomersChange} mode='multiple' allowClear placeholder='请选择客户/商标' />
               </Form.Item>
             </Col>
             <Col span={8}>
@@ -119,6 +124,7 @@ const Component: React.FC = function () {
               <Space size='large'>
                 <Button type='primary' onClick={onSearch} loading={loading}>查询</Button>
                 <Button onClick={print} disabled={!printable || !isIframeReady} loading={printable && !isIframeReady}>打印</Button>
+                <Button disabled={!data.length} loading={loading} onClick={exportExcel}>导出</Button>
               </Space>
             </Col>
           </Row>

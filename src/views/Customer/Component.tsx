@@ -11,8 +11,8 @@ import { ScrollTable } from '../../components'
 import { AddForm, EditForm } from './FormModal'
 
 const Component: React.FC = function () {
-  const [, data] = useCustomers()
   const keyword = useSelector((store: RootState) => store.customer.keyword)
+  const data = useCustomers(keyword)
   const pageNum = useSelector((store: RootState) => store.customer.pageNum)
   const pageSize = useSelector((store: RootState) => store.customer.pageSize)
   const loading = useSelector((store: RootState) => store.loading.effects.customer.loadCustomers)
@@ -20,7 +20,7 @@ const Component: React.FC = function () {
   const dataSource = useMemo(() => data.slice((pageNum - 1) * pageSize, pageNum * pageSize), [data, pageNum, pageSize])
 
   const dispatch = useDispatch<Dispatch>()
-  const onKeywordChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => dispatch.customer.updateState({ keyword: e.target.value }), [dispatch.customer])
+  const onKeywordChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => dispatch.customer.updateState({ keyword: e.target.value, pageNum: 1 }), [dispatch.customer])
 
   const [onDeleteId, setDeleteId] = useState<number | undefined>()
   const deleteCustomer = useCallback(async () => {
