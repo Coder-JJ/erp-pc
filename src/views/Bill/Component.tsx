@@ -1,23 +1,36 @@
 import styles from './index.less'
 import React, { useMemo, useCallback, useRef, useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { Form, Button, Row, Col, message, Space } from 'antd'
-import { usePersistFn } from 'ahooks'
+import { Form, Button, Row, Col, message, Space, Switch } from 'antd'
+import { useMount, usePersistFn } from 'ahooks'
 import dayjs, { Dayjs } from 'dayjs'
 import { RootState, Dispatch } from '../../rematch'
+import { SearchMode } from '../../rematch/models/bill'
 import { CustomerSelect, GoodsSelect, DatePicker } from '../../components'
 import BillPreview from '../../components/BillPreview'
 import exportExcelHandler from './exportExcel'
 
 const Component: React.FC = function () {
-  const { filter, data, params } = useSelector((store: RootState) => store.bill)
+  const { shouldUpdate, displayFilter, searchMode, exceptCustomers, data, filter } = useSelector((store: RootState) => store.bill)
   const loading = useSelector((store: RootState) => store.loading.effects.bill.loadBill)
-  const startDate = useMemo(() => dayjs(filter.startTime), [filter.startTime])
-  const endDate = useMemo(() => dayjs(filter.endTime), [filter.endTime])
+  const startDate = useMemo(() => dayjs(displayFilter.startTime), [displayFilter.startTime])
+  const endDate = useMemo(() => dayjs(displayFilter.endTime), [displayFilter.endTime])
 
   const dispatch = useDispatch<Dispatch>()
+  useMount(() => {
+    if (filter && shouldUpdate) {
+      dispatch.bill.updateBill()
+    }
+  })
+
   const onCustomersChange = useCallback((customIds: number[]) => {
     dispatch.bill.updateFilter({ customIds })
+  }, [dispatch.bill])
+  const onSearchModeChange = useCallback((checked: boolean) => {
+    dispatch.bill.updateState({ searchMode: checked ? SearchMode.All : SearchMode.Normal })
+  }, [dispatch.bill])
+  const onExceptCustomersChange = useCallback((exceptCustomers: number[]) => {
+    dispatch.bill.updateState({ exceptCustomers })
   }, [dispatch.bill])
   const onReceiversChange = useCallback((receiverIds: number[]) => {
     dispatch.bill.updateFilter({ receiverIds })
@@ -44,8 +57,9 @@ const Component: React.FC = function () {
     })
   }, [dispatch.bill])
 
-  const printable = !!params && !!data.length
-  const [isIframeReady, setIframeReady] = useState(false)
+  const hasData = !!data.length
+  const ref = useRef<HTMLIFrameElement | null>(null)
+  const [isIframeReady, setIframeReady] = useState<boolean>(false)
   useEffect(() => {
     const onMessage = (e: MessageEvent<boolean>): void => {
       setIframeReady(e.data)
@@ -55,24 +69,26 @@ const Component: React.FC = function () {
       window.removeEventListener('message', onMessage)
     }
   }, [])
+  const print = usePersistFn(() => {
+    ref.current?.contentWindow?.postMessage({ checkOuts: data, filter })
+  })
 
   const onSearch = usePersistFn(() => {
-    setIframeReady(false)
-    dispatch.bill.updateState({ data: [], params: '' })
-    if (!filter.customIds.length && !filter.receiverIds.length) {
+    dispatch.bill.updateState({ data: [], filter: undefined })
+    if (searchMode === SearchMode.Normal && !displayFilter.customIds.length && !displayFilter.receiverIds.length) {
       return message.error('请选择客户/商标/厂家')
     }
-    if (!filter.startTime) {
+    if (!displayFilter.startTime) {
       return message.error('请选择开始时间')
     }
-    if (!filter.endTime) {
+    if (!displayFilter.endTime) {
       return message.error('请选择结束时间')
     }
     dispatch.bill.loadBill()
   })
-
-  const ref = useRef<HTMLIFrameElement | null>(null)
-  const print = useCallback(() => ref.current?.contentWindow?.print(), [])
+  const onReset = useCallback(() => {
+    dispatch.bill.resetState()
+  }, [dispatch.bill])
 
   const exportExcel = usePersistFn(() => {
     exportExcelHandler()
@@ -82,20 +98,38 @@ const Component: React.FC = function () {
     <div className={styles.wrap}>
       <header className={styles.header}>
         <Form labelCol={{ span: 6 }}>
-          <Row gutter={24}>
+          <Row gutter={24} align='middle'>
             <Col span={8}>
               <Form.Item label='客户/商标' required>
-                <CustomerSelect<number[]> className={styles.select} value={filter.customIds} onChange={onCustomersChange} mode='multiple' allowClear placeholder='请选择客户/商标' />
+                <CustomerSelect<number[]> className={styles.select} value={displayFilter.customIds} onChange={onCustomersChange} mode='multiple' maxTagCount={5} disabled={searchMode === SearchMode.All} allowClear placeholder='请选择客户/商标' />
               </Form.Item>
             </Col>
+            <Col span={10}>
+              <Form.Item>
+                <div className={styles.except}>
+                  <Switch className={styles.switch} checked={searchMode === SearchMode.All} onChange={onSearchModeChange} checkedChildren='全选' unCheckedChildren='全选' />
+                  {
+                    searchMode === SearchMode.All && (
+                      <>
+                        <div className={styles.label}>除</div>
+                        <CustomerSelect<number[]> value={exceptCustomers} onChange={onExceptCustomersChange} mode='multiple' allowClear placeholder='请选择客户/商标' />
+                        <div>外</div>
+                      </>
+                    )
+                  }
+                </div>
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={24}>
             <Col span={8}>
               <Form.Item label='收货方/厂家' required>
-                <CustomerSelect<number[]> className={styles.select} value={filter.receiverIds} onChange={onReceiversChange} mode='multiple' allowClear placeholder='请选择收货方/厂家' />
+                <CustomerSelect<number[]> className={styles.select} value={displayFilter.receiverIds} onChange={onReceiversChange} mode='multiple' allowClear placeholder='请选择收货方/厂家' />
               </Form.Item>
             </Col>
             <Col span={8}>
               <Form.Item label='货物'>
-                <GoodsSelect<number[]> className={styles.select} value={filter.goodsIds} onChange={onGoodsChange} mode='multiple' allowClear placeholder='请选择货物' />
+                <GoodsSelect<number[]> className={styles.select} value={displayFilter.goodsIds} onChange={onGoodsChange} mode='multiple' allowClear placeholder='请选择货物' />
               </Form.Item>
             </Col>
           </Row>
@@ -123,7 +157,8 @@ const Component: React.FC = function () {
             <Col className={styles.center} span={24}>
               <Space size='large'>
                 <Button type='primary' onClick={onSearch} loading={loading}>查询</Button>
-                <Button onClick={print} disabled={!printable || !isIframeReady} loading={printable && !isIframeReady}>打印</Button>
+                <Button onClick={onReset}>重置</Button>
+                <Button onClick={print} disabled={!hasData || !isIframeReady} loading={hasData && !isIframeReady}>打印</Button>
                 <Button disabled={!data.length} loading={loading} onClick={exportExcel}>导出</Button>
               </Space>
             </Col>
@@ -133,7 +168,7 @@ const Component: React.FC = function () {
       <footer className={styles.footer}>
         <BillPreview checkOuts={data} startDate={startDate} endDate={endDate} />
       </footer>
-      <iframe className={styles.print} src={`/print/bill?${params}`} ref={ref} />
+      <iframe className={styles.print} src='/print/bill' ref={ref} />
     </div>
   )
 }

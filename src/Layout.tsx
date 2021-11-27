@@ -63,7 +63,8 @@ const menus: MenuType[] = [
   },
   { key: 'checkin', name: '入库登记', view: 'CheckIn', icon: 'icon-rkd' },
   { key: 'checkout', name: '出库登记', view: 'CheckOut', icon: 'icon-ckd' },
-  { key: 'bill', name: '账单查询', view: 'Bill', icon: 'icon-kcpd' },
+  { key: 'return', name: '退货登记', view: 'Return', icon: 'icon-navicon-kcz' },
+  { key: 'bill', name: '账单查询', view: 'Bill', icon: 'icon-navicon-wgthgl1' },
   { key: 'stock', name: '查看库存', view: 'Stock', icon: 'icon-kcpd' }
 ]
 

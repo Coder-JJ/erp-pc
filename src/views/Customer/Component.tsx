@@ -38,12 +38,12 @@ const Component: React.FC = function () {
     { dataIndex: 'fax', title: '传真号' },
     {
       dataIndex: 'id',
-      width: 140,
+      width: 110,
       render (id, record) {
         return (
           <>
             <EditForm>
-              <Button type='link' onMouseEnter={() => dispatch.customer.updateEditForm(record)}>编辑</Button>
+              <Button type='link' size='small' onMouseEnter={() => dispatch.customer.updateEditForm(record)}>编辑</Button>
             </EditForm>
             <Popconfirm
               visible={id === onDeleteId}
@@ -54,7 +54,7 @@ const Component: React.FC = function () {
               title='是否确定删除该客户'
               placement='topRight'
             >
-              <Button type='link' danger>删除</Button>
+              <Button type='link' size='small' danger>删除</Button>
             </Popconfirm>
           </>
         )

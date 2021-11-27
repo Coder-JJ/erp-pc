@@ -1,9 +1,8 @@
 import styles from './index.less'
 import React, { useEffect, useMemo, useState } from 'react'
-import { useLocation } from 'react-router'
+import { useUpdateEffect } from 'ahooks'
 import dayjs from 'dayjs'
-import qs from 'qs'
-import { CheckOut, getInitialGoods, loadCheckOut } from '../../rematch/models/checkOut'
+import { CheckOut, getInitialGoods } from '../../rematch/models/checkOut'
 import { getCheckOutPrice } from '../../utils'
 
 export interface Params {
@@ -12,17 +11,24 @@ export interface Params {
 
 const PrintCheckout: React.FC = function () {
   const [data, setData] = useState<CheckOut | undefined>()
-  const location = useLocation()
-  const params = useMemo<Params>(() => qs.parse(location.search, { ignoreQueryPrefix: true }) as any, [location.search])
-  useEffect(() => {
-    window.parent.postMessage(false)
-    if (params.id) {
-      loadCheckOut(params.id).then(data => {
-        setData(data)
-        window.parent.postMessage(true)
-      })
+
+  useUpdateEffect(() => {
+    if (data) {
+      window.print()
+      setData(undefined)
     }
-  }, [params.id])
+  }, [data])
+
+  useEffect(() => {
+    const onMessage = (e: MessageEvent<CheckOut>): void => {
+      setData(e.data)
+    }
+    window.addEventListener('message', onMessage)
+    window.parent.postMessage(true)
+    return () => {
+      window.removeEventListener('message', onMessage)
+    }
+  }, [])
 
   const date = useMemo(() => data?.dealTime ? dayjs(data.dealTime) : undefined, [data])
   const totalPrice = useMemo(() => data ? getCheckOutPrice(data) : 0, [data])
@@ -55,7 +61,7 @@ const PrintCheckout: React.FC = function () {
           <tr>
             <th style={{ width: '30mm', minWidth: '30mm' }}>货物</th>
             <th style={{ width: '30mm', minWidth: '30mm' }}>规格</th>
-            <th style={{ width: '18mm', minWidth: '18mm' }}>鞋盒</th>
+            <th style={{ width: '18mm', minWidth: '18mm' }}>数量</th>
             <th style={{ width: '18mm', minWidth: '18mm' }}>鞋套</th>
             <th style={{ width: '18mm', minWidth: '18mm' }}>手提袋</th>
             <th style={{ width: '18mm', minWidth: '18mm' }}>外箱</th>

@@ -1,29 +1,35 @@
 import './index.less'
-import React, { useEffect, useMemo, useState } from 'react'
-import { useLocation } from 'react-router'
+import React, { useEffect, useState } from 'react'
+import { useUpdateEffect } from 'ahooks'
 import dayjs from 'dayjs'
-import qs from 'qs'
-import { loadBill, PrintRouteParams } from '../../rematch/models/bill'
 import { CheckOut } from '../../rematch/models/checkOut'
+import { Filter } from '../../rematch/models/bill'
 import BillPreview from '../../components/BillPreview'
 
 const PrintBill: React.FC = function () {
-  const location = useLocation()
-  const params = useMemo(() => location.search.slice(1), [location.search])
-  const paramsObj = useMemo<PrintRouteParams>(() => qs.parse(params) as any, [params])
+  const [filter, setFilter] = useState<Filter | undefined>()
+  const [checkOuts, setCheckOuts] = useState<CheckOut[]>([])
 
-  const [data, setData] = useState<CheckOut[]>([])
-  useEffect(() => {
-    window.parent.postMessage(false)
-    if (params) {
-      loadBill(params).then(data => {
-        setData(data)
-        window.parent.postMessage(true)
-      })
+  useUpdateEffect(() => {
+    if (checkOuts.length) {
+      window.print()
+      setCheckOuts([])
     }
-  }, [params])
+  }, [checkOuts.length])
 
-  return <BillPreview checkOuts={data} startDate={dayjs(paramsObj.startTime)} endDate={dayjs(paramsObj.endTime)} />
+  useEffect(() => {
+    const onMessage = (e: MessageEvent<{ filter: Filter, checkOuts: CheckOut[] }>): void => {
+      setFilter(e.data.filter)
+      setCheckOuts(e.data.checkOuts)
+    }
+    window.addEventListener('message', onMessage)
+    window.parent.postMessage(true)
+    return () => {
+      window.removeEventListener('message', onMessage)
+    }
+  }, [])
+
+  return <BillPreview checkOuts={checkOuts} startDate={filter?.startTime ? dayjs(filter.startTime) : dayjs()} endDate={filter?.endTime ? dayjs(filter.endTime) : dayjs()} />
 }
 
 export default React.memo(PrintBill)

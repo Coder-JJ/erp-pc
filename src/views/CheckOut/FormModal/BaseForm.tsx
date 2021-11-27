@@ -1,6 +1,8 @@
 import styles from './index.less'
-import React, { useState, useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
+import { useControllableValue } from 'ahooks'
 import { Modal, message, Form, Input, Table, InputNumber, Button } from 'antd'
+import { ModalProps } from 'antd/lib/modal'
 import { ColumnsType } from 'antd/lib/table'
 import { GetRowKey } from 'antd/lib/table/interface'
 import dayjs, { Dayjs } from 'dayjs'
@@ -11,8 +13,7 @@ import { AddForm as CheckOut, GoodsForm } from '../../../rematch/models/checkOut
 import { getCheckOutPrice, getGoodsPrice } from '../../../utils'
 import { DatePicker, RepositorySelect, PriceInput, CustomerSelect, GoodsSelect } from '../../../components'
 
-interface Props {
-  title: string
+interface Props extends Omit<ModalProps, 'children'> {
   value: CheckOut
   saving: boolean
   onChange (key: keyof CheckOut, value: any): void
@@ -20,11 +21,11 @@ interface Props {
   onAddGoods (): void
   onResetGoodsProps (index: number): void
   onSave (form: CheckOut): Promise<void>
-  children: React.ReactElement
+  children?: React.ReactElement
 }
 
 const BaseForm: React.FC<Props> = function (props) {
-  const { title, value, saving, onChange, onGoodsPropChange: passedOnGoodsPropChange, onAddGoods, onResetGoodsProps, onSave, children } = props
+  const { value, saving, onChange, onGoodsPropChange: passedOnGoodsPropChange, onAddGoods, onResetGoodsProps, onSave, children, ...modalProps } = props
   const paidPlaceholder = useMemo(() => {
     if (typeof value.paid === 'number') {
       return { placeholder: `${value.paid}` }
@@ -37,9 +38,14 @@ const BaseForm: React.FC<Props> = function (props) {
   }, [value])
   const customers = useCustomers()
 
-  const [visible, setVisible] = useState(false)
-  const openModal = useCallback(() => setVisible(true), [])
-  const closeModal = useCallback(() => !saving && setVisible(false), [saving])
+  const [visible, setVisible] = useControllableValue(props, {
+    defaultValue: false,
+    valuePropName: 'visible'
+  })
+  const openModal = useCallback(() => setVisible(true), [setVisible])
+  const closeModal = useCallback(() => {
+    !saving && setVisible(false)
+  }, [saving, setVisible])
 
   const addGoods = useCallback(() => onAddGoods(), [onAddGoods])
   const onDealTimeChange = useCallback((value: Dayjs | null, dateString: string) => {
@@ -167,7 +173,7 @@ const BaseForm: React.FC<Props> = function (props) {
     },
     {
       dataIndex: 'num',
-      title: '鞋盒',
+      title: '数量',
       width: 100,
       render (num, record, index) {
         return <InputNumber value={num} onChange={value => onGoodsNumChange(index, record, value)} precision={0} min={0} />
@@ -234,8 +240,8 @@ const BaseForm: React.FC<Props> = function (props) {
 
   return (
     <>
-      { React.cloneElement(children, { onClick: openModal }) }
-      <Modal wrapClassName={styles.wrap} visible={visible} onOk={onOk} onCancel={closeModal} width={1000} title={title} confirmLoading={saving}>
+      { !!children && React.cloneElement(children, { onClick: openModal }) }
+      <Modal wrapClassName={styles.wrap} visible={visible} onOk={onOk} onCancel={closeModal} width={1000} confirmLoading={saving} {...modalProps}>
         <Form>
           <div className={styles.spaceBetween}>
             <Form.Item className={styles.item} label='开单日期' required>

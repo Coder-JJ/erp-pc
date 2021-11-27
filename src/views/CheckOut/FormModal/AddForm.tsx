@@ -1,15 +1,15 @@
 import React, { useCallback } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
+import { ModalProps } from 'antd/lib/modal'
 import BaseForm from './BaseForm'
 import { RootState, Dispatch } from '../../../rematch'
 import { CheckOut, GoodsForm } from '../../../rematch/models/checkOut'
 
-interface Props {
-  children: React.ReactElement
+export interface Props extends Omit<ModalProps, 'children'> {
+  children?: React.ReactElement
 }
 
 const AddForm: React.FC<Props> = function (props) {
-  const { children } = props
   const { addForm } = useSelector((store: RootState) => store.checkOut)
   const loading = useSelector((store: RootState) => store.loading.effects.checkOut.addCheckOut)
   const dispatch = useDispatch<Dispatch>()
@@ -23,7 +23,7 @@ const AddForm: React.FC<Props> = function (props) {
     dispatch.checkOut.clearAddForm()
   }, [dispatch.checkOut])
 
-  return <BaseForm value={addForm} saving={loading} onChange={onChange} onGoodsPropChange={onGoodsPropChange} onAddGoods={onAddGoods} onResetGoodsProps={onResetGoodsProps} onSave={onSave} title='新增入库单'>{ children }</BaseForm>
+  return <BaseForm value={addForm} saving={loading} onChange={onChange} onGoodsPropChange={onGoodsPropChange} onAddGoods={onAddGoods} onResetGoodsProps={onResetGoodsProps} onSave={onSave} title='新增入库单' {...props} />
 }
 
 export default React.memo(AddForm)

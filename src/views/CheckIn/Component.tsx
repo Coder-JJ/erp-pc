@@ -28,7 +28,8 @@ const Component: React.FC = function () {
 
   const debouncedLoadCheckIns = useMemo(() => debounce<() => void>(dispatch.checkIn.loadCheckIns, 250), [dispatch.checkIn.loadCheckIns])
   const onOddChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch.checkIn.updateFilter({ odd: e.target.value, pageNum: 1 })
+    dispatch.checkIn.updateFilter({ odd: e.target.value })
+    dispatch.checkIn.updateState({ pageNum: 1 })
     debouncedLoadCheckIns()
   }, [dispatch.checkIn, debouncedLoadCheckIns])
 
@@ -69,12 +70,12 @@ const Component: React.FC = function () {
     { dataIndex: 'remark', title: '备注' },
     {
       dataIndex: 'id',
-      width: 140,
+      width: 110,
       render (id, record) {
         return (
           <>
             <EditForm>
-              <Button type='link' onMouseEnter={() => dispatch.checkIn.updateEditForm(record)}>编辑</Button>
+              <Button type='link' size='small' onMouseEnter={() => dispatch.checkIn.updateEditForm(record)}>编辑</Button>
             </EditForm>
             <Popconfirm
               visible={id === onDeleteId}
@@ -85,7 +86,7 @@ const Component: React.FC = function () {
               title='是否确定删除该出库单'
               placement='topRight'
             >
-              <Button type='link' danger>删除</Button>
+              <Button type='link' size='small' danger>删除</Button>
             </Popconfirm>
           </>
         )

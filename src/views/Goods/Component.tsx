@@ -41,12 +41,12 @@ const Component: React.FC = function () {
     { dataIndex: 'remark', title: '备注' },
     {
       dataIndex: 'id',
-      width: 140,
+      width: 110,
       render (id, record) {
         return (
           <>
             <EditForm>
-              <Button type='link' onMouseEnter={() => dispatch.goods.updateEditForm(record)}>编辑</Button>
+              <Button type='link' size='small' onMouseEnter={() => dispatch.goods.updateEditForm(record)}>编辑</Button>
             </EditForm>
             <Popconfirm
               visible={id === onDeleteId}
@@ -57,7 +57,7 @@ const Component: React.FC = function () {
               title='是否确定删除该货物'
               placement='topRight'
             >
-              <Button type='link' danger>删除</Button>
+              <Button type='link' size='small' danger>删除</Button>
             </Popconfirm>
           </>
         )

@@ -26,7 +26,7 @@ export enum CheckOutState {
   InStock = 1,
   Delivered = 2,
   Signed = 3,
-  Paied = 4,
+  Paid = 4,
   Canceled = 99
 }
 
@@ -259,6 +259,7 @@ export const checkOut = createModel<RootModel>()({
       await request.post('/repertory/fetchAndSaveRecord/insert', checkOut)
       dispatch.checkOut.loadCheckOuts()
       dispatch.checkIn.shouldUpdate()
+      dispatch.bill.shouldUpdate()
       dispatch.stock.shouldUpdate()
       dispatch.stock.detailShouldUpdate(checkOut.warehouseId!)
     },
@@ -266,13 +267,22 @@ export const checkOut = createModel<RootModel>()({
       await request.put('/repertory/fetchAndSaveRecord/update', checkOut)
       dispatch.checkOut.loadCheckOuts()
       dispatch.checkIn.shouldUpdate()
+      dispatch.bill.shouldUpdate()
       dispatch.stock.shouldUpdate()
       dispatch.stock.detailShouldUpdate(checkOut.warehouseId)
+    },
+    async setCheckOutState ({ id, state }: { id: number, state: CheckOutState }) {
+      await request.patch(`/repertory/fetchRecord/status/${id}?state=${state}`)
+      dispatch.checkOut.loadCheckOuts()
+      if (state === CheckOutState.Paid) {
+        dispatch.bill.shouldUpdate()
+      }
     },
     async cancelCheckOut (checkOut: CheckOut) {
       await request.patch(`/repertory/fetchAndSaveRecord/cancel/${checkOut.id}`)
       dispatch.checkOut.loadCheckOuts()
       dispatch.checkIn.shouldUpdate()
+      dispatch.bill.shouldUpdate()
       dispatch.stock.shouldUpdate()
       dispatch.stock.detailShouldUpdate(checkOut.warehouseId)
     },
@@ -281,6 +291,7 @@ export const checkOut = createModel<RootModel>()({
       await request.delete(`/repertory/fetchAndSaveRecord/delete/${id}`)
       dispatch.checkOut.loadCheckOuts()
       dispatch.checkIn.shouldUpdate()
+      dispatch.bill.shouldUpdate()
       dispatch.stock.shouldUpdate()
       dispatch.stock.detailShouldUpdate(repositoryId)
     }
