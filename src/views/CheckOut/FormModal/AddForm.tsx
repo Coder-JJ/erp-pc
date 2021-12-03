@@ -23,7 +23,7 @@ const AddForm: React.FC<Props> = function (props) {
     dispatch.checkOut.clearAddForm()
   }, [dispatch.checkOut])
 
-  return <BaseForm value={addForm} saving={loading} onChange={onChange} onGoodsPropChange={onGoodsPropChange} onAddGoods={onAddGoods} onResetGoodsProps={onResetGoodsProps} onSave={onSave} title='新增入库单' {...props} />
+  return <BaseForm value={addForm} saving={loading} onChange={onChange} onGoodsPropChange={onGoodsPropChange} onAddGoods={onAddGoods} onResetGoodsProps={onResetGoodsProps} onSave={onSave} title='新增出库单' {...props} />
 }
 
 export default React.memo(AddForm)

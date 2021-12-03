@@ -5,6 +5,7 @@ import axios, { CancelTokenSource } from 'axios'
 import { request } from '../../libs'
 import type { RootModel } from '.'
 import { CheckOut } from './checkOut'
+import { ReturnGoods } from './returnGoods'
 
 export interface Filter {
   customIds: number[]
@@ -24,12 +25,25 @@ export interface State {
   displayFilter: Filter
   searchMode: SearchMode
   exceptCustomers: number[]
-  data: CheckOut[]
+  checkOuts: CheckOut[]
+  returnGoods: ReturnGoods[]
   filter: Filter | undefined
 }
 
-export const loadBill = (params: Filter, cancelTokenSource?: CancelTokenSource): Promise<CheckOut[]> => {
-  return request.post<CheckOut[], CheckOut[]>('/repertory/fetchRecord/all/list', params, { cancelToken: cancelTokenSource?.token })
+export const loadCheckOuts = (filter: Filter, cancelTokenSource?: CancelTokenSource): Promise<CheckOut[]> => {
+  return request.post<CheckOut[], CheckOut[]>('/repertory/fetchRecord/all/list', filter, { cancelToken: cancelTokenSource?.token })
+}
+
+export const loadReturnGoods = (filter: Filter, cancelTokenSource?: CancelTokenSource): Promise<ReturnGoods[]> => {
+  return request.post<ReturnGoods[], ReturnGoods[]>('/cancel/all/list', {
+    customIds: filter.customIds,
+    cancelPersonIds: filter.receiverIds,
+    goodsIds: filter.goodsIds,
+    startTime: filter.startTime,
+    endTime: filter.endTime
+  }, {
+    cancelToken: cancelTokenSource?.token
+  })
 }
 
 let cancelTokenSource: CancelTokenSource | undefined
@@ -41,12 +55,13 @@ const getInitialState = (): State => {
       customIds: [],
       receiverIds: [],
       goodsIds: [],
-      startTime: dayjs().startOf('M').startOf('d').format('YYYY-MM-DD HH:mm:ss'),
-      endTime: dayjs().endOf('M').endOf('d').format('YYYY-MM-DD HH:mm:ss')
+      startTime: dayjs().subtract(1, 'M').startOf('M').startOf('d').format('YYYY-MM-DD HH:mm:ss'),
+      endTime: dayjs().subtract(1, 'M').endOf('M').endOf('d').format('YYYY-MM-DD HH:mm:ss')
     },
     searchMode: SearchMode.Normal,
     exceptCustomers: [],
-    data: [],
+    checkOuts: [],
+    returnGoods: [],
     filter: undefined
   }
 }
@@ -89,23 +104,30 @@ export const bill = createModel<RootModel>()({
         customIds: searchMode === SearchMode.All ? allCustomers.filter(({ id }) => !exceptCustomers.some(c => c === id)).map(({ id }) => id) : customIds
       }
       cancelTokenSource = axios.CancelToken.source()
-      const data = await loadBill(filter, cancelTokenSource)
+      const [checkOuts, returnGoods] = await Promise.all([
+        loadCheckOuts(filter, cancelTokenSource),
+        loadReturnGoods(filter, cancelTokenSource)
+      ])
       cancelTokenSource = undefined
-      dispatch.bill.updateState({ data, filter })
-      return data
+      dispatch.bill.updateState({ checkOuts, returnGoods, filter })
+      return checkOuts
     },
     async updateBill (_: any, store) {
+      const filter = store.bill.filter
       if (cancelTokenSource) {
         cancelTokenSource.cancel('cancel repetitive request.')
       }
-      if (!store.bill.filter) {
+      if (!filter) {
         dispatch.bill.updateState({ shouldUpdate: false })
         return
       }
       cancelTokenSource = axios.CancelToken.source()
-      const data = await loadBill(store.bill.filter, cancelTokenSource)
+      const [checkOuts, returnGoods] = await Promise.all([
+        loadCheckOuts(filter, cancelTokenSource),
+        loadReturnGoods(filter, cancelTokenSource)
+      ])
       cancelTokenSource = undefined
-      dispatch.bill.updateState({ data, shouldUpdate: false })
+      dispatch.bill.updateState({ checkOuts, returnGoods, shouldUpdate: false })
     }
   })
 })

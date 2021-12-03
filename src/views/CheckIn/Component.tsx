@@ -9,7 +9,7 @@ import dayjs from 'dayjs'
 import { RootState, Dispatch } from '../../rematch'
 import { Goods, CheckIn } from '../../rematch/models/checkIn'
 import { getCheckInPriceDisplay, getGoodsPriceDisplay } from '../../utils'
-import { useFooter, useEnterEvent } from '../../hooks'
+import { useFooter } from '../../hooks'
 import { ScrollTable } from '../../components'
 import { AddForm, EditForm } from './FormModal'
 
@@ -34,13 +34,6 @@ const Component: React.FC = function () {
   }, [dispatch.checkIn, debouncedLoadCheckIns])
 
   const [onDeleteId, setDeleteId] = useState<number | undefined>()
-  const deleteCheckIn = useCallback(async () => {
-    if (onDeleteId) {
-      setDeleteId(onDeleteId)
-      await dispatch.checkIn.deleteCheckIn(onDeleteId)
-      setDeleteId(undefined)
-    }
-  }, [onDeleteId, dispatch.checkIn])
   const columns: ColumnsType<CheckIn> = useMemo(() => [
     { dataIndex: 'odd', title: '单号' },
     { dataIndex: 'warehouseName', title: '入库仓库' },
@@ -62,7 +55,7 @@ const Component: React.FC = function () {
     },
     {
       dataIndex: 'paid',
-      title: '实付金额',
+      title: '应付金额',
       render (paid, record) {
         return getCheckInPriceDisplay(record)
       }
@@ -80,7 +73,7 @@ const Component: React.FC = function () {
             <Popconfirm
               visible={id === onDeleteId}
               onVisibleChange={visible => setDeleteId(visible || deleting ? id : undefined)}
-              onConfirm={deleteCheckIn}
+              onConfirm={() => dispatch.checkIn.deleteCheckIn(record)}
               okButtonProps={{ loading: deleting }}
               arrowPointAtCenter
               title='是否确定删除该出库单'
@@ -92,7 +85,7 @@ const Component: React.FC = function () {
         )
       }
     }
-  ], [dispatch.checkIn, onDeleteId, deleteCheckIn, deleting])
+  ], [dispatch.checkIn, onDeleteId, deleting])
 
   const goodsColumns: ColumnsType<Goods> = useMemo(() => [
     { dataIndex: 'name', title: '货物名称' },
@@ -110,7 +103,7 @@ const Component: React.FC = function () {
     },
     {
       dataIndex: 'paid',
-      title: '实付金额',
+      title: '应付金额',
       render (paid, record) {
         return getGoodsPriceDisplay(record)
       }
@@ -122,7 +115,6 @@ const Component: React.FC = function () {
     }
   }), [goodsColumns])
 
-  useEnterEvent(deleteCheckIn, !!onDeleteId)
   const renderFooter = useFooter()
 
   const onPaginationChange = useCallback((pageNum: number, pageSize: number | undefined) => {

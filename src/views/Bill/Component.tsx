@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { Form, Button, Row, Col, message, Space, Switch } from 'antd'
 import { useMount, usePersistFn } from 'ahooks'
 import dayjs, { Dayjs } from 'dayjs'
+import { useCustomers, useGoods } from '../../hooks'
 import { RootState, Dispatch } from '../../rematch'
 import { SearchMode } from '../../rematch/models/bill'
 import { CustomerSelect, GoodsSelect, DatePicker } from '../../components'
@@ -11,7 +12,7 @@ import BillPreview from '../../components/BillPreview'
 import exportExcelHandler from './exportExcel'
 
 const Component: React.FC = function () {
-  const { shouldUpdate, displayFilter, searchMode, exceptCustomers, data, filter } = useSelector((store: RootState) => store.bill)
+  const { shouldUpdate, displayFilter, searchMode, exceptCustomers, checkOuts, returnGoods, filter } = useSelector((store: RootState) => store.bill)
   const loading = useSelector((store: RootState) => store.loading.effects.bill.loadBill)
   const startDate = useMemo(() => dayjs(displayFilter.startTime), [displayFilter.startTime])
   const endDate = useMemo(() => dayjs(displayFilter.endTime), [displayFilter.endTime])
@@ -57,7 +58,7 @@ const Component: React.FC = function () {
     })
   }, [dispatch.bill])
 
-  const hasData = !!data.length
+  const hasData = !!checkOuts.length || !!returnGoods.length
   const ref = useRef<HTMLIFrameElement | null>(null)
   const [isIframeReady, setIframeReady] = useState<boolean>(false)
   useEffect(() => {
@@ -69,14 +70,17 @@ const Component: React.FC = function () {
       window.removeEventListener('message', onMessage)
     }
   }, [])
+
+  const [goods] = useGoods()
+  const customers = useCustomers()
   const print = usePersistFn(() => {
-    ref.current?.contentWindow?.postMessage({ checkOuts: data, filter })
+    ref.current?.contentWindow?.postMessage({ goods, customers, checkOuts, returnGoods, filter })
   })
 
   const onSearch = usePersistFn(() => {
-    dispatch.bill.updateState({ data: [], filter: undefined })
-    if (searchMode === SearchMode.Normal && !displayFilter.customIds.length && !displayFilter.receiverIds.length) {
-      return message.error('请选择客户/商标/厂家')
+    dispatch.bill.updateState({ checkOuts: [], returnGoods: [], filter: undefined })
+    if (searchMode === SearchMode.Normal && !displayFilter.customIds.length && !displayFilter.receiverIds.length && !displayFilter.goodsIds.length) {
+      return message.error('请选择客户/厂家/货物')
     }
     if (!displayFilter.startTime) {
       return message.error('请选择开始时间')
@@ -159,14 +163,14 @@ const Component: React.FC = function () {
                 <Button type='primary' onClick={onSearch} loading={loading}>查询</Button>
                 <Button onClick={onReset}>重置</Button>
                 <Button onClick={print} disabled={!hasData || !isIframeReady} loading={hasData && !isIframeReady}>打印</Button>
-                <Button disabled={!data.length} loading={loading} onClick={exportExcel}>导出</Button>
+                <Button disabled={!hasData} loading={loading} onClick={exportExcel}>导出</Button>
               </Space>
             </Col>
           </Row>
         </Form>
       </header>
       <footer className={styles.footer}>
-        <BillPreview checkOuts={data} startDate={startDate} endDate={endDate} />
+        <BillPreview goods={goods} customers={customers} checkOuts={checkOuts} returnGoods={returnGoods} startDate={startDate} endDate={endDate} />
       </footer>
       <iframe className={styles.print} src='/print/bill' ref={ref} />
     </div>

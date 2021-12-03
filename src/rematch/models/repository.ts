@@ -82,7 +82,7 @@ export const repository = createModel<RootModel>()({
     }
   },
   effects: dispatch => ({
-    async loadRepositories (_: any, store) {
+    async loadRepositories (_: any) {
       if (cancelTokenSource) {
         cancelTokenSource.cancel('cancel repetitive request.')
       }

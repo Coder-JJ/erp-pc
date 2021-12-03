@@ -1,11 +1,11 @@
 export interface Goods {
-  paid: number | null
+  paid?: number | null
   price: number
   num: number
-  discount: number
+  discount?: number
 }
 
-const getGoodsPrice = ({ paid, price, num, discount }: Goods): number => paid === null ? price * num * discount : paid
+const getGoodsPrice = ({ paid, price, num, discount }: Goods): number => typeof paid === 'number' ? paid : price * num * (discount || 1)
 
 export const getGoodsPriceDisplay = (goods: Goods): string => getGoodsPrice(goods).toFixed(2)
 

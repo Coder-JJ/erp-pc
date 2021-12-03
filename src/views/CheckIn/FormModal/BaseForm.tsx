@@ -122,7 +122,7 @@ const BaseForm: React.FC<Props> = function (props) {
     },
     {
       dataIndex: 'paid',
-      title: '实付金额',
+      title: '应付金额',
       width: 160,
       render (value, record, index) {
         const price = getGoodsPrice(record)
@@ -172,7 +172,7 @@ const BaseForm: React.FC<Props> = function (props) {
               <Form.Item label='折扣'>
                 <DiscountInput value={value.discount} onChange={onDiscountChange} />
               </Form.Item>
-              <Form.Item label='实付金额'>
+              <Form.Item label='应付金额'>
                 <PriceInput className={paidPlaceholder.placeholder ? styles.paid : undefined} value={value.paid === null ? undefined : value.paid} onChange={onPaidChange} {...paidPlaceholder} />
               </Form.Item>
             </div>

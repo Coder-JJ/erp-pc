@@ -23,7 +23,7 @@ const EditForm: React.FC<Props> = function (props) {
     dispatch.checkOut.clearEditForm()
   }, [dispatch.checkOut])
 
-  return <BaseForm value={editForm} saving={loading} onChange={onChange} onGoodsPropChange={onGoodsPropChange} onAddGoods={onAddGoods} onResetGoodsProps={onResetGoodsProps} onSave={onSave} title='编辑入库单' {...props} />
+  return <BaseForm value={editForm} saving={loading} onChange={onChange} onGoodsPropChange={onGoodsPropChange} onAddGoods={onAddGoods} onResetGoodsProps={onResetGoodsProps} onSave={onSave} title='编辑出库单' {...props} />
 }
 
 export default React.memo(EditForm)

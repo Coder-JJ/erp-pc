@@ -1,6 +1,7 @@
 import getGoodsPrice, { getGoodsPriceDisplay } from './getGoodsPrice'
 import getCheckInPrice, { getCheckInPriceDisplay } from './getCheckInPrice'
 import getCheckOutPrice, { getCheckOutPriceDisplay } from './getCheckOutPrice'
+import getReturnGoodsPrice, { getReturnGoodsPriceDisplay } from './getReturnGoodsPrice'
 
 export {
   getGoodsPrice,
@@ -8,5 +9,7 @@ export {
   getCheckInPrice,
   getCheckInPriceDisplay,
   getCheckOutPrice,
-  getCheckOutPriceDisplay
+  getCheckOutPriceDisplay,
+  getReturnGoodsPrice,
+  getReturnGoodsPriceDisplay
 }

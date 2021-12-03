@@ -205,12 +205,11 @@ export const checkIn = createModel<RootModel>()({
       dispatch.stock.shouldUpdate()
       dispatch.stock.detailShouldUpdate(checkIn.warehouseId)
     },
-    async deleteCheckIn (id: number, store) {
-      const repositoryId = store.checkIn.data.find(item => item.id === id)!.warehouseId
-      await request.delete(`/repertory/saveRecord/delete/${id}`)
+    async deleteCheckIn (checkIn: CheckIn) {
+      await request.delete(`/repertory/saveRecord/delete/${checkIn.id}`)
       dispatch.checkIn.loadCheckIns()
       dispatch.stock.shouldUpdate()
-      dispatch.stock.detailShouldUpdate(repositoryId)
+      dispatch.stock.detailShouldUpdate(checkIn.warehouseId)
     }
   })
 })

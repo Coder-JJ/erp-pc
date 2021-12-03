@@ -274,9 +274,7 @@ export const checkOut = createModel<RootModel>()({
     async setCheckOutState ({ id, state }: { id: number, state: CheckOutState }) {
       await request.patch(`/repertory/fetchRecord/status/${id}?state=${state}`)
       dispatch.checkOut.loadCheckOuts()
-      if (state === CheckOutState.Paid) {
-        dispatch.bill.shouldUpdate()
-      }
+      dispatch.bill.shouldUpdate()
     },
     async cancelCheckOut (checkOut: CheckOut) {
       await request.patch(`/repertory/fetchAndSaveRecord/cancel/${checkOut.id}`)
@@ -286,14 +284,13 @@ export const checkOut = createModel<RootModel>()({
       dispatch.stock.shouldUpdate()
       dispatch.stock.detailShouldUpdate(checkOut.warehouseId)
     },
-    async deleteCheckOut (id: number, store) {
-      const repositoryId = store.checkOut.data.find(item => item.id === id)!.warehouseId
-      await request.delete(`/repertory/fetchAndSaveRecord/delete/${id}`)
+    async deleteCheckOut (checkOut: CheckOut) {
+      await request.delete(`/repertory/fetchAndSaveRecord/delete/${checkOut.id}`)
       dispatch.checkOut.loadCheckOuts()
       dispatch.checkIn.shouldUpdate()
       dispatch.bill.shouldUpdate()
       dispatch.stock.shouldUpdate()
-      dispatch.stock.detailShouldUpdate(repositoryId)
+      dispatch.stock.detailShouldUpdate(checkOut.warehouseId)
     }
   })
 })

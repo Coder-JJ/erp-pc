@@ -10,7 +10,7 @@ import dayjs from 'dayjs'
 import { RootState, Dispatch } from '../../rematch'
 import { Goods, CheckOut, checkOutStateNameMap, CheckOutState } from '../../rematch/models/checkOut'
 import { getCheckOutPriceDisplay, getGoodsPriceDisplay } from '../../utils'
-import { useFooter, useEnterEvent } from '../../hooks'
+import { useFooter } from '../../hooks'
 import { ScrollTable, CustomerSelect } from '../../components'
 import { AddForm, EditForm } from './FormModal'
 import StatusModal from './StatusModal'
@@ -40,13 +40,6 @@ const Component: React.FC = function () {
   }, [dispatch.checkOut, debouncedLoadCheckOuts])
 
   const [onDeleteId, setDeleteId] = useState<number | undefined>()
-  const deleteCheckOut = useCallback(async () => {
-    if (onDeleteId) {
-      setDeleteId(onDeleteId)
-      await dispatch.checkOut.deleteCheckOut(onDeleteId)
-      setDeleteId(undefined)
-    }
-  }, [onDeleteId, dispatch.checkOut])
 
   const ref = useRef<HTMLIFrameElement | null>(null)
   const [isIframeReady, setIframeReady] = useState<boolean>(false)
@@ -89,8 +82,8 @@ const Component: React.FC = function () {
     {
       dataIndex: 'dealTime',
       title: '开单日期',
-      render (receivedTime, record) {
-        return dayjs(receivedTime).format('YYYY-MM-DD')
+      render (dealTime, record) {
+        return dayjs(dealTime).format('YYYY-MM-DD')
       }
     },
     // {
@@ -141,7 +134,7 @@ const Component: React.FC = function () {
                           <Popconfirm
                             visible={id === onDeleteId}
                             onVisibleChange={visible => setDeleteId(visible || deleting ? id : undefined)}
-                            onConfirm={deleteCheckOut}
+                            onConfirm={() => dispatch.checkOut.deleteCheckOut(record)}
                             okButtonProps={{ loading: deleting }}
                             arrowPointAtCenter
                             title='是否确定删除该出库单'
@@ -162,7 +155,7 @@ const Component: React.FC = function () {
         )
       }
     }
-  ], [isIframeReady, printCheckOut, onDeleteId, deleteCheckOut, deleting, openEditForm, openStatusModal])
+  ], [dispatch.checkOut, isIframeReady, printCheckOut, onDeleteId, deleting, openEditForm, openStatusModal])
 
   const goodsColumns: ColumnsType<Goods> = useMemo(() => [
     { dataIndex: 'name', title: '货物名称' },
@@ -195,7 +188,6 @@ const Component: React.FC = function () {
     }
   }), [goodsColumns])
 
-  useEnterEvent(deleteCheckOut, !!onDeleteId)
   const renderFooter = useFooter()
 
   const onPaginationChange = useCallback((pageNum: number, pageSize: number | undefined) => {

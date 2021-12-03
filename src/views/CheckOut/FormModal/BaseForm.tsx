@@ -40,7 +40,8 @@ const BaseForm: React.FC<Props> = function (props) {
 
   const [visible, setVisible] = useControllableValue(props, {
     defaultValue: false,
-    valuePropName: 'visible'
+    valuePropName: 'visible',
+    trigger: 'onCancel'
   })
   const openModal = useCallback(() => setVisible(true), [setVisible])
   const closeModal = useCallback(() => {
@@ -220,7 +221,7 @@ const BaseForm: React.FC<Props> = function (props) {
     // },
     {
       dataIndex: 'paid',
-      title: '实付金额',
+      title: '应收金额',
       width: 135,
       render (value, record, index) {
         const price = getGoodsPrice(record)
@@ -299,7 +300,7 @@ const BaseForm: React.FC<Props> = function (props) {
               { /* <Form.Item label='折扣'>
                 <DiscountInput value={value.discount} onChange={onDiscountChange} />
               </Form.Item> */ }
-              <Form.Item className={styles.item} label='实付金额'>
+              <Form.Item className={styles.item} label='应收金额'>
                 <PriceInput className={paidPlaceholder.placeholder ? styles.paid : undefined} value={value.paid === null ? undefined : value.paid} onChange={onPaidChange} {...paidPlaceholder} />
               </Form.Item>
             </div>

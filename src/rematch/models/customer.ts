@@ -102,7 +102,7 @@ export const customer = createModel<RootModel>()({
     }
   },
   effects: dispatch => ({
-    async loadCustomers (_: any, store) {
+    async loadCustomers (_: any) {
       if (cancelTokenSource) {
         cancelTokenSource.cancel('cancel repetitive request.')
       }

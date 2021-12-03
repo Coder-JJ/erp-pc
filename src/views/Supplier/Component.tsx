@@ -6,7 +6,7 @@ import { ColumnsType } from 'antd/lib/table'
 import { ExpandableConfig } from 'antd/lib/table/interface'
 import { RootState, Dispatch } from '../../rematch'
 import { Supplier } from '../../rematch/models/supplier'
-import { useFooter, useEnterEvent, useSuppliers } from '../../hooks'
+import { useFooter, useSuppliers } from '../../hooks'
 import { ScrollTable } from '../../components'
 import { AddForm, EditForm } from './FormModal'
 
@@ -20,13 +20,6 @@ const Component: React.FC = function () {
   const onKeywordChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => dispatch.supplier.updateState({ keyword: e.target.value }), [dispatch.supplier])
 
   const [onDeleteId, setDeleteId] = useState<number | undefined>()
-  const deleteSupplier = useCallback(async () => {
-    if (onDeleteId) {
-      setDeleteId(onDeleteId)
-      await dispatch.supplier.deleteSupplier(onDeleteId)
-      setDeleteId(undefined)
-    }
-  }, [onDeleteId, dispatch.supplier])
   const columns: ColumnsType<Supplier> = useMemo(() => [
     { dataIndex: 'name', title: '供应商名称' },
     { dataIndex: 'leader', title: '负责人' },
@@ -45,7 +38,7 @@ const Component: React.FC = function () {
             <Popconfirm
               visible={id === onDeleteId}
               onVisibleChange={visible => setDeleteId(visible || deleting ? id : undefined)}
-              onConfirm={deleteSupplier}
+              onConfirm={() => dispatch.supplier.deleteSupplier(id)}
               okButtonProps={{ loading: deleting }}
               arrowPointAtCenter
               title='是否确定删除该供应商'
@@ -57,7 +50,7 @@ const Component: React.FC = function () {
         )
       }
     }
-  ], [dispatch.supplier, onDeleteId, deleteSupplier, deleting])
+  ], [dispatch.supplier, onDeleteId, deleting])
 
   const expandable = useMemo<ExpandableConfig<Supplier>>(() => ({
     expandedRowRender ({ address, addressDetail, bank, bankAccount, bankAccountName, mail, website, remark }) {
@@ -82,7 +75,6 @@ const Component: React.FC = function () {
     }
   }), [])
 
-  useEnterEvent(deleteSupplier, !!onDeleteId)
   const renderFooter = useFooter()
 
   return (

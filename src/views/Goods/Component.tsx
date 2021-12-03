@@ -5,7 +5,7 @@ import { Input, Button, Popconfirm, Tag, Pagination, Form } from 'antd'
 import { ColumnsType } from 'antd/lib/table'
 import { RootState, Dispatch } from '../../rematch'
 import { Goods, Whether } from '../../rematch/models/goods'
-import { useFooter, useEnterEvent, useGoods } from '../../hooks'
+import { useFooter, useGoods } from '../../hooks'
 import { ScrollTable } from '../../components'
 import { AddForm, EditForm } from './FormModal'
 
@@ -22,13 +22,6 @@ const Component: React.FC = function () {
   const onKeywordChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => dispatch.goods.updateState({ keyword: e.target.value, pageNum: 1 }), [dispatch.goods])
 
   const [onDeleteId, setDeleteId] = useState<number | undefined>()
-  const deleteGoods = useCallback(async () => {
-    if (onDeleteId) {
-      setDeleteId(onDeleteId)
-      await dispatch.goods.deleteGoods(onDeleteId)
-      setDeleteId(undefined)
-    }
-  }, [onDeleteId, dispatch.goods])
   const columns: ColumnsType<Goods> = useMemo(() => [
     { dataIndex: 'name', title: '货物名称' },
     { dataIndex: 'brand', title: '商标' },
@@ -51,7 +44,7 @@ const Component: React.FC = function () {
             <Popconfirm
               visible={id === onDeleteId}
               onVisibleChange={visible => setDeleteId(visible || deleting ? id : undefined)}
-              onConfirm={deleteGoods}
+              onConfirm={() => dispatch.goods.deleteGoods(id)}
               okButtonProps={{ loading: deleting }}
               arrowPointAtCenter
               title='是否确定删除该货物'
@@ -63,9 +56,8 @@ const Component: React.FC = function () {
         )
       }
     }
-  ], [dispatch.goods, onDeleteId, deleteGoods, deleting])
+  ], [dispatch.goods, onDeleteId, deleting])
 
-  useEnterEvent(deleteGoods, !!onDeleteId)
   const renderFooter = useFooter()
 
   const onPaginationChange = useCallback((pageNum: number, pageSize?: number | undefined) => dispatch.goods.updateState({ pageNum, pageSize }), [dispatch.goods])

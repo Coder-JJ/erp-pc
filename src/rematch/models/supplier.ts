@@ -100,7 +100,7 @@ export const supplier = createModel<RootModel>()({
     }
   },
   effects: dispatch => ({
-    async loadSuppliers (_: any, store) {
+    async loadSuppliers (_: any) {
       if (cancelTokenSource) {
         cancelTokenSource.cancel('cancel repetitive request.')
       }

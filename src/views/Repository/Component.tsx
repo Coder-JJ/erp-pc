@@ -5,7 +5,7 @@ import { Input, Button, Popconfirm, Form } from 'antd'
 import { ColumnsType } from 'antd/lib/table'
 import { RootState, Dispatch } from '../../rematch'
 import { Repository } from '../../rematch/models/repository'
-import { useFooter, useEnterEvent, useRepositories } from '../../hooks'
+import { useFooter, useRepositories } from '../../hooks'
 import { ScrollTable } from '../../components'
 import { AddForm, EditForm } from './FormModal'
 
@@ -19,13 +19,6 @@ const Component: React.FC = function () {
   const onKeywordChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => dispatch.repository.updateState({ keyword: e.target.value }), [dispatch.repository])
 
   const [onDeleteId, setDeleteId] = useState<number | undefined>()
-  const deleteRepository = useCallback(async () => {
-    if (onDeleteId) {
-      setDeleteId(onDeleteId)
-      await dispatch.repository.deleteRepository(onDeleteId)
-      setDeleteId(undefined)
-    }
-  }, [onDeleteId, dispatch.repository])
   const columns: ColumnsType<Repository> = useMemo(() => [
     { dataIndex: 'name', title: '仓库名称' },
     { dataIndex: 'leader', title: '负责人' },
@@ -43,7 +36,7 @@ const Component: React.FC = function () {
             <Popconfirm
               visible={id === onDeleteId}
               onVisibleChange={visible => setDeleteId(visible || deleting ? id : undefined)}
-              onConfirm={deleteRepository}
+              onConfirm={() => dispatch.repository.deleteRepository(id)}
               okButtonProps={{ loading: deleting }}
               arrowPointAtCenter
               title='是否确定删除该仓库'
@@ -55,9 +48,8 @@ const Component: React.FC = function () {
         )
       }
     }
-  ], [dispatch.repository, onDeleteId, deleteRepository, deleting])
+  ], [dispatch.repository, onDeleteId, deleting])
 
-  useEnterEvent(deleteRepository, !!onDeleteId)
   const renderFooter = useFooter()
 
   return (

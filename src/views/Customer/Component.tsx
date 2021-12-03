@@ -6,7 +6,7 @@ import { ColumnsType } from 'antd/lib/table'
 import { ExpandableConfig } from 'antd/lib/table/interface'
 import { RootState, Dispatch } from '../../rematch'
 import { Customer } from '../../rematch/models/customer'
-import { useFooter, useEnterEvent, useCustomers } from '../../hooks'
+import { useFooter, useCustomers } from '../../hooks'
 import { ScrollTable } from '../../components'
 import { AddForm, EditForm } from './FormModal'
 
@@ -23,13 +23,6 @@ const Component: React.FC = function () {
   const onKeywordChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => dispatch.customer.updateState({ keyword: e.target.value, pageNum: 1 }), [dispatch.customer])
 
   const [onDeleteId, setDeleteId] = useState<number | undefined>()
-  const deleteCustomer = useCallback(async () => {
-    if (onDeleteId) {
-      setDeleteId(onDeleteId)
-      await dispatch.customer.deleteCustomer(onDeleteId)
-      setDeleteId(undefined)
-    }
-  }, [onDeleteId, dispatch.customer])
   const columns: ColumnsType<Customer> = useMemo(() => [
     { dataIndex: 'name', title: '客户名称' },
     { dataIndex: 'leader', title: '负责人' },
@@ -48,7 +41,7 @@ const Component: React.FC = function () {
             <Popconfirm
               visible={id === onDeleteId}
               onVisibleChange={visible => setDeleteId(visible || deleting ? id : undefined)}
-              onConfirm={deleteCustomer}
+              onConfirm={() => dispatch.customer.deleteCustomer(id)}
               okButtonProps={{ loading: deleting }}
               arrowPointAtCenter
               title='是否确定删除该客户'
@@ -60,7 +53,7 @@ const Component: React.FC = function () {
         )
       }
     }
-  ], [dispatch.customer, onDeleteId, deleteCustomer, deleting])
+  ], [dispatch.customer, onDeleteId, deleting])
 
   const expandable = useMemo<ExpandableConfig<Customer>>(() => ({
     expandedRowRender ({ address, addressDetail, bank, bankAccount, bankAccountName, mail, remark }) {
@@ -84,7 +77,6 @@ const Component: React.FC = function () {
     }
   }), [])
 
-  useEnterEvent(deleteCustomer, !!onDeleteId)
   const renderFooter = useFooter()
 
   const onPaginationChange = useCallback((pageNum: number, pageSize?: number | undefined) => dispatch.customer.updateState({ pageNum, pageSize }), [dispatch.customer])
