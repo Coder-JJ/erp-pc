@@ -9,14 +9,14 @@ interface Props {
   children: React.ReactElement
 }
 
-const AddForm: React.FC<Props> = function (props) {
+const AddForm: React.FC<Props> = function(props) {
   const { onSave: onSaveRepository, children } = props
   const { addForm } = useSelector((store: RootState) => store.repository)
   const loading = useSelector((store: RootState) => store.loading.effects.repository.addRepository)
   const dispatch = useDispatch<Dispatch>()
 
   const onChange = useCallback((key: keyof Repository, value: any) => dispatch.repository.updateAddForm({ [key]: value }), [dispatch.repository])
-  const onSave = useCallback(async (form: Repository) => {
+  const onSave = useCallback(async(form: Repository) => {
     const id = await dispatch.repository.addRepository(form)
     onSaveRepository && onSaveRepository(id)
     dispatch.repository.clearAddForm()

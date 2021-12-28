@@ -69,39 +69,39 @@ const state: State = {
 export const goods = createModel<RootModel>()({
   state,
   reducers: {
-    shouldUpdate (state: State): State {
+    shouldUpdate(state: State): State {
       state.shouldUpdate = true
       return state
     },
-    updateState (state: State, keyValues: Partial<State>): State {
+    updateState(state: State, keyValues: Partial<State>): State {
       for (const [key, value] of Object.entries(keyValues)) {
         state[key as keyof State] = value as never
       }
       return state
     },
-    updateAddForm (state: State, keyValues: Partial<AddForm>): State {
+    updateAddForm(state: State, keyValues: Partial<AddForm>): State {
       for (const [key, value] of Object.entries(keyValues)) {
         state.addForm[key as keyof AddForm] = value as never
       }
       return state
     },
-    clearAddForm (state: State): State {
+    clearAddForm(state: State): State {
       state.addForm = getInitialAddForm()
       return state
     },
-    updateEditForm (state: State, keyValues: Partial<Goods>): State {
+    updateEditForm(state: State, keyValues: Partial<Goods>): State {
       for (const [key, value] of Object.entries(keyValues)) {
         state.editForm[key as keyof Goods] = value as never
       }
       return state
     },
-    clearEditForm (state: State) {
+    clearEditForm(state: State) {
       state.editForm = getInitialEditForm()
       return state
     }
   },
   effects: dispatch => ({
-    async loadGoods (_: any) {
+    async loadGoods(_: any) {
       if (cancelTokenSource) {
         cancelTokenSource.cancel('cancel repetitive request.')
       }
@@ -110,16 +110,16 @@ export const goods = createModel<RootModel>()({
       cancelTokenSource = undefined
       dispatch.goods.updateState({ data })
     },
-    async addGoods (goods: AddForm): Promise<number> {
+    async addGoods(goods: AddForm): Promise<number> {
       const id = await request.post<number, number>('/goods/insert', goods)
       dispatch.goods.shouldUpdate()
       return id
     },
-    async editGoods (goods: Goods) {
+    async editGoods(goods: Goods) {
       await request.put('/goods/update', goods)
       dispatch.goods.shouldUpdate()
     },
-    async deleteGoods (id: number) {
+    async deleteGoods(id: number) {
       await request.delete(`/goods/delete/${id}`)
       dispatch.goods.shouldUpdate()
     }

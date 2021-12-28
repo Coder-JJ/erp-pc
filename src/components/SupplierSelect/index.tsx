@@ -14,7 +14,7 @@ interface Props extends SelectProps<number> {
   onAdd? (id: number): void
 }
 
-const SupplierSelect: React.FC<Props> = function ({ addButtonVisible, onAdd, ...props }) {
+const SupplierSelect: React.FC<Props> = function({ addButtonVisible, onAdd, ...props }) {
   const [suppliers] = useSuppliers()
   const dropdownRender = useMemo<{} | { dropdownRender: Props['dropdownRender'] }>(() => {
     if (addButtonVisible) {

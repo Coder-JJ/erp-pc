@@ -9,14 +9,14 @@ interface Props {
   children: React.ReactElement
 }
 
-const AddForm: React.FC<Props> = function (props) {
+const AddForm: React.FC<Props> = function(props) {
   const { onSave: onSaveCustomer, children } = props
   const { addForm } = useSelector((store: RootState) => store.customer)
   const loading = useSelector((store: RootState) => store.loading.effects.customer.addCustomer)
   const dispatch = useDispatch<Dispatch>()
 
   const onChange = useCallback((key: keyof Customer, value: any) => dispatch.customer.updateAddForm({ [key]: value }), [dispatch.customer])
-  const onSave = useCallback(async (form: Customer) => {
+  const onSave = useCallback(async(form: Customer) => {
     const id = await dispatch.customer.addCustomer(form)
     onSaveCustomer && onSaveCustomer({ ...form, id })
     dispatch.customer.clearAddForm()

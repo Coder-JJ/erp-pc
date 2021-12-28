@@ -25,24 +25,24 @@ export const app = createModel<RootModel>()({
     menuCollapsed: false
   } as State,
   reducers: {
-    updateState (state: State, keyValues: Partial<State>): State {
+    updateState(state: State, keyValues: Partial<State>): State {
       for (const [key, value] of Object.entries(keyValues)) {
         state[key as keyof State] = value as never
       }
       return state
     },
-    toggleMenuCollapsed (state: State): State {
+    toggleMenuCollapsed(state: State): State {
       state.menuCollapsed = !state.menuCollapsed
       return state
     }
   },
   effects: dispatch => ({
-    async login (params: LoginForm) {
+    async login(params: LoginForm) {
       await request.post('/user/login', {}, { params })
       dispatch.app.updateState({ loginStatus: LoginStatus.Login })
       message.success('登录成功.')
     },
-    async logout () {
+    async logout() {
       await request.post('/user/logout')
       dispatch.app.updateState({ loginStatus: LoginStatus.NotLogin })
     }

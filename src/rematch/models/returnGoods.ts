@@ -101,35 +101,35 @@ const state: State = {
 export const returnGoods = createModel<RootModel>()({
   state,
   reducers: {
-    updateState (state: State, keyValues: Partial<State>): State {
+    updateState(state: State, keyValues: Partial<State>): State {
       for (const [key, value] of Object.entries(keyValues)) {
         state[key as keyof State] = value as any
       }
       return state
     },
-    updateFilter (state: State, keyValues: Partial<Filter>): State {
+    updateFilter(state: State, keyValues: Partial<Filter>): State {
       for (const [key, value] of Object.entries(keyValues)) {
         state.filter[key as keyof Filter] = value as never
       }
       return state
     },
-    updateAddForm (state: State, keyValues: Partial<AddForm>): State {
+    updateAddForm(state: State, keyValues: Partial<AddForm>): State {
       for (const [key, value] of Object.entries(keyValues)) {
         state.addForm[key as keyof AddForm] = value as never
       }
       return state
     },
-    updateAddFormGoods (state: State, { index, key, value }: { index: number, key: keyof GoodsForm, value: any }): State {
+    updateAddFormGoods(state: State, { index, key, value }: { index: number, key: keyof GoodsForm, value: any }): State {
       state.addForm.cancelGoodsRecordList[index][key] = value
       return state
     },
-    addAddFormGoods (state: State): State {
+    addAddFormGoods(state: State): State {
       for (let i = 0; i < 5; i++) {
         state.addForm.cancelGoodsRecordList.push(getInitialGoods())
       }
       return state
     },
-    resetAddFormGoodsProps (state: State, index: number): State {
+    resetAddFormGoodsProps(state: State, index: number): State {
       const goods = state.addForm.cancelGoodsRecordList[index]
       goods.goodsId = undefined
       goods.num = 0
@@ -139,33 +139,33 @@ export const returnGoods = createModel<RootModel>()({
       goods.container = 0
       return state
     },
-    clearAddForm (state: State): State {
+    clearAddForm(state: State): State {
       state.addForm = getInitialAddForm()
       return state
     },
-    setEditForm (state: State, form: EditForm): State {
+    setEditForm(state: State, form: EditForm): State {
       state.editForm = { ...form }
       state.editForm.cancelGoodsRecordList = [...state.editForm.cancelGoodsRecordList, ...Array(5).fill(0).map(() => getInitialGoods())]
       state.editForm.cancelGoodsRecordList = state.editForm.cancelGoodsRecordList.slice(0, 5)
       return state
     },
-    updateEditForm (state: State, keyValues: Partial<EditForm>): State {
+    updateEditForm(state: State, keyValues: Partial<EditForm>): State {
       state.editForm = { ...(state.editForm || {}), ...keyValues } as any
       return state
     },
-    updateEditFormGoods (state: State, { index, key, value }: { index: number, key: keyof GoodsForm, value: any }): State {
+    updateEditFormGoods(state: State, { index, key, value }: { index: number, key: keyof GoodsForm, value: any }): State {
       if (state.editForm?.cancelGoodsRecordList) {
         state.editForm.cancelGoodsRecordList[index][key] = value
       }
       return state
     },
-    addEditFormGoods (state: State): State {
+    addEditFormGoods(state: State): State {
       for (let i = 0; i < 5; i++) {
         state.editForm?.cancelGoodsRecordList.push(getInitialGoods())
       }
       return state
     },
-    resetEditFormGoodsProps (state: State, index: number) {
+    resetEditFormGoodsProps(state: State, index: number) {
       const goods = state.editForm?.cancelGoodsRecordList[index]
       if (goods) {
         goods.goodsId = undefined
@@ -177,13 +177,13 @@ export const returnGoods = createModel<RootModel>()({
       }
       return state
     },
-    clearEditForm (state: State) {
+    clearEditForm(state: State) {
       state.editForm = undefined
       return state
     }
   },
   effects: dispatch => ({
-    async loadReturnGoods (_: any, store) {
+    async loadReturnGoods(_: any, store) {
       if (cancelTokenSource) {
         cancelTokenSource.cancel('cancel repetitive request.')
       }
@@ -205,19 +205,19 @@ export const returnGoods = createModel<RootModel>()({
       dispatch.returnGoods.updateState(result || {})
       dispatch.returnGoods.updateFilter({ pageNum: filter.pageNum, pageSize: filter.pageSize })
     },
-    async addReturnGoods (returnGoods: AddForm) {
+    async addReturnGoods(returnGoods: AddForm) {
       await request.post('/cancel', returnGoods)
       dispatch.returnGoods.loadReturnGoods()
       dispatch.checkIn.shouldUpdate()
       dispatch.bill.shouldUpdate()
     },
-    async editReturnGoods (returnGoods: EditForm) {
+    async editReturnGoods(returnGoods: EditForm) {
       await request.put('/cancel', returnGoods)
       dispatch.returnGoods.loadReturnGoods()
       dispatch.checkIn.shouldUpdate()
       dispatch.bill.shouldUpdate()
     },
-    async deleteReturnGoods (returnGoods: ReturnGoods) {
+    async deleteReturnGoods(returnGoods: ReturnGoods) {
       await request.delete(`/cancel/${returnGoods.id}`)
       dispatch.returnGoods.loadReturnGoods()
       dispatch.checkIn.shouldUpdate()

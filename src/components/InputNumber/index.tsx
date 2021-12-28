@@ -11,7 +11,7 @@ export interface Props extends Omit<InputProps, 'onChange' | 'onBlur'> {
 export const intReg = /^-?\d*(\.\d*)?$/
 export const positiveIntReg = /^\d*(\.\d*)?$/
 
-const InputNumber: React.FC<Props> = function ({ positive, onChange, onBlur, ...props }) {
+const InputNumber: React.FC<Props> = function({ positive, onChange, onBlur, ...props }) {
   const onChangeHandler = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target
     const reg = positive ? positiveIntReg : intReg

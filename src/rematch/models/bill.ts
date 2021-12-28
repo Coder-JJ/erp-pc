@@ -69,20 +69,20 @@ const getInitialState = (): State => {
 export const bill = createModel<RootModel>()({
   state: getInitialState(),
   reducers: {
-    shouldUpdate (state: State): State {
+    shouldUpdate(state: State): State {
       state.shouldUpdate = true
       return state
     },
-    updateState (state: State, keyValues: Partial<State>): State {
+    updateState(state: State, keyValues: Partial<State>): State {
       for (const [key, value] of Object.entries(keyValues)) {
         state[key as keyof State] = value as never
       }
       return state
     },
-    resetState (): State {
+    resetState(): State {
       return getInitialState()
     },
-    updateFilter (state: State, keyValues: Partial<Filter>): State {
+    updateFilter(state: State, keyValues: Partial<Filter>): State {
       for (const [key, value] of Object.entries(keyValues)) {
         state.displayFilter[key as keyof Filter] = value as never
       }
@@ -90,7 +90,7 @@ export const bill = createModel<RootModel>()({
     }
   },
   effects: dispatch => ({
-    async loadBill (_: any, store): Promise<CheckOut[]> {
+    async loadBill(_: any, store): Promise<CheckOut[]> {
       if (cancelTokenSource) {
         cancelTokenSource.cancel('cancel repetitive request.')
       }
@@ -112,7 +112,7 @@ export const bill = createModel<RootModel>()({
       dispatch.bill.updateState({ checkOuts, returnGoods, filter })
       return checkOuts
     },
-    async updateBill (_: any, store) {
+    async updateBill(_: any, store) {
       const filter = store.bill.filter
       if (cancelTokenSource) {
         cancelTokenSource.cancel('cancel repetitive request.')

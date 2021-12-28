@@ -4,14 +4,14 @@ import { useSelector, useDispatch } from 'react-redux'
 import { Form, Button, Row, Col, message, Space, Switch } from 'antd'
 import { useMount, usePersistFn } from 'ahooks'
 import dayjs, { Dayjs } from 'dayjs'
-import { useCustomers, useGoods } from '../../hooks'
 import { RootState, Dispatch } from '../../rematch'
 import { SearchMode } from '../../rematch/models/bill'
 import { CustomerSelect, GoodsSelect, DatePicker } from '../../components'
 import BillPreview from '../../components/BillPreview'
 import exportExcelHandler from './exportExcel'
+// import { nodeRequest } from '../../libs/request'
 
-const Component: React.FC = function () {
+const Component: React.FC = function() {
   const { shouldUpdate, displayFilter, searchMode, exceptCustomers, checkOuts, returnGoods, filter } = useSelector((store: RootState) => store.bill)
   const loading = useSelector((store: RootState) => store.loading.effects.bill.loadBill)
   const startDate = useMemo(() => dayjs(displayFilter.startTime), [displayFilter.startTime])
@@ -19,6 +19,7 @@ const Component: React.FC = function () {
 
   const dispatch = useDispatch<Dispatch>()
   useMount(() => {
+    // nodeRequest.get('/test')
     if (filter && shouldUpdate) {
       dispatch.bill.updateBill()
     }
@@ -71,10 +72,8 @@ const Component: React.FC = function () {
     }
   }, [])
 
-  const [goods] = useGoods()
-  const customers = useCustomers()
   const print = usePersistFn(() => {
-    ref.current?.contentWindow?.postMessage({ goods, customers, checkOuts, returnGoods, filter })
+    ref.current?.contentWindow?.postMessage({ checkOuts, returnGoods, filter })
   })
 
   const onSearch = usePersistFn(() => {
@@ -170,7 +169,7 @@ const Component: React.FC = function () {
         </Form>
       </header>
       <footer className={styles.footer}>
-        <BillPreview goods={goods} customers={customers} checkOuts={checkOuts} returnGoods={returnGoods} startDate={startDate} endDate={endDate} />
+        <BillPreview checkOuts={checkOuts} returnGoods={returnGoods} startDate={startDate} endDate={endDate} />
       </footer>
       <iframe className={styles.print} src='/print/bill' ref={ref} />
     </div>

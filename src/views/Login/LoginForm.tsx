@@ -9,7 +9,7 @@ import { LoginForm as LoginFormType } from '../../rematch/models/app'
 
 export type Props = FormProps<LoginFormType>
 
-const LoginForm: React.FC<Props> = function (props) {
+const LoginForm: React.FC<Props> = function(props) {
   const { onFinish } = props
   const loading = useSelector((store: RootState) => store.loading.effects.app.login)
 

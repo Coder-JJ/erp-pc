@@ -9,7 +9,7 @@ export interface Props extends Omit<ModalProps, 'children'> {
   children?: React.ReactElement
 }
 
-const AddForm: React.FC<Props> = function (props) {
+const AddForm: React.FC<Props> = function(props) {
   const { addForm } = useSelector((store: RootState) => store.checkOut)
   const loading = useSelector((store: RootState) => store.loading.effects.checkOut.addCheckOut)
   const dispatch = useDispatch<Dispatch>()
@@ -18,7 +18,7 @@ const AddForm: React.FC<Props> = function (props) {
   const onGoodsPropChange = useCallback((index: number, key: keyof GoodsForm, value: any) => dispatch.checkOut.updateAddFormGoods({ index, key, value }), [dispatch.checkOut])
   const onAddGoods = useCallback(() => dispatch.checkOut.addAddFormGoods(), [dispatch.checkOut])
   const onResetGoodsProps = useCallback((index: number) => dispatch.checkOut.resetAddFormGoodsProps(index), [dispatch.checkOut])
-  const onSave = useCallback(async (form: CheckOut) => {
+  const onSave = useCallback(async(form: CheckOut) => {
     await dispatch.checkOut.addCheckOut(form)
     dispatch.checkOut.clearAddForm()
   }, [dispatch.checkOut])

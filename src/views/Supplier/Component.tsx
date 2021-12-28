@@ -10,7 +10,7 @@ import { useFooter, useSuppliers } from '../../hooks'
 import { ScrollTable } from '../../components'
 import { AddForm, EditForm } from './FormModal'
 
-const Component: React.FC = function () {
+const Component: React.FC = function() {
   const [, data] = useSuppliers()
   const keyword = useSelector((store: RootState) => store.supplier.keyword)
   const loading = useSelector((store: RootState) => store.loading.effects.supplier.loadSuppliers)
@@ -29,7 +29,7 @@ const Component: React.FC = function () {
     {
       dataIndex: 'id',
       width: 110,
-      render (id, record) {
+      render(id, record) {
         return (
           <>
             <EditForm>
@@ -53,7 +53,7 @@ const Component: React.FC = function () {
   ], [dispatch.supplier, onDeleteId, deleting])
 
   const expandable = useMemo<ExpandableConfig<Supplier>>(() => ({
-    expandedRowRender ({ address, addressDetail, bank, bankAccount, bankAccountName, mail, website, remark }) {
+    expandedRowRender({ address, addressDetail, bank, bankAccount, bankAccountName, mail, website, remark }) {
       return (
         <>
           <Row gutter={[16, 16]}>

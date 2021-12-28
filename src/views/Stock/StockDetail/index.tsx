@@ -22,7 +22,7 @@ const columns: ColumnsType<StockDetail> = [
   { dataIndex: 'goodRemark', title: '备注' }
 ]
 
-const Stock: React.FC = function () {
+const Stock: React.FC = function() {
   const { state: { warehouseId, warehouseName } } = useLocation<StockOverview>()
   const overviews = useStockOverviews()
   const { details, detailFilter } = useSelector((store: RootState) => store.stock)

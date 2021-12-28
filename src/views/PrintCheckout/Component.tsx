@@ -9,7 +9,7 @@ export interface Params {
   id?: string
 }
 
-const PrintCheckout: React.FC = function () {
+const PrintCheckout: React.FC = function() {
   const [data, setData] = useState<CheckOut | undefined>()
 
   useUpdateEffect(() => {
@@ -62,9 +62,9 @@ const PrintCheckout: React.FC = function () {
             <th style={{ width: '30mm', minWidth: '30mm' }}>货物</th>
             <th style={{ width: '30mm', minWidth: '30mm' }}>规格</th>
             <th style={{ width: '18mm', minWidth: '18mm' }}>数量</th>
-            <th style={{ width: '18mm', minWidth: '18mm' }}>鞋套</th>
             <th style={{ width: '18mm', minWidth: '18mm' }}>手提袋</th>
             <th style={{ width: '18mm', minWidth: '18mm' }}>外箱</th>
+            <th style={{ width: '18mm', minWidth: '18mm' }}>鞋套</th>
             <th style={{ width: '18mm', minWidth: '18mm' }}>单价</th>
             <th style={{ width: '25mm', minWidth: '25mm' }}>金额</th>
           </tr>
@@ -80,9 +80,9 @@ const PrintCheckout: React.FC = function () {
                   <td>{ goods.name }</td>
                   <td>{ goods.size }</td>
                   <td>{ goods.num || '' }</td>
-                  <td>{ goods.shoeCover || '' }</td>
                   <td>{ goods.reticule || '' }</td>
                   <td>{ goods.container || '' }</td>
+                  <td>{ goods.shoeCover || '' }</td>
                   <td>{ goods.price ? `¥${goods.price.toFixed(2)}` : '' }</td>
                   <td>{ goods.price * goods.num ? `¥${(goods.price * goods.num).toFixed(2)}` : '' }</td>
                 </tr>

@@ -9,7 +9,7 @@ import { useFooter, useGoods } from '../../hooks'
 import { ScrollTable } from '../../components'
 import { AddForm, EditForm } from './FormModal'
 
-const Component: React.FC = function () {
+const Component: React.FC = function() {
   const [, data] = useGoods()
   const keyword = useSelector((store: RootState) => store.goods.keyword)
   const pageNum = useSelector((store: RootState) => store.goods.pageNum)
@@ -35,7 +35,7 @@ const Component: React.FC = function () {
     {
       dataIndex: 'id',
       width: 110,
-      render (id, record) {
+      render(id, record) {
         return (
           <>
             <EditForm>

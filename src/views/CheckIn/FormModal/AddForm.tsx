@@ -8,7 +8,7 @@ interface Props {
   children: React.ReactElement
 }
 
-const AddForm: React.FC<Props> = function (props) {
+const AddForm: React.FC<Props> = function(props) {
   const { children } = props
   const { addForm } = useSelector((store: RootState) => store.checkIn)
   const loading = useSelector((store: RootState) => store.loading.effects.checkIn.addCheckIn)
@@ -18,7 +18,7 @@ const AddForm: React.FC<Props> = function (props) {
   const onGoodsPropChange = useCallback((index: number, key: keyof GoodsForm, value: any) => dispatch.checkIn.updateAddFormGoods({ index, key, value }), [dispatch.checkIn])
   const onAddGoods = useCallback(() => dispatch.checkIn.addAddFormGoods(), [dispatch.checkIn])
   const onDeleteGoods = useCallback((index: number) => dispatch.checkIn.deleteAddFormGoods(index), [dispatch.checkIn])
-  const onSave = useCallback(async (form: CheckIn) => {
+  const onSave = useCallback(async(form: CheckIn) => {
     await dispatch.checkIn.addCheckIn(form)
     dispatch.checkIn.clearAddForm()
   }, [dispatch.checkIn])

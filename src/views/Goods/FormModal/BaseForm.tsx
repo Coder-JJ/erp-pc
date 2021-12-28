@@ -16,7 +16,7 @@ interface Props {
   children: React.ReactElement
 }
 
-const BaseForm: React.FC<Props> = function (props) {
+const BaseForm: React.FC<Props> = function(props) {
   const { title, value, saving, onChange, onSave, children } = props
 
   const [visible, setVisible] = useState(false)
@@ -42,7 +42,7 @@ const BaseForm: React.FC<Props> = function (props) {
   const onIfNeedShoeCoverChange = useCallback((e: RadioChangeEvent) => onChange('ifNeedShoeCover', e.target.value), [onChange])
   const onNeedBoxChange = useCallback((e: CheckboxChangeEvent) => setNeedBox(e.target.checked), [])
 
-  const onOk = useCallback(async () => {
+  const onOk = useCallback(async() => {
     const form: Goods = {
       ...value,
       name: value.name.trim(),

@@ -1,7 +1,7 @@
 import ExcelJs from 'exceljs'
 import FileSaver from 'file-saver'
 
-export default async (): Promise<void> => {
+export default async(): Promise<void> => {
   const excel = new ExcelJs.Workbook()
   excel.creator = 'Me'
   excel.lastModifiedBy = 'Her'

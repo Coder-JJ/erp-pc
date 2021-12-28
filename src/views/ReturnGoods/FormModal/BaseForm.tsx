@@ -24,7 +24,7 @@ interface Props extends Omit<ModalProps, 'children'> {
   children?: React.ReactElement
 }
 
-const BaseForm: React.FC<Props> = function (props) {
+const BaseForm: React.FC<Props> = function(props) {
   const { value, saving, onChange, onGoodsPropChange: passedOnGoodsPropChange, onAddGoods, onResetGoodsProps, onSave, children, ...modalProps } = props
   const customers = useCustomers()
 
@@ -93,7 +93,7 @@ const BaseForm: React.FC<Props> = function (props) {
   const resetGoodsProps = useCallback((index: number) => onResetGoodsProps(index), [onResetGoodsProps])
   const onRemarkChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('remark', e.target.value), [onChange])
 
-  const onOk = useCallback(async () => {
+  const onOk = useCallback(async() => {
     if (!value) {
       return
     }
@@ -127,7 +127,7 @@ const BaseForm: React.FC<Props> = function (props) {
     {
       dataIndex: 'goodsId',
       title: '货物',
-      render (goodsId, record, index) {
+      render(goodsId, record, index) {
         return <GoodsSelect<number> value={goodsId} onChange={(value, goods) => onSelectGoods(index, record, value, goods)} onAdd={(id, goods) => onSelectGoods(index, record, id, goods)} allowClear addButtonVisible />
       }
     },
@@ -135,7 +135,7 @@ const BaseForm: React.FC<Props> = function (props) {
       dataIndex: 'num',
       title: '数量',
       width: 100,
-      render (num, record, index) {
+      render(num, record, index) {
         return <InputNumber value={num} onChange={value => onGoodsNumChange(index, record, value)} precision={0} min={0} />
       }
     },
@@ -143,7 +143,7 @@ const BaseForm: React.FC<Props> = function (props) {
       dataIndex: 'reticule',
       title: '手提袋',
       width: 100,
-      render (reticule, record, index) {
+      render(reticule, record, index) {
         return <InputNumber value={reticule} onChange={value => onGoodsPropChange(index, 'reticule', value)} precision={0} min={0} />
       }
     },
@@ -151,7 +151,7 @@ const BaseForm: React.FC<Props> = function (props) {
       dataIndex: 'shoeCover',
       title: '鞋套',
       width: 100,
-      render (shoeCover, record, index) {
+      render(shoeCover, record, index) {
         return <InputNumber value={shoeCover} onChange={value => onGoodsPropChange(index, 'shoeCover', value)} precision={0} min={0} />
       }
     },
@@ -159,7 +159,7 @@ const BaseForm: React.FC<Props> = function (props) {
       dataIndex: 'container',
       title: '外箱',
       width: 100,
-      render (container, record, index) {
+      render(container, record, index) {
         return <InputNumber value={container} onChange={value => onGoodsPropChange(index, 'container', value)} precision={0} min={0} />
       }
     },
@@ -167,7 +167,7 @@ const BaseForm: React.FC<Props> = function (props) {
       dataIndex: 'price',
       title: '单价',
       width: 100,
-      render (price, record, index) {
+      render(price, record, index) {
         return <PriceInput value={price} onChange={value => onGoodsPropChange(index, 'price', value)} />
       }
     },
@@ -175,14 +175,14 @@ const BaseForm: React.FC<Props> = function (props) {
       dataIndex: 'paid',
       title: '退货金额',
       width: 135,
-      render (value, record) {
+      render(value, record) {
         return getGoodsPriceDisplay(record)
       }
     },
     {
       dataIndex: 'operation',
       width: 70,
-      render (value, record, index) {
+      render(value, record, index) {
         return <Button type='primary' onClick={() => resetGoodsProps(index)} size='small'>清空</Button>
       }
     }

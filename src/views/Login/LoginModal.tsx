@@ -5,7 +5,7 @@ import LoginForm from './LoginForm'
 import { RootState, Dispatch } from '../../rematch'
 import { LoginStatus } from '../../rematch/models/app'
 
-const LoginModal: React.FC = function () {
+const LoginModal: React.FC = function() {
   const loginStatus = useSelector((store: RootState) => store.app.loginStatus)
   const dispatch = useDispatch<Dispatch>()
 

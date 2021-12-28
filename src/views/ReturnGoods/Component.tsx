@@ -9,11 +9,11 @@ import dayjs from 'dayjs'
 import { RootState, Dispatch } from '../../rematch'
 import { Goods, ReturnGoods } from '../../rematch/models/returnGoods'
 import { getReturnGoodsPriceDisplay, getGoodsPriceDisplay } from '../../utils'
-import { useCustomers, useFooter, useGoods } from '../../hooks'
+import { useFooter } from '../../hooks'
 import { ScrollTable, CustomerSelect, GoodsSelect } from '../../components'
 import { AddForm, EditForm } from './FormModal'
 
-const Component: React.FC = function () {
+const Component: React.FC = function() {
   const { filter, data, total, pageNum, pageSize } = useSelector((store: RootState) => store.returnGoods)
   const loading = useSelector((store: RootState) => store.loading.effects.returnGoods.loadReturnGoods)
   const deleting = useSelector((store: RootState) => store.loading.effects.returnGoods.deleteReturnGoods)
@@ -53,21 +53,20 @@ const Component: React.FC = function () {
     setEditFormVisible(false)
   }, [])
 
-  const customers = useCustomers()
   const columns = useMemo<ColumnsType<ReturnGoods>>(() => [
-    { dataIndex: 'customId', title: '客户/商标', render: value => customers.find(c => c.id === value)?.name },
-    { dataIndex: 'cancelPersonId', title: '退货方/厂家', render: value => customers.find(c => c.id === value)?.name },
+    { dataIndex: 'customName', title: '客户/商标' },
+    { dataIndex: 'cancelPersonName', title: '退货方/厂家' },
     {
       dataIndex: 'cancelTime',
       title: '退货日期',
-      render (cancelTime, record) {
+      render(cancelTime, record) {
         return dayjs(cancelTime).format('YYYY-MM-DD')
       }
     },
     {
       dataIndex: 'paid',
       title: '退货金额',
-      render (paid, record) {
+      render(paid, record) {
         return getReturnGoodsPriceDisplay(record)
       }
     },
@@ -75,7 +74,7 @@ const Component: React.FC = function () {
     {
       dataIndex: 'id',
       width: 110,
-      render (id, record) {
+      render(id, record) {
         return (
           <>
             <Button type='link' size='small' onClick={() => openEditForm(record)}>编辑</Button>
@@ -94,13 +93,12 @@ const Component: React.FC = function () {
         )
       }
     }
-  ], [dispatch.returnGoods, onDeleteId, deleting, openEditForm, customers])
+  ], [dispatch.returnGoods, onDeleteId, deleting, openEditForm])
 
-  const [goods] = useGoods()
   const goodsColumns: ColumnsType<Goods> = useMemo(() => [
-    { dataIndex: 'goodsId', title: '货物名称', render: value => goods.find(g => g.id === value)?.name },
-    { dataIndex: 'goodsId', title: '商标', render: value => goods.find(g => g.id === value)?.brand },
-    { dataIndex: 'goodsId', title: '规格', render: value => goods.find(g => g.id === value)?.size },
+    { dataIndex: 'name', title: '货物名称' },
+    { dataIndex: 'brand', title: '商标' },
+    { dataIndex: 'size', title: '规格' },
     { dataIndex: 'num', title: '数量' },
     { dataIndex: 'reticule', title: '手提袋' },
     { dataIndex: 'shoeCover', title: '鞋套' },
@@ -109,13 +107,13 @@ const Component: React.FC = function () {
     {
       dataIndex: 'paid',
       title: '退货金额',
-      render (paid, record) {
+      render(paid, record) {
         return getGoodsPriceDisplay(record)
       }
     }
-  ], [goods])
+  ], [])
   const expandable = useMemo<ExpandableConfig<ReturnGoods>>(() => ({
-    expandedRowRender ({ cancelGoodsRecordList }) {
+    expandedRowRender({ cancelGoodsRecordList }) {
       return <Table<Goods> rowKey='id' columns={goodsColumns} dataSource={cancelGoodsRecordList} bordered pagination={false} size='middle' />
     }
   }), [goodsColumns])

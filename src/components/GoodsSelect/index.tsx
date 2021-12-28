@@ -17,7 +17,7 @@ interface Props<T> extends Omit<SelectProps<T>, 'onChange'> {
   onAdd? (id: number, goods: Goods[]): void
 }
 
-const GoodsSelect = function <T extends SelectValue = SelectValue> ({ addButtonVisible, onChange, onAdd, ...props }: React.PropsWithChildren<Props<T>>): React.ReactElement {
+const GoodsSelect = function <T extends SelectValue = SelectValue>({ addButtonVisible, onChange, onAdd, ...props }: React.PropsWithChildren<Props<T>>): React.ReactElement {
   const [goods] = useGoods()
   const onGoodsChange = useCallback((value: T) => onChange && onChange(value, goods), [onChange, goods])
   const onAddGoods = useCallback((goods: Goods) => onAdd && onAdd(goods.id, [goods]), [onAdd])

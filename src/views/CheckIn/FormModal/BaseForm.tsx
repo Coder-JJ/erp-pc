@@ -21,7 +21,7 @@ interface Props {
   children: React.ReactElement
 }
 
-const BaseForm: React.FC<Props> = function (props) {
+const BaseForm: React.FC<Props> = function(props) {
   const { title, value, saving, onChange, onGoodsPropChange, onAddGoods, onDeleteGoods, onSave, children } = props
   const paidPlaceholder = useMemo(() => {
     if (typeof value.paid === 'number') {
@@ -57,7 +57,7 @@ const BaseForm: React.FC<Props> = function (props) {
   const onPaidChange = useCallback((value: string | number | undefined) => onChange('paid', value), [onChange])
   const onRemarkChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('remark', e.target.value), [onChange])
 
-  const onOk = useCallback(async () => {
+  const onOk = useCallback(async() => {
     const form: CheckIn = {
       ...value,
       odd: value.odd.trim(),
@@ -92,7 +92,7 @@ const BaseForm: React.FC<Props> = function (props) {
     {
       dataIndex: 'goodsId',
       title: '货物',
-      render (goodsId, record, index) {
+      render(goodsId, record, index) {
         return <GoodsSelect value={goodsId} onChange={(value, goods) => onSelectGoods(index, value, goods)} onAdd={(id, goods) => onSelectGoods(index, id, goods)} allowClear addButtonVisible />
       }
     },
@@ -100,7 +100,7 @@ const BaseForm: React.FC<Props> = function (props) {
       dataIndex: 'num',
       title: '数量',
       width: 160,
-      render (num, record, index) {
+      render(num, record, index) {
         return <InputNumber value={num} onChange={value => onGoodsChange(index, 'num', value)} precision={0} min={0} />
       }
     },
@@ -108,7 +108,7 @@ const BaseForm: React.FC<Props> = function (props) {
       dataIndex: 'price',
       title: '单价',
       width: 160,
-      render (price, record, index) {
+      render(price, record, index) {
         return <PriceInput value={price} onChange={value => onGoodsChange(index, 'price', value)} />
       }
     },
@@ -116,7 +116,7 @@ const BaseForm: React.FC<Props> = function (props) {
       dataIndex: 'discount',
       title: '折扣',
       width: 160,
-      render (discount, record, index) {
+      render(discount, record, index) {
         return <DiscountInput value={discount} onChange={value => onGoodsChange(index, 'discount', value)} />
       }
     },
@@ -124,7 +124,7 @@ const BaseForm: React.FC<Props> = function (props) {
       dataIndex: 'paid',
       title: '应付金额',
       width: 160,
-      render (value, record, index) {
+      render(value, record, index) {
         const price = getGoodsPrice(record)
         const placeholder = typeof value === 'number' ? { placeholder: `${value}` } : (price ? { placeholder: `${price.toFixed(2)}` } : {})
         return <PriceInput className={placeholder.placeholder ? styles.paid : undefined} value={value} onChange={value => onGoodsChange(index, 'paid', value)} {...placeholder} />
@@ -134,7 +134,7 @@ const BaseForm: React.FC<Props> = function (props) {
       dataIndex: 'operation',
       title: <Button type='primary' onClick={addGoods} size='small'>新增</Button>,
       width: 70,
-      render (value, record, index) {
+      render(value, record, index) {
         return <Button type='primary' onClick={() => deleteGoods(index)} danger size='small'>删除</Button>
       }
     }

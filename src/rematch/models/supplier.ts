@@ -68,39 +68,39 @@ const state: State = {
 export const supplier = createModel<RootModel>()({
   state,
   reducers: {
-    shouldUpdate (state: State): State {
+    shouldUpdate(state: State): State {
       state.shouldUpdate = true
       return state
     },
-    updateState (state: State, keyValues: Partial<State>): State {
+    updateState(state: State, keyValues: Partial<State>): State {
       for (const [key, value] of Object.entries(keyValues)) {
         state[key as keyof State] = value as never
       }
       return state
     },
-    updateAddForm (state: State, keyValues: Partial<AddForm>): State {
+    updateAddForm(state: State, keyValues: Partial<AddForm>): State {
       for (const [key, value] of Object.entries(keyValues)) {
         state.addForm[key as keyof AddForm] = value as never
       }
       return state
     },
-    clearAddForm (state: State): State {
+    clearAddForm(state: State): State {
       state.addForm = getInitialAddForm()
       return state
     },
-    updateEditForm (state: State, keyValues: Partial<Supplier>): State {
+    updateEditForm(state: State, keyValues: Partial<Supplier>): State {
       for (const [key, value] of Object.entries(keyValues)) {
         state.editForm[key as keyof Supplier] = value as never
       }
       return state
     },
-    clearEditForm (state: State) {
+    clearEditForm(state: State) {
       state.editForm = getInitialEditForm()
       return state
     }
   },
   effects: dispatch => ({
-    async loadSuppliers (_: any) {
+    async loadSuppliers(_: any) {
       if (cancelTokenSource) {
         cancelTokenSource.cancel('cancel repetitive request.')
       }
@@ -109,16 +109,16 @@ export const supplier = createModel<RootModel>()({
       cancelTokenSource = undefined
       dispatch.supplier.updateState(({ data }))
     },
-    async addSupplier (supplier: AddForm) {
+    async addSupplier(supplier: AddForm) {
       const id = await request.post<number, number>('/supplier/insert', supplier)
       dispatch.supplier.shouldUpdate()
       return id
     },
-    async editSupplier (supplier: Supplier) {
+    async editSupplier(supplier: Supplier) {
       await request.put('/supplier/update', supplier)
       dispatch.supplier.shouldUpdate()
     },
-    async deleteSupplier (id: number) {
+    async deleteSupplier(id: number) {
       await request.delete(`/supplier/delete/${id}`)
       dispatch.supplier.shouldUpdate()
     }

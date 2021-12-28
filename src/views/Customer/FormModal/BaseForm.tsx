@@ -11,7 +11,7 @@ interface Props {
   children: React.ReactElement
 }
 
-const BaseForm: React.FC<Props> = function (props) {
+const BaseForm: React.FC<Props> = function(props) {
   const { title, value, saving, onChange, onSave, children } = props
 
   const [visible, setVisible] = useState(false)
@@ -32,7 +32,7 @@ const BaseForm: React.FC<Props> = function (props) {
   // const onRemarkChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('remark', e.target.value), [onChange])
   const onSortChange = useCallback((value: string | number | undefined) => onChange('sort', value), [onChange])
 
-  const onOk = useCallback(async () => {
+  const onOk = useCallback(async() => {
     const form: Customer = {
       ...value,
       name: value.name.trim(),

@@ -15,7 +15,7 @@ import { ScrollTable, CustomerSelect } from '../../components'
 import { AddForm, EditForm } from './FormModal'
 import StatusModal from './StatusModal'
 
-const Component: React.FC = function () {
+const Component: React.FC = function() {
   const { filter, data, total, pageNum, pageSize } = useSelector((store: RootState) => store.checkOut)
   const loading = useSelector((store: RootState) => store.loading.effects.checkOut.loadCheckOuts)
   const deleting = useSelector((store: RootState) => store.loading.effects.checkOut.deleteCheckOut)
@@ -82,7 +82,7 @@ const Component: React.FC = function () {
     {
       dataIndex: 'dealTime',
       title: '开单日期',
-      render (dealTime, record) {
+      render(dealTime, record) {
         return dayjs(dealTime).format('YYYY-MM-DD')
       }
     },
@@ -96,14 +96,14 @@ const Component: React.FC = function () {
     {
       dataIndex: 'paid',
       title: '应收金额',
-      render (paid, record) {
+      render(paid, record) {
         return getCheckOutPriceDisplay(record)
       }
     },
     {
       dataIndex: 'state',
       title: '状态',
-      render (value, record) {
+      render(value, record) {
         const state = value as CheckOutState
         const text = checkOutStateNameMap[state]
         return <Tag color={state === CheckOutState.Canceled ? 'error' : (state === CheckOutState.Paid ? 'success' : 'processing')}>{ text }</Tag>
@@ -113,7 +113,7 @@ const Component: React.FC = function () {
     {
       dataIndex: 'id',
       width: 130,
-      render (id, record) {
+      render(id, record) {
         return (
           <div>
             {
@@ -177,13 +177,13 @@ const Component: React.FC = function () {
     {
       dataIndex: 'paid',
       title: '应收金额',
-      render (paid, record) {
+      render(paid, record) {
         return getGoodsPriceDisplay(record)
       }
     }
   ], [])
   const expandable = useMemo<ExpandableConfig<CheckOut>>(() => ({
-    expandedRowRender ({ fetchGoodsRecordList }) {
+    expandedRowRender({ fetchGoodsRecordList }) {
       return <Table<Goods> rowKey='id' columns={goodsColumns} dataSource={fetchGoodsRecordList} bordered pagination={false} size='middle' />
     }
   }), [goodsColumns])

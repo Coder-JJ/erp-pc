@@ -9,9 +9,9 @@ export interface ContextType {
 }
 
 const Context = React.createContext<ContextType>({
-  showFooter () {},
-  hideFooter () {},
-  renderFooter () {
+  showFooter() {},
+  hideFooter() {},
+  renderFooter() {
     return null
   }
 })

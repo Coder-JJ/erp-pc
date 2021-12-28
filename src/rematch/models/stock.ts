@@ -53,39 +53,39 @@ const state: State = {
 export const stock = createModel<RootModel>()({
   state,
   reducers: {
-    shouldUpdate (state: State): State {
+    shouldUpdate(state: State): State {
       state.shouldUpdate = true
       return state
     },
-    detailDidMount (state: State, id: number): State {
+    detailDidMount(state: State, id: number): State {
       state.detailsDidMount[id] = true
       return state
     },
-    detailShouldUpdate (state: State, id: number): State {
+    detailShouldUpdate(state: State, id: number): State {
       state.detailsShouldUpdate[id] = true
       return state
     },
-    detailDidUpdate (state: State, id: number): State {
+    detailDidUpdate(state: State, id: number): State {
       state.detailsShouldUpdate[id] = false
       return state
     },
-    updateState (state: State, keyValues: Partial<State>): State {
+    updateState(state: State, keyValues: Partial<State>): State {
       for (const [key, value] of Object.entries(keyValues)) {
         state[key as keyof State] = value as never
       }
       return state
     },
-    updateDetails (state: State, { id, data }: { id: number, data: StockDetail[] }): State {
+    updateDetails(state: State, { id, data }: { id: number, data: StockDetail[] }): State {
       state.details[id] = data
       return state
     }
   },
   effects: dispatch => ({
-    async loadStockOverviews () {
+    async loadStockOverviews() {
       const overviews = await request.get<StockOverview[], StockOverview[]>('/warehouse/statistics')
       dispatch.stock.updateState({ overviews })
     },
-    async loadStockDetail (id: number) {
+    async loadStockDetail(id: number) {
       const data = await request.get<StockDetail[], StockDetail[]>(`/warehouse/repertory/${id}`)
       dispatch.stock.updateDetails({ id, data })
     }

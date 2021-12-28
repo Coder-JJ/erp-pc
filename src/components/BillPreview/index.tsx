@@ -2,14 +2,10 @@ import styles from './index.less'
 import React, { useMemo } from 'react'
 import dayjs, { Dayjs } from 'dayjs'
 import { getCheckOutPrice, getReturnGoodsPrice } from '../../utils'
-import { Goods } from '../../rematch/models/goods'
-import { Customer } from '../../rematch/models/customer'
 import { CheckOut, CheckOutState, getInitialGoods } from '../../rematch/models/checkOut'
 import { ReturnGoods } from '../../rematch/models/returnGoods'
 
 export interface Props {
-  goods: Goods[]
-  customers: Customer[]
   checkOuts: CheckOut[]
   returnGoods: ReturnGoods[]
   startDate: Dayjs
@@ -23,8 +19,8 @@ export interface GroupedBills {
   returnGoods: ReturnGoods[]
 }
 
-const BillPreview: React.FC<Props> = function (props) {
-  const { startDate, endDate, goods, customers, checkOuts, returnGoods } = props
+const BillPreview: React.FC<Props> = function(props) {
+  const { startDate, endDate, checkOuts, returnGoods } = props
 
   const filteredCheckOuts = useMemo<CheckOut[]>(() => checkOuts.filter(({ state }) => state !== CheckOutState.Canceled), [checkOuts])
   const groupedBills = useMemo<GroupedBills[]>(() => {
@@ -47,7 +43,7 @@ const BillPreview: React.FC<Props> = function (props) {
       if (!item) {
         item = {
           customerId: record.customId,
-          customerName: customers.find(c => c.id === record.customId)?.name!,
+          customerName: record.customName,
           checkOuts: [],
           returnGoods: []
         }
@@ -56,7 +52,7 @@ const BillPreview: React.FC<Props> = function (props) {
       item.returnGoods.push(record)
     }
     return result
-  }, [filteredCheckOuts, returnGoods, customers])
+  }, [filteredCheckOuts, returnGoods])
 
   return (
     <div className={styles.wrap}>
@@ -107,7 +103,7 @@ const BillPreview: React.FC<Props> = function (props) {
                                   <td>{ goods.container }</td>
                                   <td>¥{ goods.price.toFixed(2) }</td>
                                   <td rowSpan={rowSpan}>¥{ totalPrice.toFixed(2) }</td>
-                                  <td rowSpan={rowSpan}>{ row.state === CheckOutState.Paid ? '已收款' : '' }</td>
+                                  <td rowSpan={rowSpan}>{ row.state === CheckOutState.Paid ? '已收款' : row.remark }</td>
                                 </React.Fragment>
                               ))
                             }
@@ -139,41 +135,35 @@ const BillPreview: React.FC<Props> = function (props) {
                           <tr>
                             <td rowSpan={rowSpan}>退货单</td>
                             <td rowSpan={rowSpan}>{ dayjs(row.cancelTime).format('MM-DD') }</td>
-                            <td rowSpan={rowSpan}>{ customers.find(c => c.id === row.cancelPersonId)?.name }</td>
+                            <td rowSpan={rowSpan}>{ row.cancelPersonName }</td>
                             {
-                              [firstGoods || getInitialGoods()].map(item => {
-                                const g = goods.find(g => g.id === item.goodsId)
-                                return (
-                                  <React.Fragment key={item.id || '-1'}>
-                                    <td>{ g?.name }</td>
-                                    <td>{ g?.size }</td>
-                                    <td>{ item.num }</td>
-                                    <td>{ item.shoeCover }</td>
-                                    <td>{ item.reticule }</td>
-                                    <td>{ item.container }</td>
-                                    <td>¥{ item.price.toFixed(2) }</td>
-                                    <td rowSpan={rowSpan}>¥{ totalPrice.toFixed(2) }</td>
-                                    <td rowSpan={rowSpan}>退货</td>
-                                  </React.Fragment>
-                                )
-                              })
+                              [firstGoods || getInitialGoods()].map(goods => (
+                                <React.Fragment key={goods.id || '-1'}>
+                                  <td>{ goods.name }</td>
+                                  <td>{ goods.size }</td>
+                                  <td>{ goods.num }</td>
+                                  <td>{ goods.shoeCover }</td>
+                                  <td>{ goods.reticule }</td>
+                                  <td>{ goods.container }</td>
+                                  <td>¥{ goods.price.toFixed(2) }</td>
+                                  <td rowSpan={rowSpan}>¥{ totalPrice.toFixed(2) }</td>
+                                  <td rowSpan={rowSpan}>退货</td>
+                                </React.Fragment>
+                              ))
                             }
                           </tr>
                           {
-                            restGoods.map(item => {
-                              const g = goods.find(g => g.id === item.goodsId)
-                              return (
-                                <tr key={item.id}>
-                                  <td>{ g?.name }</td>
-                                  <td>{ g?.size }</td>
-                                  <td>{ item.num }</td>
-                                  <td>{ item.shoeCover }</td>
-                                  <td>{ item.reticule }</td>
-                                  <td>{ item.container }</td>
-                                  <td>¥{ item.price.toFixed(2) }</td>
-                                </tr>
-                              )
-                            })
+                            restGoods.map(goods => (
+                              <tr key={goods.id}>
+                                <td>{ goods.name }</td>
+                                <td>{ goods.size }</td>
+                                <td>{ goods.num }</td>
+                                <td>{ goods.shoeCover }</td>
+                                <td>{ goods.reticule }</td>
+                                <td>{ goods.container }</td>
+                                <td>¥{ goods.price.toFixed(2) }</td>
+                              </tr>
+                            ))
                           }
                         </React.Fragment>
                       )
@@ -181,20 +171,20 @@ const BillPreview: React.FC<Props> = function (props) {
                   }
                   <tr>
                     <td className={styles.footer} colSpan={12}>
-                      <div>共<b>{ group.checkOuts.length }</b>张回单，总金额：<b>¥{ groupTotalPrice.toFixed(2) }</b></div>
+                      共<b>{ group.checkOuts.length }</b>张回单，总金额：<b>¥{ groupTotalPrice.toFixed(2) }</b>
                       {
-                        !!paidCheckOuts.length && (
-                          <div><b>{ paidCheckOuts.length }</b>张已付款，已付金额：<b>¥{ paidPrice.toFixed(2) }</b></div>
+                        !!group.returnGoods.length && (
+                          <>，退款金额：<b>¥{ returnPrice.toFixed(2) }</b></>
                         )
                       }
                       {
-                        !!group.returnGoods.length && (
-                          <div>退款金额：<b>¥{ returnPrice.toFixed(2) }</b></div>
+                        !!paidCheckOuts.length && (
+                          <>，已付金额：<b>¥{ paidPrice.toFixed(2) }</b></>
                         )
                       }
                       {
                         !!(paidCheckOuts.length || group.returnGoods.length) && (
-                          <div>剩余待付金额：<b>¥{ (groupTotalPrice - paidPrice - returnPrice).toFixed(2) }</b></div>
+                          <>，待付金额：<b>¥{ (groupTotalPrice - paidPrice - returnPrice).toFixed(2) }</b></>
                         )
                       }
                     </td>

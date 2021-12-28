@@ -11,7 +11,7 @@ interface Props extends Omit<SelectProps<number>, 'onChange'> {
   onChange? (value: number | undefined, goods: StockDetail[]): void
 }
 
-const RepositoryGoodsSelect: React.FC<Props> = function ({ onChange, ...props }) {
+const RepositoryGoodsSelect: React.FC<Props> = function({ onChange, ...props }) {
   const goods = useRepostitoryGoods(props.repositoryId)
   const onGoodsChange = useCallback((value: number | undefined) => onChange && onChange(value, goods), [onChange, goods])
 

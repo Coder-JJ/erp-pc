@@ -5,7 +5,7 @@ import { StockOverview } from '../../rematch/models/stock'
 import StockOverviews from './StockOverviews'
 import StockDetail from './StockDetail'
 
-const Stock: React.FC = function () {
+const Stock: React.FC = function() {
   const { state } = useLocation<StockOverview | undefined>()
 
   return (

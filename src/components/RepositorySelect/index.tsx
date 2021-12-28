@@ -15,7 +15,7 @@ interface Props extends Omit<SelectProps<number>, 'onChange'> {
   onAdd? (id: number): void
 }
 
-const RepositorySelect: React.FC<Props> = function ({ value, addButtonVisible, onAdd, onChange, ...props }) {
+const RepositorySelect: React.FC<Props> = function({ value, addButtonVisible, onAdd, onChange, ...props }) {
   const [repositories] = useRepositories()
   const dropdownRender = useMemo<{} | { dropdownRender: Props['dropdownRender'] }>(() => {
     if (addButtonVisible) {

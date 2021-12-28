@@ -8,6 +8,7 @@
   ],
   "rules": {
     "multiline-ternary": 0,
+    "space-before-function-paren": [2, "never"],
     "no-param-reassign": [2, { "props": true, "ignorePropertyModificationsFor": ["state"] }],
     "react/no-multi-comp": 0,
     "react/prop-types": 0

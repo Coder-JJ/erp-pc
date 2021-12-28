@@ -19,7 +19,7 @@ export interface Props extends ModalProps {
   checkOut?: CheckOut
 }
 
-const StatusModal: React.FC<Props> = function (props) {
+const StatusModal: React.FC<Props> = function(props) {
   const { checkOut, ...modalProps } = props
 
   const [current, setCurrent] = useState<number | undefined>()
@@ -40,7 +40,7 @@ const StatusModal: React.FC<Props> = function (props) {
         return Modal.confirm({
           title: '是否确定已收款？',
           content: <Alert type='warning' message='收款后不计入账单待收金额！' />,
-          onOk () {
+          onOk() {
             setLoading(true)
             dispatch.checkOut.setCheckOutState({ id: checkOut.id, state: status[current] }).then(resolve)
           }
@@ -49,7 +49,7 @@ const StatusModal: React.FC<Props> = function (props) {
         return Modal.confirm({
           title: '是否确定作废？',
           content: <Alert type='warning' message='作废后不可撤销！' />,
-          onOk () {
+          onOk() {
             setLoading(true)
             dispatch.checkOut.cancelCheckOut(checkOut).then(resolve)
           }

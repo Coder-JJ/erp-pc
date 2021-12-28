@@ -111,73 +111,73 @@ const state: State = {
 export const checkIn = createModel<RootModel>()({
   state,
   reducers: {
-    shouldUpdate (state: State): State {
+    shouldUpdate(state: State): State {
       state.shouldUpdate = true
       return state
     },
-    updateState (state: State, keyValues: Partial<State>): State {
+    updateState(state: State, keyValues: Partial<State>): State {
       for (const [key, value] of Object.entries(keyValues)) {
         state[key as keyof State] = value as never
       }
       return state
     },
-    updateFilter (state: State, keyValues: Partial<Filter>): State {
+    updateFilter(state: State, keyValues: Partial<Filter>): State {
       for (const [key, value] of Object.entries(keyValues)) {
         state.filter[key as keyof Filter] = value as never
       }
       return state
     },
-    updateAddForm (state: State, keyValues: Partial<AddForm>): State {
+    updateAddForm(state: State, keyValues: Partial<AddForm>): State {
       for (const [key, value] of Object.entries(keyValues)) {
         state.addForm[key as keyof AddForm] = value as never
       }
       return state
     },
-    updateAddFormGoods (state: State, { index, key, value }: { index: number, key: keyof GoodsForm, value: any }): State {
+    updateAddFormGoods(state: State, { index, key, value }: { index: number, key: keyof GoodsForm, value: any }): State {
       state.addForm.saveGoodsRecordList[index][key] = value
       return state
     },
-    addAddFormGoods (state: State): State {
+    addAddFormGoods(state: State): State {
       for (let i = 0; i < 5; i++) {
         state.addForm.saveGoodsRecordList.push(getInitialGoods())
       }
       return state
     },
-    deleteAddFormGoods (state: State, index: number): State {
+    deleteAddFormGoods(state: State, index: number): State {
       state.addForm.saveGoodsRecordList.splice(index, 1)
       return state
     },
-    clearAddForm (state: State): State {
+    clearAddForm(state: State): State {
       state.addForm = getInitialAddForm()
       return state
     },
-    updateEditForm (state: State, keyValues: Partial<EditForm>): State {
+    updateEditForm(state: State, keyValues: Partial<EditForm>): State {
       for (const [key, value] of Object.entries(keyValues)) {
         state.editForm[key as keyof EditForm] = value as never
       }
       return state
     },
-    updateEditFormGoods (state: State, { index, key, value }: { index: number, key: keyof GoodsForm, value: any }): State {
+    updateEditFormGoods(state: State, { index, key, value }: { index: number, key: keyof GoodsForm, value: any }): State {
       state.editForm.saveGoodsRecordList[index][key] = value
       return state
     },
-    addEditFormGoods (state: State): State {
+    addEditFormGoods(state: State): State {
       for (let i = 0; i < 5; i++) {
         state.editForm.saveGoodsRecordList.push(getInitialGoods())
       }
       return state
     },
-    deleteEditFormGoods (state: State, index: number) {
+    deleteEditFormGoods(state: State, index: number) {
       state.editForm.saveGoodsRecordList.splice(index, 1)
       return state
     },
-    clearEditForm (state: State) {
+    clearEditForm(state: State) {
       state.editForm = getInitialEditForm()
       return state
     }
   },
   effects: dispatch => ({
-    async loadCheckIns (_: any, store) {
+    async loadCheckIns(_: any, store) {
       if (cancelTokenSource) {
         cancelTokenSource.cancel('cancel repetitive request.')
       }
@@ -193,19 +193,19 @@ export const checkIn = createModel<RootModel>()({
       dispatch.checkIn.updateState(result || {})
       dispatch.checkIn.updateFilter({ pageNum: filter.pageNum, pageSize: filter.pageSize })
     },
-    async addCheckIn (checkIn: AddForm) {
+    async addCheckIn(checkIn: AddForm) {
       await request.post('/repertory/saveRecord/insert', checkIn)
       dispatch.checkIn.loadCheckIns()
       dispatch.stock.shouldUpdate()
       dispatch.stock.detailShouldUpdate(checkIn.warehouseId!)
     },
-    async editCheckIn (checkIn: EditForm) {
+    async editCheckIn(checkIn: EditForm) {
       await request.put('/repertory/saveRecord/update', checkIn)
       dispatch.checkIn.loadCheckIns()
       dispatch.stock.shouldUpdate()
       dispatch.stock.detailShouldUpdate(checkIn.warehouseId)
     },
-    async deleteCheckIn (checkIn: CheckIn) {
+    async deleteCheckIn(checkIn: CheckIn) {
       await request.delete(`/repertory/saveRecord/delete/${checkIn.id}`)
       dispatch.checkIn.loadCheckIns()
       dispatch.stock.shouldUpdate()

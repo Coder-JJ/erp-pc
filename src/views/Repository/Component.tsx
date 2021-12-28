@@ -9,7 +9,7 @@ import { useFooter, useRepositories } from '../../hooks'
 import { ScrollTable } from '../../components'
 import { AddForm, EditForm } from './FormModal'
 
-const Component: React.FC = function () {
+const Component: React.FC = function() {
   const [, data] = useRepositories()
   const keyword = useSelector((store: RootState) => store.repository.keyword)
   const loading = useSelector((store: RootState) => store.loading.effects.repository.loadRepositories)
@@ -27,7 +27,7 @@ const Component: React.FC = function () {
     {
       dataIndex: 'id',
       width: 110,
-      render (id, record) {
+      render(id, record) {
         return (
           <>
             <EditForm>

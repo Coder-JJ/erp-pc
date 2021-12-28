@@ -70,39 +70,39 @@ const state: State = {
 export const customer = createModel<RootModel>()({
   state,
   reducers: {
-    shouldUpdate (state: State): State {
+    shouldUpdate(state: State): State {
       state.shouldUpdate = true
       return state
     },
-    updateState (state: State, keyValues: Partial<State>): State {
+    updateState(state: State, keyValues: Partial<State>): State {
       for (const [key, value] of Object.entries(keyValues)) {
         state[key as keyof State] = value as never
       }
       return state
     },
-    updateAddForm (state: State, keyValues: Partial<AddForm>): State {
+    updateAddForm(state: State, keyValues: Partial<AddForm>): State {
       for (const [key, value] of Object.entries(keyValues)) {
         state.addForm[key as keyof AddForm] = value as never
       }
       return state
     },
-    clearAddForm (state: State): State {
+    clearAddForm(state: State): State {
       state.addForm = getInitialAddForm()
       return state
     },
-    updateEditForm (state: State, keyValues: Partial<Customer>): State {
+    updateEditForm(state: State, keyValues: Partial<Customer>): State {
       for (const [key, value] of Object.entries(keyValues)) {
         state.editForm[key as keyof Customer] = value as never
       }
       return state
     },
-    clearEditForm (state: State) {
+    clearEditForm(state: State) {
       state.editForm = getInitialEditForm()
       return state
     }
   },
   effects: dispatch => ({
-    async loadCustomers (_: any) {
+    async loadCustomers(_: any) {
       if (cancelTokenSource) {
         cancelTokenSource.cancel('cancel repetitive request.')
       }
@@ -111,16 +111,16 @@ export const customer = createModel<RootModel>()({
       cancelTokenSource = undefined
       dispatch.customer.updateState(({ data }))
     },
-    async addCustomer (customer: AddForm) {
+    async addCustomer(customer: AddForm) {
       const id = await request.post<number, number>('/custom/insert', customer)
       dispatch.customer.shouldUpdate()
       return id
     },
-    async editCustomer (customer: Customer) {
+    async editCustomer(customer: Customer) {
       await request.put('/custom/update', customer)
       dispatch.customer.shouldUpdate()
     },
-    async deleteCustomer (id: number) {
+    async deleteCustomer(id: number) {
       await request.delete(`/custom/delete/${id}`)
       dispatch.customer.shouldUpdate()
     }

@@ -5,7 +5,7 @@ import views from './views'
 import PrivateRoute from './PrivateRoute'
 import Layout from './Layout'
 
-const App: React.FC = function () {
+const App: React.FC = function() {
   return (
     <Switch>
       <Route path='/login' exact strict sensitive>

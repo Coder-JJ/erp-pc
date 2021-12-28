@@ -153,35 +153,35 @@ const state: State = {
 export const checkOut = createModel<RootModel>()({
   state,
   reducers: {
-    updateState (state: State, keyValues: Partial<State>): State {
+    updateState(state: State, keyValues: Partial<State>): State {
       for (const [key, value] of Object.entries(keyValues)) {
         state[key as keyof State] = value as any
       }
       return state
     },
-    updateFilter (state: State, keyValues: Partial<Filter>): State {
+    updateFilter(state: State, keyValues: Partial<Filter>): State {
       for (const [key, value] of Object.entries(keyValues)) {
         state.filter[key as keyof Filter] = value as never
       }
       return state
     },
-    updateAddForm (state: State, keyValues: Partial<AddForm>): State {
+    updateAddForm(state: State, keyValues: Partial<AddForm>): State {
       for (const [key, value] of Object.entries(keyValues)) {
         state.addForm[key as keyof AddForm] = value as never
       }
       return state
     },
-    updateAddFormGoods (state: State, { index, key, value }: { index: number, key: keyof GoodsForm, value: any }): State {
+    updateAddFormGoods(state: State, { index, key, value }: { index: number, key: keyof GoodsForm, value: any }): State {
       state.addForm.fetchGoodsRecordList[index][key] = value
       return state
     },
-    addAddFormGoods (state: State): State {
+    addAddFormGoods(state: State): State {
       for (let i = 0; i < 5; i++) {
         state.addForm.fetchGoodsRecordList.push(getInitialGoods())
       }
       return state
     },
-    resetAddFormGoodsProps (state: State, index: number): State {
+    resetAddFormGoodsProps(state: State, index: number): State {
       const goods = state.addForm.fetchGoodsRecordList[index]
       goods.goodsId = undefined
       goods.num = 0
@@ -193,11 +193,11 @@ export const checkOut = createModel<RootModel>()({
       goods.container = 0
       return state
     },
-    clearAddForm (state: State): State {
+    clearAddForm(state: State): State {
       state.addForm = getInitialAddForm()
       return state
     },
-    setEditForm (state: State, form: EditForm): State {
+    setEditForm(state: State, form: EditForm): State {
       for (const [key, value] of Object.entries(form)) {
         state.editForm[key as keyof EditForm] = value as never
       }
@@ -205,23 +205,23 @@ export const checkOut = createModel<RootModel>()({
       state.editForm.fetchGoodsRecordList = state.editForm.fetchGoodsRecordList.slice(0, 5)
       return state
     },
-    updateEditForm (state: State, keyValues: Partial<EditForm>): State {
+    updateEditForm(state: State, keyValues: Partial<EditForm>): State {
       for (const [key, value] of Object.entries(keyValues)) {
         state.editForm[key as keyof EditForm] = value as never
       }
       return state
     },
-    updateEditFormGoods (state: State, { index, key, value }: { index: number, key: keyof GoodsForm, value: any }): State {
+    updateEditFormGoods(state: State, { index, key, value }: { index: number, key: keyof GoodsForm, value: any }): State {
       state.editForm.fetchGoodsRecordList[index][key] = value
       return state
     },
-    addEditFormGoods (state: State): State {
+    addEditFormGoods(state: State): State {
       for (let i = 0; i < 5; i++) {
         state.editForm.fetchGoodsRecordList.push(getInitialGoods())
       }
       return state
     },
-    resetEditFormGoodsProps (state: State, index: number) {
+    resetEditFormGoodsProps(state: State, index: number) {
       const goods = state.editForm.fetchGoodsRecordList[index]
       goods.goodsId = undefined
       goods.num = 0
@@ -233,13 +233,13 @@ export const checkOut = createModel<RootModel>()({
       goods.container = 0
       return state
     },
-    clearEditForm (state: State) {
+    clearEditForm(state: State) {
       state.editForm = getInitialEditForm()
       return state
     }
   },
   effects: dispatch => ({
-    async loadCheckOuts (_: any, store) {
+    async loadCheckOuts(_: any, store) {
       if (cancelTokenSource) {
         cancelTokenSource.cancel('cancel repetitive request.')
       }
@@ -255,7 +255,7 @@ export const checkOut = createModel<RootModel>()({
       dispatch.checkOut.updateState(result || {})
       dispatch.checkOut.updateFilter({ pageNum: filter.pageNum, pageSize: filter.pageSize })
     },
-    async addCheckOut (checkOut: AddForm) {
+    async addCheckOut(checkOut: AddForm) {
       await request.post('/repertory/fetchAndSaveRecord/insert', checkOut)
       dispatch.checkOut.loadCheckOuts()
       dispatch.checkIn.shouldUpdate()
@@ -263,7 +263,7 @@ export const checkOut = createModel<RootModel>()({
       dispatch.stock.shouldUpdate()
       dispatch.stock.detailShouldUpdate(checkOut.warehouseId!)
     },
-    async editCheckOut (checkOut: EditForm) {
+    async editCheckOut(checkOut: EditForm) {
       await request.put('/repertory/fetchAndSaveRecord/update', checkOut)
       dispatch.checkOut.loadCheckOuts()
       dispatch.checkIn.shouldUpdate()
@@ -271,12 +271,12 @@ export const checkOut = createModel<RootModel>()({
       dispatch.stock.shouldUpdate()
       dispatch.stock.detailShouldUpdate(checkOut.warehouseId)
     },
-    async setCheckOutState ({ id, state }: { id: number, state: CheckOutState }) {
+    async setCheckOutState({ id, state }: { id: number, state: CheckOutState }) {
       await request.patch(`/repertory/fetchRecord/status/${id}?state=${state}`)
       dispatch.checkOut.loadCheckOuts()
       dispatch.bill.shouldUpdate()
     },
-    async cancelCheckOut (checkOut: CheckOut) {
+    async cancelCheckOut(checkOut: CheckOut) {
       await request.patch(`/repertory/fetchAndSaveRecord/cancel/${checkOut.id}`)
       dispatch.checkOut.loadCheckOuts()
       dispatch.checkIn.shouldUpdate()
@@ -284,7 +284,7 @@ export const checkOut = createModel<RootModel>()({
       dispatch.stock.shouldUpdate()
       dispatch.stock.detailShouldUpdate(checkOut.warehouseId)
     },
-    async deleteCheckOut (checkOut: CheckOut) {
+    async deleteCheckOut(checkOut: CheckOut) {
       await request.delete(`/repertory/fetchAndSaveRecord/delete/${checkOut.id}`)
       dispatch.checkOut.loadCheckOuts()
       dispatch.checkIn.shouldUpdate()

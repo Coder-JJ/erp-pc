@@ -7,7 +7,7 @@ import { useStockOverviews } from '../../../hooks'
 import { RootState } from '../../../rematch'
 import { StockOverview } from '../../../rematch/models/stock'
 
-const Stock: React.FC = function () {
+const Stock: React.FC = function() {
   const overviews = useStockOverviews()
   const loading = useSelector((store: RootState) => store.loading.effects.stock.loadStockOverviews)
 

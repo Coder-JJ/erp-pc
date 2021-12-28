@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux'
 import { RootState } from './rematch'
 import { LoginStatus } from './rematch/models/app'
 
-const PrivateRoute: React.FC<RouteProps> = function ({ children, component, ...props }) {
+const PrivateRoute: React.FC<RouteProps> = function({ children, component, ...props }) {
   const { loginStatus } = useSelector((store: RootState) => store.app)
 
   return (

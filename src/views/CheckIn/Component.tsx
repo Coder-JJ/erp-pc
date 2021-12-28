@@ -13,7 +13,7 @@ import { useFooter } from '../../hooks'
 import { ScrollTable } from '../../components'
 import { AddForm, EditForm } from './FormModal'
 
-const Component: React.FC = function () {
+const Component: React.FC = function() {
   const { didMount, shouldUpdate, filter, data, total, pageNum, pageSize } = useSelector((store: RootState) => store.checkIn)
   const loading = useSelector((store: RootState) => store.loading.effects.checkIn.loadCheckIns)
   const deleting = useSelector((store: RootState) => store.loading.effects.checkIn.deleteCheckIn)
@@ -42,21 +42,21 @@ const Component: React.FC = function () {
     {
       dataIndex: 'receivedTime',
       title: '签收时间',
-      render (receivedTime, record) {
+      render(receivedTime, record) {
         return dayjs(receivedTime).format('YYYY-MM-DD')
       }
     },
     {
       dataIndex: 'discount',
       title: '折扣',
-      render (discount) {
+      render(discount) {
         return discount === 1 ? '--' : discount
       }
     },
     {
       dataIndex: 'paid',
       title: '应付金额',
-      render (paid, record) {
+      render(paid, record) {
         return getCheckInPriceDisplay(record)
       }
     },
@@ -64,7 +64,7 @@ const Component: React.FC = function () {
     {
       dataIndex: 'id',
       width: 110,
-      render (id, record) {
+      render(id, record) {
         return (
           <>
             <EditForm>
@@ -97,20 +97,20 @@ const Component: React.FC = function () {
     {
       dataIndex: 'discount',
       title: '折扣',
-      render (discount) {
+      render(discount) {
         return discount === 1 ? '--' : discount
       }
     },
     {
       dataIndex: 'paid',
       title: '应付金额',
-      render (paid, record) {
+      render(paid, record) {
         return getGoodsPriceDisplay(record)
       }
     }
   ], [])
   const expandable = useMemo<ExpandableConfig<CheckIn>>(() => ({
-    expandedRowRender ({ saveGoodsRecordList }) {
+    expandedRowRender({ saveGoodsRecordList }) {
       return <Table<Goods> rowKey='id' columns={goodsColumns} dataSource={saveGoodsRecordList} bordered pagination={false} size='middle' />
     }
   }), [goodsColumns])

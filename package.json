@@ -35,7 +35,7 @@
   "scripts": {
     "start": "nodemon --exec \"craco start\"",
     "build": "craco build",
-    "eject": "react-scripts eject"
+    "eslint": "npx eslint -c ./.eslintrc.prod.json src/ --fix"
   },
   "browserslist": {
     "production": [

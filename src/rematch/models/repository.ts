@@ -50,39 +50,39 @@ const state: State = {
 export const repository = createModel<RootModel>()({
   state,
   reducers: {
-    shouldUpdate (state: State): State {
+    shouldUpdate(state: State): State {
       state.shouldUpdate = true
       return state
     },
-    updateState (state: State, keyValues: Partial<State>): State {
+    updateState(state: State, keyValues: Partial<State>): State {
       for (const [key, value] of Object.entries(keyValues)) {
         state[key as keyof State] = value as never
       }
       return state
     },
-    updateAddForm (state: State, keyValues: Partial<AddForm>): State {
+    updateAddForm(state: State, keyValues: Partial<AddForm>): State {
       for (const [key, value] of Object.entries(keyValues)) {
         state.addForm[key as keyof AddForm] = value as never
       }
       return state
     },
-    clearAddForm (state: State): State {
+    clearAddForm(state: State): State {
       state.addForm = getInitialAddForm()
       return state
     },
-    updateEditForm (state: State, keyValues: Partial<Repository>): State {
+    updateEditForm(state: State, keyValues: Partial<Repository>): State {
       for (const [key, value] of Object.entries(keyValues)) {
         state.editForm[key as keyof Repository] = value as never
       }
       return state
     },
-    clearEditForm (state: State) {
+    clearEditForm(state: State) {
       state.editForm = getInitialEditForm()
       return state
     }
   },
   effects: dispatch => ({
-    async loadRepositories (_: any) {
+    async loadRepositories(_: any) {
       if (cancelTokenSource) {
         cancelTokenSource.cancel('cancel repetitive request.')
       }
@@ -91,16 +91,16 @@ export const repository = createModel<RootModel>()({
       cancelTokenSource = undefined
       dispatch.repository.updateState({ data })
     },
-    async addRepository (repository: AddForm) {
+    async addRepository(repository: AddForm) {
       const id = await request.post<number, number>('/warehouse/insert', repository)
       dispatch.repository.shouldUpdate()
       return id
     },
-    async editRepository (repository: Repository) {
+    async editRepository(repository: Repository) {
       await request.put('/warehouse/update', repository)
       dispatch.repository.shouldUpdate()
     },
-    async deleteRepository (id: number) {
+    async deleteRepository(id: number) {
       await request.delete(`/warehouse/delete/${id}`)
       dispatch.repository.shouldUpdate()
     }

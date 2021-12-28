@@ -7,11 +7,11 @@ import LoginForm from './LoginForm'
 import { Dispatch } from '../../rematch'
 import { LoginForm as LoginFormType } from '../../rematch/models/app'
 
-const Login: React.FC = function () {
+const Login: React.FC = function() {
   const history = useHistory()
   const { state } = useLocation<H.Location<H.LocationState>>()
   const dispatch = useDispatch<Dispatch>()
-  const onLogin = useCallback(async (form: LoginFormType) => {
+  const onLogin = useCallback(async(form: LoginFormType) => {
     await dispatch.app.login(form)
     history.replace(state || '/checkout')
   }, [dispatch.app, state, history])

@@ -105,7 +105,7 @@ const getRoutesFromMenus = (menus: MenuType[], prefixPath: string = ''): RouteTy
 
 // const getPopupContainer: (triggerNode: HTMLElement) => HTMLElement = triggerNode => triggerNode?.parentElement || document.body
 
-function AppLayout (): React.ReactElement {
+function AppLayout(): React.ReactElement {
   const { loginStatus, menuCollapsed } = useSelector((store: RootState) => store.app)
 
   const didMount = useRef(false)
@@ -159,18 +159,18 @@ function AppLayout (): React.ReactElement {
   const [footerRef, setFooterRef] = useState<HTMLDivElement | null>(null)
   const refCallback = useCallback((node: HTMLDivElement | null) => setFooterRef(node), [])
   const layoutContextValue = useMemo<ContextType>(() => ({
-    showFooter () {
+    showFooter() {
       setFooterVisible(true)
     },
-    hideFooter () {
+    hideFooter() {
       setFooterVisible(false)
     },
-    renderFooter (node) {
+    renderFooter(node) {
       return footerRef ? createPortal(node, footerRef) : null
     }
   }), [footerRef])
 
-  const logout = useCallback(async () => {
+  const logout = useCallback(async() => {
     await dispatch.app.logout()
     history.push('/login')
   }, [dispatch.app, history])
