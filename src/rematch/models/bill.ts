@@ -6,6 +6,7 @@ import { request } from '../../libs'
 import type { RootModel } from '.'
 import { CheckOut } from './checkOut'
 import { ReturnGoods } from './returnGoods'
+import { Collection } from './collection'
 
 export interface Filter {
   customIds: number[]
@@ -27,6 +28,7 @@ export interface State {
   exceptCustomers: number[]
   checkOuts: CheckOut[]
   returnGoods: ReturnGoods[]
+  collections: Collection[]
   filter: Filter | undefined
 }
 
@@ -39,6 +41,16 @@ export const loadReturnGoods = (filter: Filter, cancelTokenSource?: CancelTokenS
     customIds: filter.customIds,
     cancelPersonIds: filter.receiverIds,
     goodsIds: filter.goodsIds,
+    startTime: filter.startTime,
+    endTime: filter.endTime
+  }, {
+    cancelToken: cancelTokenSource?.token
+  })
+}
+
+export const loadCollections = (filter: Filter, cancelTokenSource?: CancelTokenSource): Promise<Collection[]> => {
+  return request.post<Collection[], Collection[]>('/collection/all', {
+    customIds: filter.customIds,
     startTime: filter.startTime,
     endTime: filter.endTime
   }, {
@@ -62,6 +74,7 @@ const getInitialState = (): State => {
     exceptCustomers: [],
     checkOuts: [],
     returnGoods: [],
+    collections: [],
     filter: undefined
   }
 }
@@ -104,12 +117,13 @@ export const bill = createModel<RootModel>()({
         customIds: searchMode === SearchMode.All ? allCustomers.filter(({ id }) => !exceptCustomers.some(c => c === id)).map(({ id }) => id) : customIds
       }
       cancelTokenSource = axios.CancelToken.source()
-      const [checkOuts, returnGoods] = await Promise.all([
+      const [checkOuts, returnGoods, collections] = await Promise.all([
         loadCheckOuts(filter, cancelTokenSource),
-        loadReturnGoods(filter, cancelTokenSource)
+        loadReturnGoods(filter, cancelTokenSource),
+        loadCollections(filter, cancelTokenSource)
       ])
       cancelTokenSource = undefined
-      dispatch.bill.updateState({ checkOuts, returnGoods, filter })
+      dispatch.bill.updateState({ checkOuts, returnGoods, collections, filter })
       return checkOuts
     },
     async updateBill(_: any, store) {
@@ -122,12 +136,13 @@ export const bill = createModel<RootModel>()({
         return
       }
       cancelTokenSource = axios.CancelToken.source()
-      const [checkOuts, returnGoods] = await Promise.all([
+      const [checkOuts, returnGoods, collections] = await Promise.all([
         loadCheckOuts(filter, cancelTokenSource),
-        loadReturnGoods(filter, cancelTokenSource)
+        loadReturnGoods(filter, cancelTokenSource),
+        loadCollections(filter, cancelTokenSource)
       ])
       cancelTokenSource = undefined
-      dispatch.bill.updateState({ checkOuts, returnGoods, shouldUpdate: false })
+      dispatch.bill.updateState({ checkOuts, returnGoods, collections, shouldUpdate: false })
     }
   })
 })

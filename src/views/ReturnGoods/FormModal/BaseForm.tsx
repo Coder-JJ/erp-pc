@@ -6,9 +6,8 @@ import { ModalProps } from 'antd/lib/modal'
 import { ColumnsType } from 'antd/lib/table'
 import { GetRowKey } from 'antd/lib/table/interface'
 import dayjs, { Dayjs } from 'dayjs'
-import { useCustomers, useGoods } from '../../../hooks'
+import { useGoods } from '../../../hooks'
 import { Goods } from '../../../rematch/models/goods'
-import { Customer } from '../../../rematch/models/customer'
 import { AddForm as ReturnGoods, GoodsForm } from '../../../rematch/models/returnGoods'
 import { getReturnGoodsPriceDisplay, getGoodsPriceDisplay } from '../../../utils'
 import { DatePicker, PriceInput, CustomerSelect, GoodsSelect } from '../../../components'
@@ -26,7 +25,6 @@ interface Props extends Omit<ModalProps, 'children'> {
 
 const BaseForm: React.FC<Props> = function(props) {
   const { value, saving, onChange, onGoodsPropChange: passedOnGoodsPropChange, onAddGoods, onResetGoodsProps, onSave, children, ...modalProps } = props
-  const customers = useCustomers()
 
   const [visible, setVisible] = useControllableValue(props, {
     defaultValue: false,
@@ -42,10 +40,8 @@ const BaseForm: React.FC<Props> = function(props) {
     onChange('cancelTime', value!.valueOf())
   }, [onChange])
   const onCustomerChange = useCallback((value: number) => onChange('customId', value), [onChange])
-  const onReturnSideChange = useCallback((receiverId: number, customers: Customer[]) => {
-    onChange('cancelPersonId', receiverId)
-  }, [onChange])
-  const copyCustomerId = useCallback(() => typeof value?.customId === 'number' && onReturnSideChange(value.customId, customers), [onReturnSideChange, customers, value?.customId])
+  const onReturnSideChange = useCallback((value: number) => onChange('cancelPersonId', value), [onChange])
+  const copyCustomerId = useCallback(() => typeof value?.customId === 'number' && onReturnSideChange(value.customId), [onReturnSideChange, value?.customId])
   const copyReturnSideId = useCallback(() => typeof value?.cancelPersonId === 'number' && onCustomerChange(value.cancelPersonId), [onCustomerChange, value?.cancelPersonId])
   const onGoodsPropChange = useCallback((index: number, key: keyof GoodsForm, value: any) => passedOnGoodsPropChange(index, key, value), [passedOnGoodsPropChange])
   const onSelectGoods = useCallback((index: number, record: GoodsForm, value: number | undefined, goods: Goods[]) => {

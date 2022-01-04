@@ -9,17 +9,17 @@ import { SearchMode } from '../../rematch/models/bill'
 import { CustomerSelect, GoodsSelect, DatePicker } from '../../components'
 import BillPreview from '../../components/BillPreview'
 import exportExcelHandler from './exportExcel'
-// import { nodeRequest } from '../../libs/request'
+import { nodeRequest } from '../../libs/request'
 
 const Component: React.FC = function() {
-  const { shouldUpdate, displayFilter, searchMode, exceptCustomers, checkOuts, returnGoods, filter } = useSelector((store: RootState) => store.bill)
+  const { shouldUpdate, displayFilter, searchMode, exceptCustomers, checkOuts, returnGoods, collections, filter } = useSelector((store: RootState) => store.bill)
   const loading = useSelector((store: RootState) => store.loading.effects.bill.loadBill)
   const startDate = useMemo(() => dayjs(displayFilter.startTime), [displayFilter.startTime])
   const endDate = useMemo(() => dayjs(displayFilter.endTime), [displayFilter.endTime])
 
   const dispatch = useDispatch<Dispatch>()
   useMount(() => {
-    // nodeRequest.get('/test')
+    nodeRequest.get('/test')
     if (filter && shouldUpdate) {
       dispatch.bill.updateBill()
     }
@@ -59,7 +59,7 @@ const Component: React.FC = function() {
     })
   }, [dispatch.bill])
 
-  const hasData = !!checkOuts.length || !!returnGoods.length
+  const hasData = !!checkOuts.length || !!returnGoods.length || !!collections.length
   const ref = useRef<HTMLIFrameElement | null>(null)
   const [isIframeReady, setIframeReady] = useState<boolean>(false)
   useEffect(() => {
@@ -73,11 +73,11 @@ const Component: React.FC = function() {
   }, [])
 
   const print = usePersistFn(() => {
-    ref.current?.contentWindow?.postMessage({ checkOuts, returnGoods, filter })
+    ref.current?.contentWindow?.postMessage({ checkOuts, returnGoods, collections, filter })
   })
 
   const onSearch = usePersistFn(() => {
-    dispatch.bill.updateState({ checkOuts: [], returnGoods: [], filter: undefined })
+    dispatch.bill.updateState({ checkOuts: [], returnGoods: [], collections: [], filter: undefined })
     if (searchMode === SearchMode.Normal && !displayFilter.customIds.length && !displayFilter.receiverIds.length && !displayFilter.goodsIds.length) {
       return message.error('请选择客户/厂家/货物')
     }
@@ -169,7 +169,7 @@ const Component: React.FC = function() {
         </Form>
       </header>
       <footer className={styles.footer}>
-        <BillPreview checkOuts={checkOuts} returnGoods={returnGoods} startDate={startDate} endDate={endDate} />
+        <BillPreview checkOuts={checkOuts} returnGoods={returnGoods} collections={collections} startDate={startDate} endDate={endDate} />
       </footer>
       <iframe className={styles.print} src='/print/bill' ref={ref} />
     </div>

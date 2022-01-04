@@ -4,10 +4,12 @@ import dayjs, { Dayjs } from 'dayjs'
 import { getCheckOutPrice, getReturnGoodsPrice } from '../../utils'
 import { CheckOut, CheckOutState, getInitialGoods } from '../../rematch/models/checkOut'
 import { ReturnGoods } from '../../rematch/models/returnGoods'
+import { Collection } from '../../rematch/models/collection'
 
 export interface Props {
   checkOuts: CheckOut[]
   returnGoods: ReturnGoods[]
+  collections: Collection[]
   startDate: Dayjs
   endDate: Dayjs
 }
@@ -17,10 +19,11 @@ export interface GroupedBills {
   customerName: string
   checkOuts: CheckOut[]
   returnGoods: ReturnGoods[]
+  collections: Collection[]
 }
 
 const BillPreview: React.FC<Props> = function(props) {
-  const { startDate, endDate, checkOuts, returnGoods } = props
+  const { startDate, endDate, checkOuts, returnGoods, collections } = props
 
   const filteredCheckOuts = useMemo<CheckOut[]>(() => checkOuts.filter(({ state }) => state !== CheckOutState.Canceled), [checkOuts])
   const groupedBills = useMemo<GroupedBills[]>(() => {
@@ -32,7 +35,8 @@ const BillPreview: React.FC<Props> = function(props) {
           customerId: checkOut.customId!,
           customerName: checkOut.customName,
           checkOuts: [],
-          returnGoods: []
+          returnGoods: [],
+          collections: []
         }
         result.push(item)
       }
@@ -45,23 +49,32 @@ const BillPreview: React.FC<Props> = function(props) {
           customerId: record.customId,
           customerName: record.customName,
           checkOuts: [],
-          returnGoods: []
+          returnGoods: [],
+          collections: []
         }
         result.push(item)
       }
       item.returnGoods.push(record)
     }
+    for (const record of collections) {
+      let item = result.find(({ customerId }) => customerId === record.customId)
+      if (item) {
+        item.collections.push(record)
+      }
+    }
     return result
-  }, [filteredCheckOuts, returnGoods])
+  }, [filteredCheckOuts, returnGoods, collections])
 
   return (
     <div className={styles.wrap}>
       {
         groupedBills.map(group => {
+          const groupTotalBox = group.checkOuts.flatMap(row => row.fetchGoodsRecordList.map(g => g.num)).reduce((pv, cv) => pv + cv, 0)
+          const returnBox = group.returnGoods.flatMap(row => row.cancelGoodsRecordList.map(g => g.num)).reduce((pv, cv) => pv + cv, 0)
           const groupTotalPrice = group.checkOuts.map(row => getCheckOutPrice(row)).reduce((pv, cv) => pv + cv, 0)
-          const paidCheckOuts = group.checkOuts.filter(({ state }) => state === CheckOutState.Paid)
-          const paidPrice = paidCheckOuts.map(row => getCheckOutPrice(row)).reduce((pv, cv) => pv + cv, 0)
+          const paidPrice = group.collections.map(row => row.collection).reduce((pv, cv) => pv + cv, 0)
           const returnPrice = group.returnGoods.map(row => getReturnGoodsPrice(row)).reduce((pv, cv) => pv + cv, 0)
+          const hasPaidOrReturn = !!paidPrice || !!returnPrice
           return (
             <div className={styles.group} key={group.customerId}>
               <header className={styles.caption}>{ group.customerName }{ startDate.format('YYYY-MM-DD') }至{ endDate.format('YYYY-MM-DD') }对账单</header>
@@ -74,9 +87,9 @@ const BillPreview: React.FC<Props> = function(props) {
                     <td>货物</td>
                     <td>规格</td>
                     <td>数量</td>
-                    <td>鞋套</td>
                     <td>手提袋</td>
                     <td>外箱</td>
+                    <td>鞋套</td>
                     <td>单价</td>
                     <td>金额</td>
                     <td>备注</td>
@@ -98,12 +111,12 @@ const BillPreview: React.FC<Props> = function(props) {
                                   <td>{ goods.name }</td>
                                   <td>{ goods.size }</td>
                                   <td>{ goods.num }</td>
-                                  <td>{ goods.shoeCover }</td>
                                   <td>{ goods.reticule }</td>
                                   <td>{ goods.container }</td>
+                                  <td>{ goods.shoeCover }</td>
                                   <td>¥{ goods.price.toFixed(2) }</td>
                                   <td rowSpan={rowSpan}>¥{ totalPrice.toFixed(2) }</td>
-                                  <td rowSpan={rowSpan}>{ row.state === CheckOutState.Paid ? '已收款' : row.remark }</td>
+                                  <td rowSpan={rowSpan}>{ row.remark }</td>
                                 </React.Fragment>
                               ))
                             }
@@ -114,9 +127,9 @@ const BillPreview: React.FC<Props> = function(props) {
                                 <td>{ goods.name }</td>
                                 <td>{ goods.size }</td>
                                 <td>{ goods.num }</td>
-                                <td>{ goods.shoeCover }</td>
                                 <td>{ goods.reticule }</td>
                                 <td>{ goods.container }</td>
+                                <td>{ goods.shoeCover }</td>
                                 <td>¥{ goods.price.toFixed(2) }</td>
                               </tr>
                             ))
@@ -142,12 +155,12 @@ const BillPreview: React.FC<Props> = function(props) {
                                   <td>{ goods.name }</td>
                                   <td>{ goods.size }</td>
                                   <td>{ goods.num }</td>
-                                  <td>{ goods.shoeCover }</td>
                                   <td>{ goods.reticule }</td>
                                   <td>{ goods.container }</td>
+                                  <td>{ goods.shoeCover }</td>
                                   <td>¥{ goods.price.toFixed(2) }</td>
                                   <td rowSpan={rowSpan}>¥{ totalPrice.toFixed(2) }</td>
-                                  <td rowSpan={rowSpan}>退货</td>
+                                  <td rowSpan={rowSpan}>{ row.remark || '退货' }</td>
                                 </React.Fragment>
                               ))
                             }
@@ -158,9 +171,9 @@ const BillPreview: React.FC<Props> = function(props) {
                                 <td>{ goods.name }</td>
                                 <td>{ goods.size }</td>
                                 <td>{ goods.num }</td>
-                                <td>{ goods.shoeCover }</td>
                                 <td>{ goods.reticule }</td>
                                 <td>{ goods.container }</td>
+                                <td>{ goods.shoeCover }</td>
                                 <td>¥{ goods.price.toFixed(2) }</td>
                               </tr>
                             ))
@@ -171,20 +184,31 @@ const BillPreview: React.FC<Props> = function(props) {
                   }
                   <tr>
                     <td className={styles.footer} colSpan={12}>
-                      共<b>{ group.checkOuts.length }</b>张回单，总金额：<b>¥{ groupTotalPrice.toFixed(2) }</b>
+                      共 <b>{ group.checkOuts.length }</b> 张回单
                       {
                         !!group.returnGoods.length && (
-                          <>，退款金额：<b>¥{ returnPrice.toFixed(2) }</b></>
+                          <>，<b>{ group.returnGoods.length }</b> 张退货单</>
                         )
                       }
+                      ，鞋盒总数量：<b>{ Math.max(groupTotalBox - returnBox, 0) }</b>个
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className={styles.footer} colSpan={12}>
+                      总金额：<b>¥{ groupTotalPrice.toFixed(2) }</b>
                       {
-                        !!paidCheckOuts.length && (
+                        !!paidPrice && (
                           <>，已付金额：<b>¥{ paidPrice.toFixed(2) }</b></>
                         )
                       }
                       {
-                        !!(paidCheckOuts.length || group.returnGoods.length) && (
-                          <>，待付金额：<b>¥{ (groupTotalPrice - paidPrice - returnPrice).toFixed(2) }</b></>
+                        !!returnPrice && (
+                          <>，退款金额：<b>¥{ returnPrice.toFixed(2) }</b></>
+                        )
+                      }
+                      {
+                        hasPaidOrReturn && (
+                          <>，待付金额：<b>¥{ (Math.max(groupTotalPrice - paidPrice - returnPrice, 0)).toFixed(2) }</b></>
                         )
                       }
                     </td>

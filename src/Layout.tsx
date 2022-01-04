@@ -55,15 +55,16 @@ const menus: MenuType[] = [
     name: '资料管理',
     icon: 'icon-zdgl',
     children: [
-      { key: 'supplier', name: '供应商', view: 'Supplier', icon: 'icon-gysda' },
+      // { key: 'supplier', name: '供应商', view: 'Supplier', icon: 'icon-gysda' },
       { key: 'customer', name: '客户', view: 'Customer', icon: 'icon-gysda' },
-      { key: 'repository', name: '仓库', view: 'Repository', icon: 'icon-ckdasz' },
+      // { key: 'repository', name: '仓库', view: 'Repository', icon: 'icon-ckdasz' },
       { key: 'goods', name: '货物', view: 'Goods', icon: 'icon-chdasz' }
     ]
   },
-  { key: 'checkin', name: '入库登记', view: 'CheckIn', icon: 'icon-rkd' },
+  // { key: 'checkin', name: '入库登记', view: 'CheckIn', icon: 'icon-rkd' },
   { key: 'checkout', name: '出库登记', view: 'CheckOut', icon: 'icon-ckd' },
   { key: 'return', name: '退货登记', view: 'ReturnGoods', icon: 'icon-navicon-wgthgl1' },
+  { key: 'collection', name: '收款登记', view: 'Collection', icon: 'icon-navicon-jylstj' },
   { key: 'bill', name: '账单查询', view: 'Bill', icon: 'icon-navicon-kcz' },
   { key: 'stock', name: '查看库存', view: 'Stock', icon: 'icon-kcpd' }
 ]

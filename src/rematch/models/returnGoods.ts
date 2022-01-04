@@ -45,8 +45,8 @@ export interface Filter {
   customIds: number[]
   cancelPersonIds: number[]
   goodsIds: number[]
-  startTime: null
-  endTime: null
+  startTime: string | null
+  endTime: string | null
   pageNum: number
   pageSize: number
 }
@@ -187,23 +187,22 @@ export const returnGoods = createModel<RootModel>()({
       if (cancelTokenSource) {
         cancelTokenSource.cancel('cancel repetitive request.')
       }
-      const { customIds, cancelPersonIds, goodsIds, startTime, endTime, ...filter } = store.returnGoods.filter
+      const { filter: { customIds, cancelPersonIds, goodsIds, ...filter }, pageNum, pageSize } = store.returnGoods
       cancelTokenSource = axios.CancelToken.source()
       const result = await request.get<Page<ReturnGoods>, Page<ReturnGoods>>('/cancel/page', {
         params: {
+          ...filter,
           customIds: customIds.join(','),
           cancelPersonIds: cancelPersonIds.join(','),
           goodsIds: goodsIds.join(','),
-          startTime,
-          endTime,
-          pageNum: store.returnGoods.pageNum,
-          pageSize: store.returnGoods.pageSize
+          pageNum,
+          pageSize
         },
         cancelToken: cancelTokenSource.token
       })
       cancelTokenSource = undefined
       dispatch.returnGoods.updateState(result || {})
-      dispatch.returnGoods.updateFilter({ pageNum: filter.pageNum, pageSize: filter.pageSize })
+      dispatch.returnGoods.updateFilter({ pageNum, pageSize })
     },
     async addReturnGoods(returnGoods: AddForm) {
       await request.post('/cancel', returnGoods)
