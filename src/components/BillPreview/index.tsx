@@ -116,7 +116,7 @@ const BillPreview: React.FC<Props> = function(props) {
                                   <td>{ goods.shoeCover }</td>
                                   <td>¥{ goods.price.toFixed(2) }</td>
                                   <td rowSpan={rowSpan}>¥{ totalPrice.toFixed(2) }</td>
-                                  <td rowSpan={rowSpan}>{ row.remark }</td>
+                                  <td rowSpan={rowSpan}>{ row.remark || (row.state === CheckOutState.Paid ? '已收款' : '') }</td>
                                 </React.Fragment>
                               ))
                             }
