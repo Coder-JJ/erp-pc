@@ -5,7 +5,7 @@ const StylelintPlugin = require('stylelint-webpack-plugin')
 const LessPlugin = require('craco-less')
 const ReactHotReloadPlugin = require('craco-plugin-react-hot-reload')
 const AntDesignPlugin = require('craco-antd')
-const AntdDayjsWebpackPlugin = require('antd-dayjs-webpack-plugin')
+// const AntdDayjsWebpackPlugin = require('antd-dayjs-webpack-plugin')
 const packageName = require('./package.json').name
 
 module.exports = function ({ env }) {
@@ -24,7 +24,7 @@ module.exports = function ({ env }) {
         new StylelintPlugin({
           files: 'src/**/*.(c|le)ss'
         }),
-        new AntdDayjsWebpackPlugin()
+        // new AntdDayjsWebpackPlugin()
       ]
     },
     eslint: {

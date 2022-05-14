@@ -3,13 +3,12 @@ import React, { useCallback, useMemo, useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { Switch, Route, useHistory, useLocation, Redirect, RouteProps } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
-import { OpenEventHandler } from 'rc-menu/lib/interface'
 import { ConfigProvider, Layout, Menu } from 'antd'
 import { MenuProps } from 'antd/lib/menu'
 import zhCN from 'antd/lib/locale/zh_CN'
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons'
-import dayjs from 'dayjs'
-import 'dayjs/locale/zh-cn'
+import moment from 'moment'
+import 'moment/locale/zh-cn'
 import classNames from 'classnames'
 import views from './views'
 import LoginModal from './views/Login/LoginModal'
@@ -41,7 +40,7 @@ export interface RouteType extends CustomRouteProps {
   view: string
 }
 
-dayjs.locale('zh-cn')
+moment.locale('zh-cn')
 
 const { Header, Sider, Content } = Layout
 
@@ -61,9 +60,10 @@ const menus: MenuType[] = [
       { key: 'goods', name: '货物', view: 'Goods', icon: 'icon-chdasz' }
     ]
   },
-  // { key: 'checkin', name: '入库登记', view: 'CheckIn', icon: 'icon-rkd' },
+  { key: 'checkin', name: '入库登记', view: 'CheckIn', icon: 'icon-rkd' },
   { key: 'checkout', name: '出库登记', view: 'CheckOut', icon: 'icon-ckd' },
   { key: 'return', name: '退货登记', view: 'ReturnGoods', icon: 'icon-navicon-wgthgl1' },
+  { key: 'account', name: '客户账目', view: 'CustomerAccount', icon: 'icon-navicon-kcz' },
   { key: 'collection', name: '收款登记', view: 'Collection', icon: 'icon-navicon-jylstj' },
   { key: 'bill', name: '账单查询', view: 'Bill', icon: 'icon-navicon-kcz' },
   { key: 'stock', name: '查看库存', view: 'Stock', icon: 'icon-kcpd' }
@@ -126,7 +126,7 @@ function AppLayout(): React.ReactElement {
   const location = useLocation()
   const menuSelectedKeys = useMemo(() => [location.pathname], [location.pathname])
   const [menuOpenedKeys, setMenuOpenedKeys] = useState(getOpenedMenusBySelectedMenu(menus, location.pathname) || [])
-  const onMenuOpenChange: OpenEventHandler = useCallback(keys => setMenuOpenedKeys(keys as string[]), [])
+  const onMenuOpenChange = useCallback((keys: string[]) => setMenuOpenedKeys(keys), [])
   useEffect(() => {
     const nextMenuOpenedKeys = getOpenedMenusBySelectedMenu(menus, location.pathname) || []
     if (nextMenuOpenedKeys.length) {

@@ -1,13 +1,13 @@
 import styles from './index.less'
 import React, { useState, useCallback, useMemo } from 'react'
-import { Modal, message, Form, Input, Table, InputNumber, Button } from 'antd'
+import { Modal, message, Form, Input, Table, InputNumber, Button, DatePicker } from 'antd'
 import { ColumnsType } from 'antd/lib/table'
 import { GetRowKey } from 'antd/lib/table/interface'
-import dayjs, { Dayjs } from 'dayjs'
+import moment from 'moment'
 import { Goods } from '../../../rematch/models/goods'
 import { AddForm as CheckIn, GoodsForm } from '../../../rematch/models/checkIn'
 import { getCheckInPrice, getGoodsPrice } from '../../../utils'
-import { DatePicker, RepositorySelect, GoodsSelect, DiscountInput, PriceInput, SupplierSelect } from '../../../components'
+import { RepositorySelect, GoodsSelect, DiscountInput, PriceInput, SupplierSelect } from '../../../components'
 
 interface Props {
   title: string
@@ -38,7 +38,7 @@ const BaseForm: React.FC<Props> = function(props) {
   const openModal = useCallback(() => setVisible(true), [])
   const closeModal = useCallback(() => !saving && setVisible(false), [saving])
 
-  const onReceiveTimeChange = useCallback((value: Dayjs | null, dateString: string) => onChange('receivedTime', value!.valueOf()), [onChange])
+  const onReceiveTimeChange = useCallback((value: moment.Moment | null, dateString: string) => onChange('receivedTime', value!.valueOf()), [onChange])
   const onOddChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('odd', e.target.value), [onChange])
   const onRepositoryChange = useCallback((value: number) => onChange('warehouseId', value), [onChange])
   const onSupplierChange = useCallback((value: number) => onChange('supplierId', value), [onChange])
@@ -147,7 +147,7 @@ const BaseForm: React.FC<Props> = function(props) {
         <Form>
           <div className={styles.spaceBetween}>
             <Form.Item className={styles.item} label='签收时间' required>
-              <DatePicker value={dayjs(value.receivedTime)} onChange={onReceiveTimeChange} allowClear={false} placeholder='请选择签收时间' />
+              <DatePicker value={moment(value.receivedTime)} onChange={onReceiveTimeChange} allowClear={false} placeholder='请选择签收时间' />
             </Form.Item>
             <Form.Item className={styles.item} label='单号' required>
               <Input value={value.odd} onChange={onOddChange} placeholder='请输入单号' />

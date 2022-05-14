@@ -17,6 +17,11 @@ export interface Page<T> {
   total: number
 }
 
+export interface NodePage<T> {
+  rows: T[]
+  count: number
+}
+
 export function createInstance(baseURL: string): AxiosInstance {
   const instance = axios.create({
     baseURL

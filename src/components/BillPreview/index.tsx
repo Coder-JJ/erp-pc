@@ -1,6 +1,6 @@
 import styles from './index.less'
 import React, { useMemo } from 'react'
-import dayjs, { Dayjs } from 'dayjs'
+import moment from 'moment'
 import { getCheckOutPrice, getReturnGoodsPrice } from '../../utils'
 import { CheckOut, CheckOutState, getInitialGoods } from '../../rematch/models/checkOut'
 import { ReturnGoods } from '../../rematch/models/returnGoods'
@@ -10,8 +10,8 @@ export interface Props {
   checkOuts: CheckOut[]
   returnGoods: ReturnGoods[]
   collections: Collection[]
-  startDate: Dayjs
-  endDate: Dayjs
+  startDate: moment.Moment
+  endDate: moment.Moment
 }
 
 export interface GroupedBills {
@@ -103,7 +103,7 @@ const BillPreview: React.FC<Props> = function(props) {
                         <React.Fragment key={row.id}>
                           <tr>
                             <td rowSpan={rowSpan}>{ row.odd }</td>
-                            <td rowSpan={rowSpan}>{ dayjs(row.dealTime).format('MM-DD') }</td>
+                            <td rowSpan={rowSpan}>{ moment(row.dealTime).format('MM-DD') }</td>
                             <td rowSpan={rowSpan}>{ row.receiverName }</td>
                             {
                               [firstGoods || getInitialGoods()].map(goods => (
@@ -147,7 +147,7 @@ const BillPreview: React.FC<Props> = function(props) {
                         <React.Fragment key={row.id}>
                           <tr>
                             <td rowSpan={rowSpan}>退货单</td>
-                            <td rowSpan={rowSpan}>{ dayjs(row.cancelTime).format('MM-DD') }</td>
+                            <td rowSpan={rowSpan}>{ moment(row.cancelTime).format('MM-DD') }</td>
                             <td rowSpan={rowSpan}>{ row.cancelPersonName }</td>
                             {
                               [firstGoods || getInitialGoods()].map(goods => (
@@ -214,7 +214,7 @@ const BillPreview: React.FC<Props> = function(props) {
                     </td>
                   </tr>
                   <tr>
-                    <td className={styles.footer} colSpan={12}>温州市国骏印刷有限公司，{ dayjs().format('YYYY-MM-DD') }</td>
+                    <td className={styles.footer} colSpan={12}>温州市国骏印刷有限公司，{ moment().format('YYYY-MM-DD') }</td>
                   </tr>
                 </tbody>
               </table>

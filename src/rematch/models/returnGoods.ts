@@ -1,7 +1,7 @@
 import { createModel } from '@rematch/core'
 import type { RootModel } from '.'
 import axios, { CancelTokenSource } from 'axios'
-import dayjs from 'dayjs'
+import moment from 'moment'
 import { request } from '../../libs'
 import { Page } from '../../libs/request'
 import { GoodsProps } from './goods'
@@ -73,7 +73,7 @@ export const getInitialGoods = (): GoodsForm => ({
 })
 
 const getInitialAddForm = (): AddForm => ({
-  cancelTime: dayjs().valueOf(),
+  cancelTime: moment().valueOf(),
   customId: undefined,
   cancelPersonId: undefined,
   cancelGoodsRecordList: Array(5).fill(0).map(() => getInitialGoods()),
@@ -208,18 +208,21 @@ export const returnGoods = createModel<RootModel>()({
       await request.post('/cancel', returnGoods)
       dispatch.returnGoods.loadReturnGoods()
       dispatch.checkIn.shouldUpdate()
+      dispatch.customerAccount.shouldUpdate()
       dispatch.bill.shouldUpdate()
     },
     async editReturnGoods(returnGoods: EditForm) {
       await request.put('/cancel', returnGoods)
       dispatch.returnGoods.loadReturnGoods()
       dispatch.checkIn.shouldUpdate()
+      dispatch.customerAccount.shouldUpdate()
       dispatch.bill.shouldUpdate()
     },
     async deleteReturnGoods(returnGoods: ReturnGoods) {
       await request.delete(`/cancel/${returnGoods.id}`)
       dispatch.returnGoods.loadReturnGoods()
       dispatch.checkIn.shouldUpdate()
+      dispatch.customerAccount.shouldUpdate()
       dispatch.bill.shouldUpdate()
     }
   })

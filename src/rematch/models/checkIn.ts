@@ -1,7 +1,7 @@
 import { createModel } from '@rematch/core'
 import type { RootModel } from '.'
 import axios, { CancelTokenSource } from 'axios'
-import dayjs from 'dayjs'
+import moment from 'moment'
 import { request } from '../../libs'
 import { Page } from '../../libs/request'
 import { GoodsProps } from './goods'
@@ -76,7 +76,7 @@ const getInitialAddForm = (): AddForm => ({
   warehouseId: undefined,
   supplierId: undefined,
   signer: '',
-  receivedTime: dayjs().valueOf(),
+  receivedTime: moment().valueOf(),
   discount: 1,
   paid: null,
   saveGoodsRecordList: Array(5).fill(getInitialGoods()),
@@ -88,7 +88,7 @@ const getInitialEditForm = (): EditForm => ({
   ...getInitialAddForm(),
   warehouseId: NaN,
   saveGoodsRecordList: [],
-  createTime: dayjs().valueOf()
+  createTime: moment().valueOf()
 })
 
 const state: State = {

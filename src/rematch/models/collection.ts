@@ -1,9 +1,42 @@
 import { createModel } from '@rematch/core'
 import type { RootModel } from '.'
 import axios, { CancelTokenSource } from 'axios'
-import dayjs from 'dayjs'
+import moment from 'moment'
 import { request } from '../../libs'
-import { Page } from '../../libs/request'
+import { NodePage, nodeRequest } from '../../libs/request'
+
+export enum PaymentPlatform {
+  WeChat = 'WeChat',
+  AliPay = 'AliPay',
+  ABC = 'ABC',
+  CCB = 'CCB',
+  ICBC = 'ICBC',
+  BCM = 'BCM',
+  RCC = 'RCC',
+  Others = 'Others'
+}
+
+export const paymentPlatforms = [
+  { value: PaymentPlatform.WeChat, label: '微信' },
+  { value: PaymentPlatform.AliPay, label: '支付宝' },
+  { value: PaymentPlatform.ABC, label: '农业银行' },
+  { value: PaymentPlatform.CCB, label: '建设银行' },
+  { value: PaymentPlatform.ICBC, label: '工商银行' },
+  { value: PaymentPlatform.BCM, label: '交通银行' },
+  { value: PaymentPlatform.RCC, label: '农村信用社' },
+  { value: PaymentPlatform.Others, label: '其他' }
+]
+
+export interface NodeCollection {
+  id: number
+  customer: { id: number, name: string }
+  amount: number
+  collectionTime: number
+  belongTime: number
+  payer: string | null
+  paymentPlatform: PaymentPlatform | null
+  remark: string | null
+}
 
 export interface Collection {
   id: number
@@ -12,6 +45,9 @@ export interface Collection {
   collection: number
   collectionTime: number
   goodsTime: number
+  payer: string | null | undefined
+  paymentPlatform: PaymentPlatform | null | undefined
+  remark: string | null | undefined
 }
 
 export interface AddForm {
@@ -19,6 +55,9 @@ export interface AddForm {
   collection: number | undefined
   collectionTime: number
   goodsTime: number
+  payer: string | null | undefined
+  paymentPlatform: PaymentPlatform | null | undefined
+  remark: string | null | undefined
 }
 
 export interface EditForm {
@@ -27,10 +66,15 @@ export interface EditForm {
   collection: number
   collectionTime: number
   goodsTime: number
+  payer: string | null | undefined
+  paymentPlatform: PaymentPlatform | null | undefined
+  remark: string | null | undefined
 }
 
 export interface Filter {
+  keyword: string
   customIds: number[]
+  paymentPlatform: PaymentPlatform | undefined
   startTime: string | null
   endTime: string | null
   pageNum: number
@@ -52,13 +96,18 @@ let cancelTokenSource: CancelTokenSource | undefined
 const getInitialAddForm = (): AddForm => ({
   customId: undefined,
   collection: undefined,
-  collectionTime: dayjs().valueOf(),
-  goodsTime: dayjs().valueOf()
+  collectionTime: moment().valueOf(),
+  goodsTime: moment().valueOf(),
+  payer: undefined,
+  paymentPlatform: undefined,
+  remark: undefined
 })
 
 const state: State = {
   filter: {
+    keyword: '',
     customIds: [],
+    paymentPlatform: undefined,
     startTime: null,
     endTime: null,
     pageNum: 1,
@@ -112,32 +161,64 @@ export const collection = createModel<RootModel>()({
       }
       const { filter: { customIds, ...filter }, pageNum, pageSize } = store.collection
       cancelTokenSource = axios.CancelToken.source()
-      const result = await request.get<Page<Collection>, Page<Collection>>('/collection/page', {
-        params: {
-          ...filter,
-          customIds: customIds.join(','),
-          pageNum,
-          pageSize
-        },
+      const result = await nodeRequest.post<NodePage<NodeCollection>, NodePage<NodeCollection>>('/collection/page', {
+        ...filter,
+        customerIds: customIds,
+        current: pageNum,
+        size: pageSize
+      }, {
         cancelToken: cancelTokenSource.token
       })
       cancelTokenSource = undefined
-      dispatch.collection.updateState(result || {})
+      dispatch.collection.updateState({
+        total: result.count,
+        data: result.rows.map<Collection>(c => ({
+          id: c.id,
+          customId: c.customer.id,
+          customName: c.customer.name,
+          collection: c.amount,
+          collectionTime: c.collectionTime,
+          goodsTime: c.belongTime,
+          payer: c.payer,
+          paymentPlatform: c.paymentPlatform,
+          remark: c.remark
+        }))
+      })
       dispatch.collection.updateFilter({ pageNum, pageSize })
     },
     async addCollection(collection: AddForm) {
-      await request.post('/collection', collection)
+      await nodeRequest.post('/collection/create', {
+        customerId: collection.customId,
+        amount: collection.collection,
+        belongTime: collection.goodsTime,
+        collectionTime: collection.collectionTime,
+        payer: collection.payer,
+        paymentPlatform: collection.paymentPlatform,
+        remark: collection.remark
+      })
       dispatch.collection.loadCollections()
+      dispatch.customerAccount.shouldUpdate()
       dispatch.bill.shouldUpdate()
     },
     async editCollection(collection: EditForm) {
-      await request.put('/collection', collection)
+      await nodeRequest.post('/collection/update', {
+        id: collection.id,
+        customerId: collection.customId,
+        amount: collection.collection,
+        belongTime: collection.goodsTime,
+        collectionTime: collection.collectionTime,
+        payer: collection.payer,
+        paymentPlatform: collection.paymentPlatform ?? null,
+        remark: collection.remark
+      })
       dispatch.collection.loadCollections()
+      dispatch.customerAccount.shouldUpdate()
       dispatch.bill.shouldUpdate()
     },
     async deleteCollection(collection: Collection) {
       await request.delete(`/collection/${collection.id}`)
       dispatch.collection.loadCollections()
+      dispatch.customerAccount.shouldUpdate()
       dispatch.bill.shouldUpdate()
     }
   })

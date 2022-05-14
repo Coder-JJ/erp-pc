@@ -7,6 +7,7 @@ import { customer } from './customer'
 import { goods } from './goods'
 import { checkIn } from './checkIn'
 import { checkOut } from './checkOut'
+import { customerAccount } from './customerAccount'
 import { collection } from './collection'
 import { returnGoods } from './returnGoods'
 import { bill } from './bill'
@@ -21,6 +22,7 @@ export interface RootModel extends Models<RootModel> {
   goods: typeof goods
   checkIn: typeof checkIn
   checkOut: typeof checkOut
+  customerAccount: typeof customerAccount
   collection: typeof collection
   returnGoods: typeof returnGoods
   bill: typeof bill
@@ -36,6 +38,7 @@ export const models: RootModel = {
   goods,
   checkIn,
   checkOut,
+  customerAccount,
   collection,
   returnGoods,
   bill,

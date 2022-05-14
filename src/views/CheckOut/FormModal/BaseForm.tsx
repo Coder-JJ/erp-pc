@@ -1,17 +1,17 @@
 import styles from './index.less'
 import React, { useCallback, useMemo } from 'react'
 import { useControllableValue } from 'ahooks'
-import { Modal, message, Form, Input, Table, InputNumber, Button } from 'antd'
+import { Modal, message, Form, Input, Table, InputNumber, Button, DatePicker } from 'antd'
 import { ModalProps } from 'antd/lib/modal'
 import { ColumnsType } from 'antd/lib/table'
 import { GetRowKey } from 'antd/lib/table/interface'
-import dayjs, { Dayjs } from 'dayjs'
+import moment from 'moment'
 import { useCustomers, useGoods } from '../../../hooks'
 import { Goods } from '../../../rematch/models/goods'
 import { Customer } from '../../../rematch/models/customer'
 import { AddForm as CheckOut, GoodsForm } from '../../../rematch/models/checkOut'
 import { getCheckOutPrice, getGoodsPrice } from '../../../utils'
-import { DatePicker, RepositorySelect, PriceInput, CustomerSelect, GoodsSelect } from '../../../components'
+import { RepositorySelect, PriceInput, CustomerSelect, GoodsSelect } from '../../../components'
 
 interface Props extends Omit<ModalProps, 'children'> {
   value: CheckOut
@@ -49,7 +49,7 @@ const BaseForm: React.FC<Props> = function(props) {
   }, [saving, setVisible])
 
   const addGoods = useCallback(() => onAddGoods(), [onAddGoods])
-  const onDealTimeChange = useCallback((value: Dayjs | null, dateString: string) => {
+  const onDealTimeChange = useCallback((value: moment.Moment | null, dateString: string) => {
     onChange('dealTime', value!.valueOf())
     onChange('receivedTime', value!.valueOf())
   }, [onChange])
@@ -75,7 +75,7 @@ const BaseForm: React.FC<Props> = function(props) {
   const onReceiverChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('receiver', e.target.value), [onChange])
   const onReceiverPhoneChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('receiverPhone', e.target.value), [onChange])
   const onReceivedAddressChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange('receivedAddress', e.target.value), [onChange])
-  const onReceivedTimeChange = useCallback((value: Dayjs | null, dateString: string) => onChange('receivedTime', value ? value.valueOf() : null), [onChange])
+  const onReceivedTimeChange = useCallback((value: moment.Moment | null, dateString: string) => onChange('receivedTime', value ? value.valueOf() : null), [onChange])
   const onGoodsPropChange = useCallback((index: number, key: keyof GoodsForm, value: any) => passedOnGoodsPropChange(index, key, value), [passedOnGoodsPropChange])
   const onSelectGoods = useCallback((index: number, record: GoodsForm, value: number | undefined, goods: Goods[]) => {
     onGoodsPropChange(index, 'goodsId', value)
@@ -246,7 +246,7 @@ const BaseForm: React.FC<Props> = function(props) {
         <Form>
           <div className={styles.spaceBetween}>
             <Form.Item className={styles.item} label='开单日期' required>
-              <DatePicker value={dayjs(value.dealTime)} onChange={onDealTimeChange} allowClear={false} placeholder='请选择开单日期' />
+              <DatePicker value={moment(value.dealTime)} onChange={onDealTimeChange} allowClear={false} placeholder='请选择开单日期' />
             </Form.Item>
             <Form.Item className={styles.item} label='单号'>
               <Input value={value.odd || ''} onChange={onOddChange} placeholder='请输入单号' />
@@ -267,7 +267,7 @@ const BaseForm: React.FC<Props> = function(props) {
               <RepositorySelect value={value.warehouseId} onChange={onRepositoryChange} onAdd={onRepositoryChange} addButtonVisible />
             </Form.Item>
             <Form.Item className={styles.item} label='收货时间' required>
-              <DatePicker value={value.receivedTime === null ? null : dayjs(value.receivedTime)} onChange={onReceivedTimeChange} placeholder='请选择收货时间' />
+              <DatePicker value={value.receivedTime === null ? null : moment(value.receivedTime)} onChange={onReceivedTimeChange} placeholder='请选择收货时间' />
             </Form.Item>
           </div>
           <div className={styles.spaceBetween}>

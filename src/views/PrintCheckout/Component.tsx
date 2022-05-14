@@ -1,7 +1,7 @@
 import styles from './index.less'
 import React, { useEffect, useMemo, useState } from 'react'
 import { useUpdateEffect } from 'ahooks'
-import dayjs from 'dayjs'
+import moment from 'moment'
 import { CheckOut, getInitialGoods } from '../../rematch/models/checkOut'
 import { getCheckOutPrice } from '../../utils'
 
@@ -30,7 +30,7 @@ const PrintCheckout: React.FC = function() {
     }
   }, [])
 
-  const date = useMemo(() => data?.dealTime ? dayjs(data.dealTime) : undefined, [data])
+  const date = useMemo(() => data?.dealTime ? moment(data.dealTime) : undefined, [data])
   const totalPrice = useMemo(() => data ? getCheckOutPrice(data) : 0, [data])
 
   return (

@@ -1,8 +1,7 @@
-import 'antd/lib/date-picker/style/index'
-import dayjsGenerateConfig from 'rc-picker/lib/generate/dayjs'
-import generatePicker from 'antd/lib/date-picker/generatePicker'
-import { Dayjs } from 'dayjs'
+import dateFnsGenerateConfig from 'rc-picker/es/generate/dateFns'
+import generatePicker from 'antd/es/date-picker/generatePicker'
+import 'antd/es/date-picker/style/index'
 
-const DatePicker = generatePicker<Dayjs>(dayjsGenerateConfig)
+const DatePicker = generatePicker<Date>(dateFnsGenerateConfig)
 
 export default DatePicker

@@ -5,7 +5,7 @@ import { Button, Popconfirm, Pagination, Table, Form } from 'antd'
 import { ColumnsType } from 'antd/lib/table'
 import { ExpandableConfig } from 'antd/lib/table/interface'
 import { debounce } from 'lodash'
-import dayjs from 'dayjs'
+import moment from 'moment'
 import { RootState, Dispatch } from '../../rematch'
 import { Goods, ReturnGoods } from '../../rematch/models/returnGoods'
 import { getReturnGoodsPriceDisplay, getGoodsPriceDisplay } from '../../utils'
@@ -60,7 +60,7 @@ const Component: React.FC = function() {
       dataIndex: 'cancelTime',
       title: '退货日期',
       render(cancelTime, record) {
-        return dayjs(cancelTime).format('YYYY-MM-DD')
+        return moment(cancelTime).format('YYYY-MM-DD')
       }
     },
     {

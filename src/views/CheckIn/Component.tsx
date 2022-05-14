@@ -5,7 +5,7 @@ import { Input, Button, Popconfirm, Pagination, Form } from 'antd'
 import Table, { ColumnsType } from 'antd/lib/table'
 import { ExpandableConfig } from 'antd/lib/table/interface'
 import { debounce } from 'lodash'
-import dayjs from 'dayjs'
+import moment from 'moment'
 import { RootState, Dispatch } from '../../rematch'
 import { Goods, CheckIn } from '../../rematch/models/checkIn'
 import { getCheckInPriceDisplay, getGoodsPriceDisplay } from '../../utils'
@@ -43,7 +43,7 @@ const Component: React.FC = function() {
       dataIndex: 'receivedTime',
       title: '签收时间',
       render(receivedTime, record) {
-        return dayjs(receivedTime).format('YYYY-MM-DD')
+        return moment(receivedTime).format('YYYY-MM-DD')
       }
     },
     {

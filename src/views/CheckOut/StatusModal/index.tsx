@@ -39,7 +39,7 @@ const StatusModal: React.FC<Props> = function(props) {
       if (current === 3) {
         return Modal.confirm({
           title: '是否确定已收款？',
-          content: <Alert type='warning' message='收款后不计入账单待收金额！' />,
+          content: <Alert type='warning' message='标记收款后不计入账单待收金额！' />,
           onOk() {
             setLoading(true)
             dispatch.checkOut.setCheckOutState({ id: checkOut.id, state: status[current] }).then(resolve)
@@ -48,7 +48,7 @@ const StatusModal: React.FC<Props> = function(props) {
       } else if (current === 4) {
         return Modal.confirm({
           title: '是否确定作废？',
-          content: <Alert type='warning' message='作废后不可撤销！' />,
+          content: <Alert type='warning' message='标记作废后不可撤销！' />,
           onOk() {
             setLoading(true)
             dispatch.checkOut.cancelCheckOut(checkOut).then(resolve)

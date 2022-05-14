@@ -1,25 +1,23 @@
 import styles from './index.less'
 import React, { useMemo, useCallback, useRef, useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { Form, Button, Row, Col, message, Space, Switch } from 'antd'
+import { Form, Button, Row, Col, message, Space, Switch, DatePicker } from 'antd'
 import { useMount, usePersistFn } from 'ahooks'
-import dayjs, { Dayjs } from 'dayjs'
+import moment from 'moment'
 import { RootState, Dispatch } from '../../rematch'
 import { SearchMode } from '../../rematch/models/bill'
-import { CustomerSelect, GoodsSelect, DatePicker } from '../../components'
+import { CustomerSelect, GoodsSelect } from '../../components'
 import BillPreview from '../../components/BillPreview'
 import exportExcelHandler from './exportExcel'
-import { nodeRequest } from '../../libs/request'
 
 const Component: React.FC = function() {
   const { shouldUpdate, displayFilter, searchMode, exceptCustomers, checkOuts, returnGoods, collections, filter } = useSelector((store: RootState) => store.bill)
   const loading = useSelector((store: RootState) => store.loading.effects.bill.loadBill)
-  const startDate = useMemo(() => dayjs(displayFilter.startTime), [displayFilter.startTime])
-  const endDate = useMemo(() => dayjs(displayFilter.endTime), [displayFilter.endTime])
+  const startDate = useMemo(() => moment(displayFilter.startTime), [displayFilter.startTime])
+  const endDate = useMemo(() => moment(displayFilter.endTime), [displayFilter.endTime])
 
   const dispatch = useDispatch<Dispatch>()
   useMount(() => {
-    nodeRequest.get('/test')
     if (filter && shouldUpdate) {
       dispatch.bill.updateBill()
     }
@@ -40,22 +38,22 @@ const Component: React.FC = function() {
   const onGoodsChange = useCallback((goodsIds: number[]) => {
     dispatch.bill.updateFilter({ goodsIds })
   }, [dispatch.bill])
-  const onStartTimeChange = useCallback((value: Dayjs | null) => {
-    dispatch.bill.updateFilter({ startTime: dayjs(value!).startOf('d').format('YYYY-MM-DD HH:mm:ss') })
+  const onStartTimeChange = useCallback((value: moment.Moment | null) => {
+    dispatch.bill.updateFilter({ startTime: moment(value).startOf('d').format('YYYY-MM-DD HH:mm:ss') })
   }, [dispatch.bill])
-  const onEndTimeChange = useCallback((value: Dayjs | null) => {
-    dispatch.bill.updateFilter({ endTime: dayjs(value!).endOf('d').format('YYYY-MM-DD HH:mm:ss') })
+  const onEndTimeChange = useCallback((value: moment.Moment | null) => {
+    dispatch.bill.updateFilter({ endTime: moment(value).endOf('d').format('YYYY-MM-DD HH:mm:ss') })
   }, [dispatch.bill])
   const setCurrentMonth = useCallback(() => {
     dispatch.bill.updateFilter({
-      startTime: dayjs().startOf('M').startOf('d').format('YYYY-MM-DD HH:mm:ss'),
-      endTime: dayjs().endOf('M').endOf('d').format('YYYY-MM-DD HH:mm:ss')
+      startTime: moment().startOf('M').startOf('d').format('YYYY-MM-DD HH:mm:ss'),
+      endTime: moment().endOf('M').endOf('d').format('YYYY-MM-DD HH:mm:ss')
     })
   }, [dispatch.bill])
   const setPrevMonth = useCallback(() => {
     dispatch.bill.updateFilter({
-      startTime: dayjs().subtract(1, 'M').startOf('M').startOf('d').format('YYYY-MM-DD HH:mm:ss'),
-      endTime: dayjs().subtract(1, 'M').endOf('M').endOf('d').format('YYYY-MM-DD HH:mm:ss')
+      startTime: moment().subtract(1, 'M').startOf('M').startOf('d').format('YYYY-MM-DD HH:mm:ss'),
+      endTime: moment().subtract(1, 'M').endOf('M').endOf('d').format('YYYY-MM-DD HH:mm:ss')
     })
   }, [dispatch.bill])
 
@@ -132,7 +130,7 @@ const Component: React.FC = function() {
             </Col>
             <Col span={8}>
               <Form.Item label='货物'>
-                <GoodsSelect<number[]> className={styles.select} value={displayFilter.goodsIds} onChange={onGoodsChange} mode='multiple' allowClear placeholder='请选择货物' />
+                <GoodsSelect<number[]> className={styles.select} value={displayFilter.goodsIds} onChange={onGoodsChange} mode='multiple' autoClearSearchValue={false} allowClear placeholder='请选择货物' />
               </Form.Item>
             </Col>
           </Row>

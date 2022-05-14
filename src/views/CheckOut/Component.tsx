@@ -6,7 +6,7 @@ import { ColumnsType } from 'antd/lib/table'
 import { ExpandableConfig } from 'antd/lib/table/interface'
 import { DownOutlined } from '@ant-design/icons'
 import { debounce } from 'lodash'
-import dayjs from 'dayjs'
+import moment from 'moment'
 import { RootState, Dispatch } from '../../rematch'
 import { Goods, CheckOut, checkOutStateNameMap, CheckOutState } from '../../rematch/models/checkOut'
 import { getCheckOutPriceDisplay, getGoodsPriceDisplay } from '../../utils'
@@ -83,7 +83,7 @@ const Component: React.FC = function() {
       dataIndex: 'dealTime',
       title: '开单日期',
       render(dealTime, record) {
-        return dayjs(dealTime).format('YYYY-MM-DD')
+        return moment(dealTime).format('YYYY-MM-DD')
       }
     },
     // {

@@ -1,7 +1,7 @@
 import './index.less'
 import React, { useEffect, useState } from 'react'
 import { useUpdateEffect } from 'ahooks'
-import dayjs from 'dayjs'
+import moment from 'moment'
 import { CheckOut } from '../../rematch/models/checkOut'
 import { ReturnGoods } from '../../rematch/models/returnGoods'
 import { Collection } from '../../rematch/models/collection'
@@ -10,18 +10,19 @@ import BillPreview from '../../components/BillPreview'
 
 const PrintBill: React.FC = function() {
   const [filter, setFilter] = useState<Filter | undefined>()
-  const [checkOuts, setCheckOuts] = useState<CheckOut[]>([])
-  const [returnGoods, setReturnGoods] = useState<ReturnGoods[]>([])
-  const [collections, setCollections] = useState<Collection[]>([])
+  const [checkOuts, setCheckOuts] = useState<CheckOut[] | undefined>()
+  const [returnGoods, setReturnGoods] = useState<ReturnGoods[] | undefined>()
+  const [collections, setCollections] = useState<Collection[] | undefined>()
 
   useUpdateEffect(() => {
-    if (checkOuts.length || returnGoods.length || collections.length) {
+    if (filter && checkOuts && returnGoods && collections) {
       window.print()
-      setCheckOuts([])
-      setReturnGoods([])
-      setCollections([])
+      setFilter(undefined)
+      setCheckOuts(undefined)
+      setReturnGoods(undefined)
+      setCollections(undefined)
     }
-  }, [checkOuts.length, returnGoods.length, collections.length])
+  }, [filter, checkOuts, returnGoods, collections])
 
   useEffect(() => {
     const onMessage = (e: MessageEvent<{ filter: Filter, checkOuts: CheckOut[], returnGoods: ReturnGoods[], collections: Collection[] }>): void => {
@@ -37,7 +38,7 @@ const PrintBill: React.FC = function() {
     }
   }, [])
 
-  return <BillPreview checkOuts={checkOuts} returnGoods={returnGoods} collections={collections} startDate={filter?.startTime ? dayjs(filter.startTime) : dayjs()} endDate={filter?.endTime ? dayjs(filter.endTime) : dayjs()} />
+  return <BillPreview checkOuts={checkOuts || []} returnGoods={returnGoods || []} collections={collections || []} startDate={filter?.startTime ? moment(filter.startTime) : moment()} endDate={filter?.endTime ? moment(filter.endTime) : moment()} />
 }
 
 export default React.memo(PrintBill)

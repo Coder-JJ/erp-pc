@@ -1,15 +1,16 @@
 import styles from './index.less'
 import React, { useMemo, useCallback, useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { Button, Popconfirm, Pagination, Form } from 'antd'
+import { Button, Popconfirm, Pagination, Form, Input, Select } from 'antd'
 import { ColumnsType } from 'antd/lib/table'
 import { debounce } from 'lodash'
-import dayjs from 'dayjs'
+import moment from 'moment'
 import { RootState, Dispatch } from '../../rematch'
-import { Collection } from '../../rematch/models/collection'
+import { Collection, PaymentPlatform, paymentPlatforms } from '../../rematch/models/collection'
 import { useFooter } from '../../hooks'
 import { ScrollTable, CustomerSelect } from '../../components'
 import { AddForm, EditForm } from './FormModal'
+import { usePersistFn } from 'ahooks'
 
 const Component: React.FC = function() {
   const { filter, data, total, pageNum, pageSize } = useSelector((store: RootState) => store.collection)
@@ -24,11 +25,21 @@ const Component: React.FC = function() {
   }, [total, dispatch.collection])
 
   const debouncedLoadCollections = useMemo(() => debounce<() => void>(dispatch.collection.loadCollections, 250), [dispatch.collection.loadCollections])
+  const onKeywordChange = usePersistFn<React.ChangeEventHandler<HTMLInputElement>>(e => {
+    dispatch.collection.updateFilter({ keyword: e.target.value })
+    dispatch.collection.updateState({ pageNum: 1 })
+    debouncedLoadCollections()
+  })
   const onCustomersChange = useCallback((customIds: number[]) => {
     dispatch.collection.updateFilter({ customIds })
     dispatch.collection.updateState({ pageNum: 1 })
     debouncedLoadCollections()
   }, [dispatch.collection, debouncedLoadCollections])
+  const onPaymentPlatformChange = usePersistFn((paymentPlatform: PaymentPlatform) => {
+    dispatch.collection.updateFilter({ paymentPlatform })
+    dispatch.collection.updateState({ pageNum: 1 })
+    debouncedLoadCollections()
+  })
 
   const [onDeleteId, setDeleteId] = useState<number | undefined>()
 
@@ -54,15 +65,31 @@ const Component: React.FC = function() {
       dataIndex: 'goodsTime',
       title: '货款年月',
       render(value) {
-        return dayjs(value).format('YYYY-MM')
+        return moment(value).format('YYYY-MM')
       }
     },
     {
       dataIndex: 'collectionTime',
       title: '打款时间',
       render(value) {
-        return dayjs(value).format('YYYY-MM-DD')
+        return moment(value).format('YYYY-MM-DD')
       }
+    },
+    {
+      dataIndex: 'payer',
+      title: '打款人/账号'
+    },
+    {
+      dataIndex: 'paymentPlatform',
+      title: '打款平台',
+      render(value) {
+        return paymentPlatforms.find(p => p.value === value)?.label || ''
+      }
+    },
+    {
+      dataIndex: 'remark',
+      title: '备注',
+      ellipsis: true
     },
     {
       dataIndex: 'id',
@@ -99,8 +126,18 @@ const Component: React.FC = function() {
     <div className={styles.wrap}>
       <header className={styles.header}>
         <Form layout='inline'>
+          <Form.Item label='关键字'>
+            <Input className={styles.input} value={filter.keyword} onChange={onKeywordChange} placeholder='请输入关键字' />
+          </Form.Item>
           <Form.Item label='客户/商标'>
             <CustomerSelect<number[]> className={styles.select} value={filter.customIds} onChange={onCustomersChange} mode='multiple' maxTagCount={5} allowClear placeholder='请选择客户/商标' />
+          </Form.Item>
+          <Form.Item label='打款平台'>
+            <Select<PaymentPlatform> className={styles.select} value={filter.paymentPlatform} onChange={onPaymentPlatformChange} allowClear placeholder='请选择打款平台'>
+              {
+                paymentPlatforms.map(p => <Select.Option key={p.value} value={p.value}>{ p.label }</Select.Option>)
+              }
+            </Select>
           </Form.Item>
         </Form>
       </header>

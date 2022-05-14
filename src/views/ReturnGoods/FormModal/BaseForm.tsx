@@ -1,16 +1,16 @@
 import styles from './index.less'
 import React, { useCallback, useMemo } from 'react'
 import { useControllableValue } from 'ahooks'
-import { Modal, message, Form, Input, Table, InputNumber, Button } from 'antd'
+import { Modal, message, Form, Input, Table, InputNumber, Button, DatePicker } from 'antd'
 import { ModalProps } from 'antd/lib/modal'
 import { ColumnsType } from 'antd/lib/table'
 import { GetRowKey } from 'antd/lib/table/interface'
-import dayjs, { Dayjs } from 'dayjs'
+import moment from 'moment'
 import { useGoods } from '../../../hooks'
 import { Goods } from '../../../rematch/models/goods'
 import { AddForm as ReturnGoods, GoodsForm } from '../../../rematch/models/returnGoods'
 import { getReturnGoodsPriceDisplay, getGoodsPriceDisplay } from '../../../utils'
-import { DatePicker, PriceInput, CustomerSelect, GoodsSelect } from '../../../components'
+import { PriceInput, CustomerSelect, GoodsSelect } from '../../../components'
 
 interface Props extends Omit<ModalProps, 'children'> {
   value?: ReturnGoods
@@ -36,7 +36,7 @@ const BaseForm: React.FC<Props> = function(props) {
     !saving && setVisible(false)
   }, [saving, setVisible])
 
-  const onReturnTimeChange = useCallback((value: Dayjs | null, dateString: string) => {
+  const onReturnTimeChange = useCallback((value: moment.Moment | null, dateString: string) => {
     onChange('cancelTime', value!.valueOf())
   }, [onChange])
   const onCustomerChange = useCallback((value: number) => onChange('customId', value), [onChange])
@@ -190,7 +190,7 @@ const BaseForm: React.FC<Props> = function(props) {
       <Modal wrapClassName={styles.wrap} visible={visible} onOk={onOk} onCancel={closeModal} width={1000} confirmLoading={saving} {...modalProps}>
         <Form>
           <Form.Item className={styles.item} label='退货日期' required>
-            <DatePicker value={value ? dayjs(value.cancelTime) : null} onChange={onReturnTimeChange} allowClear={false} placeholder='请选择开单日期' />
+            <DatePicker value={value ? moment(value.cancelTime) : null} onChange={onReturnTimeChange} allowClear={false} placeholder='请选择开单日期' />
           </Form.Item>
           <div className={styles.spaceBetween}>
             <Form.Item className={styles.item} label='客户/商标' required>

@@ -1,7 +1,7 @@
 import { createModel } from '@rematch/core'
 import type { RootModel } from '.'
 import axios, { CancelTokenSource } from 'axios'
-import dayjs from 'dayjs'
+import moment from 'moment'
 import { request } from '../../libs'
 import { Page } from '../../libs/request'
 import { GoodsProps } from './goods'
@@ -109,14 +109,14 @@ export const getInitialGoods = (): GoodsForm => ({
 
 const getInitialAddForm = (): AddForm => ({
   odd: '',
-  dealTime: dayjs().valueOf(),
+  dealTime: moment().valueOf(),
   warehouseId: undefined,
   customId: undefined,
   receiverId: undefined,
   receiver: null,
   receiverPhone: null,
   receivedAddress: null,
-  receivedTime: dayjs().valueOf(),
+  receivedTime: moment().valueOf(),
   fetchGoodsRecordList: [],
   discount: 1,
   paid: null,
@@ -131,7 +131,7 @@ const getInitialEditForm = (): EditForm => ({
   ...getInitialAddForm(),
   warehouseId: NaN,
   fetchGoodsRecordList: [],
-  createTime: dayjs().valueOf()
+  createTime: moment().valueOf()
 })
 
 const state: State = {
@@ -259,6 +259,7 @@ export const checkOut = createModel<RootModel>()({
       await request.post('/repertory/fetchAndSaveRecord/insert', checkOut)
       dispatch.checkOut.loadCheckOuts()
       dispatch.checkIn.shouldUpdate()
+      dispatch.customerAccount.shouldUpdate()
       dispatch.bill.shouldUpdate()
       dispatch.stock.shouldUpdate()
       dispatch.stock.detailShouldUpdate(checkOut.warehouseId!)
@@ -267,6 +268,7 @@ export const checkOut = createModel<RootModel>()({
       await request.put('/repertory/fetchAndSaveRecord/update', checkOut)
       dispatch.checkOut.loadCheckOuts()
       dispatch.checkIn.shouldUpdate()
+      dispatch.customerAccount.shouldUpdate()
       dispatch.bill.shouldUpdate()
       dispatch.stock.shouldUpdate()
       dispatch.stock.detailShouldUpdate(checkOut.warehouseId)
@@ -274,12 +276,14 @@ export const checkOut = createModel<RootModel>()({
     async setCheckOutState({ id, state }: { id: number, state: CheckOutState }) {
       await request.patch(`/repertory/fetchRecord/status/${id}?state=${state}`)
       dispatch.checkOut.loadCheckOuts()
+      dispatch.customerAccount.shouldUpdate()
       dispatch.bill.shouldUpdate()
     },
     async cancelCheckOut(checkOut: CheckOut) {
       await request.patch(`/repertory/fetchAndSaveRecord/cancel/${checkOut.id}`)
       dispatch.checkOut.loadCheckOuts()
       dispatch.checkIn.shouldUpdate()
+      dispatch.customerAccount.shouldUpdate()
       dispatch.bill.shouldUpdate()
       dispatch.stock.shouldUpdate()
       dispatch.stock.detailShouldUpdate(checkOut.warehouseId)
@@ -288,6 +292,7 @@ export const checkOut = createModel<RootModel>()({
       await request.delete(`/repertory/fetchAndSaveRecord/delete/${checkOut.id}`)
       dispatch.checkOut.loadCheckOuts()
       dispatch.checkIn.shouldUpdate()
+      dispatch.customerAccount.shouldUpdate()
       dispatch.bill.shouldUpdate()
       dispatch.stock.shouldUpdate()
       dispatch.stock.detailShouldUpdate(checkOut.warehouseId)

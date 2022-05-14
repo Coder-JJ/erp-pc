@@ -1,6 +1,6 @@
 import { createModel } from '@rematch/core'
 import { message } from 'antd'
-import dayjs from 'dayjs'
+import moment from 'moment'
 import axios, { CancelTokenSource } from 'axios'
 import { request } from '../../libs'
 import type { RootModel } from '.'
@@ -67,8 +67,8 @@ const getInitialState = (): State => {
       customIds: [],
       receiverIds: [],
       goodsIds: [],
-      startTime: dayjs().subtract(1, 'M').startOf('M').startOf('d').format('YYYY-MM-DD HH:mm:ss'),
-      endTime: dayjs().subtract(1, 'M').endOf('M').endOf('d').format('YYYY-MM-DD HH:mm:ss')
+      startTime: moment().subtract(1, 'M').startOf('M').startOf('d').format('YYYY-MM-DD HH:mm:ss'),
+      endTime: moment().subtract(1, 'M').endOf('M').endOf('d').format('YYYY-MM-DD HH:mm:ss')
     },
     searchMode: SearchMode.Normal,
     exceptCustomers: [],
