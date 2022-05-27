@@ -6,6 +6,7 @@ import { RootState, Dispatch } from '../../../rematch'
 import { Collection } from '../../../rematch/models/collection'
 
 export interface Props extends Omit<ModalProps, 'children'> {
+  record: Collection | undefined
   children?: React.ReactElement
 }
 

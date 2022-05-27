@@ -11,6 +11,7 @@ import { FlatCustomerAccount, FullCustomerAccount } from '../../../rematch/model
 
 interface Props extends Omit<ModalProps, 'children'> {
   value?: Collection
+  record?: Collection
   customerAccount?: FlatCustomerAccount
   saving: boolean
   onOpen?(): void
@@ -24,7 +25,7 @@ export interface State {
 }
 
 const BaseForm: React.FC<Props> = function(props) {
-  const { value, customerAccount, saving, onOpen, onChange, onSave, children, ...modalProps } = props
+  const { value, record, customerAccount, saving, onOpen, onChange, onSave, children, ...modalProps } = props
 
   const [state, setState] = useSetState<State>({
     customerAccount: null
@@ -77,6 +78,8 @@ const BaseForm: React.FC<Props> = function(props) {
 
   const valueCollection = useRef<number>()
   valueCollection.current = value?.collection
+  const recordRef = useRef(record)
+  recordRef.current = record
   const lockCustomerAccountRef = useRef<boolean>()
   lockCustomerAccountRef.current = !!customerAccount
   useEffect(() => {
@@ -85,14 +88,19 @@ const BaseForm: React.FC<Props> = function(props) {
         customerId: value.customId,
         billMonth: value.goodsTime
       }).then(customerAccount => {
+        if (customerAccount && recordRef.current && customerAccount.billMonth === moment(recordRef.current.goodsTime).format('YYYY-MM')) {
+          // eslint-disable-next-line
+          customerAccount.paidAmount -= recordRef.current?.collection || 0
+        }
         setState({ customerAccount })
         if (!customerAccount) {
           return onChange('collection', undefined)
         }
         const restAmount = customerAccount.billAmount - customerAccount.paidAmount - customerAccount.refundAmount
-        if (typeof valueCollection.current !== 'number' || valueCollection.current > restAmount) {
-          onChange('collection', restAmount)
-        }
+        onChange('collection', restAmount)
+        // if (typeof valueCollection.current !== 'number' || valueCollection.current > restAmount) {
+        //   onChange('collection', restAmount)
+        // }
       })
     }
   }, [visible, value?.customId, value?.goodsTime, dispatch.customerAccount, setState, onChange])

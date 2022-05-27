@@ -44,12 +44,15 @@ const Component: React.FC = function() {
   const [onDeleteId, setDeleteId] = useState<number | undefined>()
 
   const [editFormVisible, setEditFormVisible] = useState(false)
+  const [editFormRecord, setEditFormRecord] = useState<Collection>()
   const openEditForm = useCallback((record: Collection) => {
     dispatch.collection.setEditForm(record)
+    setEditFormRecord(record)
     setEditFormVisible(true)
   }, [dispatch.collection])
   const closeEditForm = useCallback(() => {
     setEditFormVisible(false)
+    setEditFormRecord(undefined)
   }, [])
 
   const columns = useMemo<ColumnsType<Collection>>(() => [
@@ -156,7 +159,7 @@ const Component: React.FC = function() {
           </>
         )
       }
-      <EditForm visible={editFormVisible} onCancel={closeEditForm} />
+      <EditForm visible={editFormVisible} record={editFormRecord} onCancel={closeEditForm} />
     </div>
   )
 }
