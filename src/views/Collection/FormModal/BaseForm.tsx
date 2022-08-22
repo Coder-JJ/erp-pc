@@ -86,7 +86,7 @@ const BaseForm: React.FC<Props> = function(props) {
     if (!lockCustomerAccountRef.current && visible && typeof value?.customId === 'number' && typeof value?.goodsTime === 'number') {
       dispatch.customerAccount.loadCustomerAccount({
         customerId: value.customId,
-        billMonth: value.goodsTime
+        billMonth: moment(value.goodsTime).format('YYYY-MM')
       }).then(customerAccount => {
         if (customerAccount && recordRef.current && customerAccount.billMonth === moment(recordRef.current.goodsTime).format('YYYY-MM')) {
           // eslint-disable-next-line

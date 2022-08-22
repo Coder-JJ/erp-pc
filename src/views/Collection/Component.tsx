@@ -9,8 +9,13 @@ import { RootState, Dispatch } from '../../rematch'
 import { Collection, PaymentPlatform, paymentPlatforms } from '../../rematch/models/collection'
 import { useFooter } from '../../hooks'
 import { ScrollTable, CustomerSelect } from '../../components'
-import { AddForm, EditForm } from './FormModal'
-import { usePersistFn } from 'ahooks'
+import { usePersistFn, useSetState } from 'ahooks'
+import ProForm from './ProForm'
+
+export interface State {
+  formVisible: boolean
+  formData: Collection | undefined
+}
 
 const Component: React.FC = function() {
   const { filter, data, total, pageNum, pageSize } = useSelector((store: RootState) => store.collection)
@@ -41,20 +46,18 @@ const Component: React.FC = function() {
     debouncedLoadCollections()
   })
 
+  const [state, setState] = useSetState<State>({
+    formVisible: false,
+    formData: undefined
+  })
+  const closeForm = usePersistFn(() => {
+    setState({
+      formVisible: false,
+      formData: undefined
+    })
+  })
+
   const [onDeleteId, setDeleteId] = useState<number | undefined>()
-
-  const [editFormVisible, setEditFormVisible] = useState(false)
-  const [editFormRecord, setEditFormRecord] = useState<Collection>()
-  const openEditForm = useCallback((record: Collection) => {
-    dispatch.collection.setEditForm(record)
-    setEditFormRecord(record)
-    setEditFormVisible(true)
-  }, [dispatch.collection])
-  const closeEditForm = useCallback(() => {
-    setEditFormVisible(false)
-    setEditFormRecord(undefined)
-  }, [])
-
   const columns = useMemo<ColumnsType<Collection>>(() => [
     { dataIndex: 'customName', title: '客户/商标' },
     {
@@ -100,7 +103,7 @@ const Component: React.FC = function() {
       render(id, record) {
         return (
           <>
-            <Button type='link' size='small' onClick={() => openEditForm(record)}>编辑</Button>
+            <Button type='link' size='small' onClick={() => setState({ formVisible: true, formData: record })}>编辑</Button>
             <Popconfirm
               visible={id === onDeleteId}
               onVisibleChange={visible => setDeleteId(visible || deleting ? id : undefined)}
@@ -116,7 +119,7 @@ const Component: React.FC = function() {
         )
       }
     }
-  ], [dispatch.collection, onDeleteId, deleting, openEditForm])
+  ], [dispatch.collection, onDeleteId, deleting, setState])
 
   const renderFooter = useFooter()
 
@@ -150,16 +153,14 @@ const Component: React.FC = function() {
       {
         renderFooter(
           <>
-            <AddForm>
-              <Button type='primary'>新增</Button>
-            </AddForm>
+            <Button type='primary' onClick={() => setState({ formVisible: true })}>新增</Button>
             {
               !!total && <Pagination current={pageNum} pageSize={pageSize} total={total} onChange={onPaginationChange} />
             }
           </>
         )
       }
-      <EditForm visible={editFormVisible} record={editFormRecord} onCancel={closeEditForm} />
+      <ProForm visible={state.formVisible} collection={state.formData} onSuccess={closeForm} modalProps={{ onCancel: closeForm }} />
     </div>
   )
 }

@@ -8,11 +8,28 @@ import { RootState, Dispatch } from '../../rematch'
 import { FlatCustomerAccount } from '../../rematch/models/customerAccount'
 import { useFooter } from '../../hooks'
 import { ScrollTable } from '../../components'
-import { AddForm } from '../Collection/FormModal'
+import ProForm from '../Collection/ProForm'
+import { usePersistFn, useSetState } from 'ahooks'
+
+export interface State {
+  collectionFormVisible: boolean
+  collectionFormData: FlatCustomerAccount | undefined
+}
 
 const Component: React.FC = function() {
   const { didMount, shouldUpdate, filter, rows, count, current, size } = useSelector((store: RootState) => store.customerAccount)
   const loading = useSelector((store: RootState) => store.loading.effects.customerAccount.loadCustomerAccounts)
+
+  const [state, setState] = useSetState<State>({
+    collectionFormVisible: false,
+    collectionFormData: undefined
+  })
+  const closeCollectionForm = usePersistFn(() => {
+    setState({
+      collectionFormVisible: false,
+      collectionFormData: undefined
+    })
+  })
 
   const dispatch = useDispatch<Dispatch>()
   useEffect(() => {
@@ -55,13 +72,11 @@ const Component: React.FC = function() {
       width: 110,
       render(id, record) {
         return (
-          <AddForm customerAccount={record}>
-            <Button type='link' size='small'>收款登记</Button>
-          </AddForm>
+          <Button type='link' onClick={() => setState({ collectionFormVisible: true, collectionFormData: record })} size='small'>收款登记</Button>
         )
       }
     }
-  ], [])
+  ], [setState])
 
   const renderFooter = useFooter()
 
@@ -90,6 +105,7 @@ const Component: React.FC = function() {
           </>
         )
       }
+      <ProForm visible={state.collectionFormVisible} customerAccount={state.collectionFormData} onSuccess={closeCollectionForm} modalProps={{ onCancel: closeCollectionForm }} />
     </div>
   )
 }

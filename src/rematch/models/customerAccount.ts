@@ -37,7 +37,7 @@ export interface Filter {
 
 export interface FindOneParams {
   customerId: number
-  billMonth: number
+  billMonth: string
 }
 
 export interface State {

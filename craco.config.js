@@ -5,26 +5,34 @@ const StylelintPlugin = require('stylelint-webpack-plugin')
 const LessPlugin = require('craco-less')
 const ReactHotReloadPlugin = require('craco-plugin-react-hot-reload')
 const AntDesignPlugin = require('craco-antd')
-// const AntdDayjsWebpackPlugin = require('antd-dayjs-webpack-plugin')
-const packageName = require('./package.json').name
 
 module.exports = function ({ env }) {
   return {
+    devServer: {
+      proxy: {
+        '/java-api': {
+          target: 'http://47.96.119.79:8045',
+          changeOrigin: true,
+          pathRewrite: {
+            '^/java-api': ''
+          }
+        },
+        '/node-api': {
+          target: 'http://47.96.119.79:8080',
+          changeOrigin: true,
+          pathRewrite: {
+            '^/node-api': ''
+          }
+        }
+      }
+    },
     webpack: {
-      // configure: {
-      //   output: {
-      //     library: packageName,
-      //     libraryTarget: 'umd',
-      //     jsonpFunction: `webpackJsonp_${packageName}`
-      //   }
-      // },
       plugins: [
         new WebpackBar({ profile: true }),
         ...(process.env.NODE_ENV === 'development' ? [new BundleAnalyzerPlugin({ openAnalyzer: false })] : []),
         new StylelintPlugin({
           files: 'src/**/*.(c|le)ss'
         }),
-        // new AntdDayjsWebpackPlugin()
       ]
     },
     eslint: {
